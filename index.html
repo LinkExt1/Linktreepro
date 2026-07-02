@@ -254,6 +254,10 @@
             object-fit: cover;
             background: #0a0b10;
             display: block;
+            transition: opacity 0.2s;
+        }
+        .avatar-uploading {
+            opacity: 0.5;
         }
         .link-item {
             background: rgba(255,255,255,0.03);
@@ -468,9 +472,14 @@
                         </div>
                     </div>
                 </div>
+                <!-- NOUVEAU : Upload avatar -->
                 <div class="input-group mt-2">
-                    <label>URL photo de profil</label>
-                    <input type="url" class="input-field" id="dashboard-photo" placeholder="https://...">
+                    <label>Photo de profil</label>
+                    <input type="file" id="avatar-input" accept="image/*" style="display:none;">
+                    <button class="btn btn-outline" id="btn-upload-avatar" style="justify-content: center;">
+                        <i class="fas fa-camera"></i> Changer ma photo
+                    </button>
+                    <small style="color:var(--text-secondary); font-size:0.75rem; margin-top:0.3rem;">Formats acceptés : JPG, PNG, GIF (max 5 Mo)</small>
                 </div>
                 <div class="input-group mt-2">
                     <label>Biographie</label>
@@ -504,6 +513,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase Storage Compat (ajout) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
     <script>
         (function() {
@@ -520,6 +531,7 @@
             firebase.initializeApp(firebaseConfig);
             const auth = firebase.auth();
             const db = firebase.firestore();
+            const storage = firebase.storage(); // initialisation du storage compat
 
             // --- Plateformes disponibles ---
             const PLATFORMS = [
@@ -586,14 +598,12 @@
                         userProfile._id = uid;
                         return userProfile;
                     } else {
-                        // Document inexistant, on renvoie null pour le créer ensuite
                         userProfile = null;
                         return null;
                     }
                 } catch (error) {
                     console.warn('Erreur Firestore (lecture profil) :', error);
                     userProfile = null;
-                    // Ne pas bloquer : on prévient l'utilisateur
                     showToast('Profil non synchronisé. Mode hors-ligne actif.', 'error');
                     return null;
                 }
@@ -607,7 +617,6 @@
                     return true;
                 } catch (error) {
                     console.warn('Erreur Firestore (écriture profil) :', error);
-                    // Mise à jour locale même en cas d'échec (fonctionnement hors-ligne)
                     userProfile = { ...userProfile, ...data, _id: uid };
                     showToast('Sauvegarde cloud échouée. Modifications locales conservées.', 'error');
                     return false;
@@ -617,17 +626,14 @@
             // --- Routage central (unique chef d'orchestre) ---
             async function handleAuthRedirection(user) {
                 if (!user) {
-                    // Non connecté → vue auth
                     showView('view-auth');
                     updateAuthUIForMode('login');
                     return;
                 }
 
-                // Tentative de chargement du profil Firestore
                 const profile = await loadUserProfile(user.uid);
 
                 if (!profile) {
-                    // Aucun document en base → on crée un profil minimal à la volée
                     const defaultProfile = {
                         displayName: user.displayName || user.email?.split('@')[0] || 'Utilisateur',
                         photoURL: user.photoURL || '',
@@ -635,23 +641,19 @@
                         links: [],
                         onboardingCompleted: false
                     };
-                    // Sauvegarde silencieuse (ne bloque pas la suite)
                     saveUserProfile(user.uid, defaultProfile).catch(() => {});
-                    // On nettoie la sélection onboarding
                     selectedOnboardingPlatforms.clear();
                     onboardingUrls = {};
                     renderOnboardingGrid();
                     document.getElementById('onboarding-bio').value = '';
                     showView('view-onboarding');
                 } else if (profile.onboardingCompleted !== true) {
-                    // Profil existant mais onboarding non terminé
                     selectedOnboardingPlatforms.clear();
                     onboardingUrls = {};
                     renderOnboardingGrid();
                     document.getElementById('onboarding-bio').value = profile.bio || '';
                     showView('view-onboarding');
                 } else {
-                    // Profil complet → dashboard
                     showView('view-dashboard');
                     await populateDashboard();
                 }
@@ -720,7 +722,6 @@
             // --- Dashboard ---
             async function populateDashboard() {
                 if (!currentUser) return;
-                // Si le profil est absent (hors-ligne), on utilise les infos de l'auth
                 if (!userProfile) {
                     userProfile = {
                         displayName: currentUser.displayName || '',
@@ -731,11 +732,11 @@
                     };
                 }
                 document.getElementById('dashboard-name').value = userProfile.displayName || '';
-                document.getElementById('dashboard-photo').value = userProfile.photoURL || '';
                 document.getElementById('dashboard-bio').value = userProfile.bio || '';
                 const avatarImg = document.getElementById('dashboard-avatar');
                 avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
                 avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
+                // Pas de champ URL texte, l'upload gère tout
                 renderDashboardLinks();
             }
 
@@ -757,7 +758,6 @@
                     container.appendChild(div);
                 });
 
-                // Gestion événements par délégation
                 container.onclick = (e) => {
                     const btn = e.target.closest('[data-action]');
                     if (!btn) return;
@@ -780,6 +780,64 @@
                         }
                     }
                 };
+            }
+
+            // --- Upload avatar (Firebase Storage) ---
+            function setupAvatarUpload() {
+                const fileInput = document.getElementById('avatar-input');
+                const uploadBtn = document.getElementById('btn-upload-avatar');
+                const avatarImg = document.getElementById('dashboard-avatar');
+
+                uploadBtn.addEventListener('click', () => {
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // Vérification du type et de la taille (5 Mo max)
+                    if (!file.type.startsWith('image/')) {
+                        showToast('Veuillez sélectionner une image.', 'error');
+                        return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('L\'image ne doit pas dépasser 5 Mo.', 'error');
+                        return;
+                    }
+
+                    if (!currentUser) {
+                        showToast('Vous devez être connecté.', 'error');
+                        return;
+                    }
+
+                    // Effet visuel : opacité réduite sur l'avatar
+                    avatarImg.classList.add('avatar-uploading');
+                    uploadBtn.disabled = true;
+                    const originalText = uploadBtn.innerHTML;
+                    uploadBtn.innerHTML = '<span class="spinner"></span> Téléversement...';
+
+                    try {
+                        const storageRef = storage.ref();
+                        const avatarRef = storageRef.child(`avatars/${currentUser.uid}/${file.name}`);
+                        const snapshot = await avatarRef.put(file);
+                        const downloadURL = await snapshot.ref.getDownloadURL();
+
+                        // Sauvegarde dans Firestore et mise à jour locale
+                        await saveUserProfile(currentUser.uid, { photoURL: downloadURL });
+                        avatarImg.src = downloadURL;
+                        showToast('Photo de profil mise à jour !', 'info');
+                    } catch (error) {
+                        console.error('Erreur upload avatar:', error);
+                        showToast('Erreur lors du téléversement : ' + error.message, 'error');
+                    } finally {
+                        avatarImg.classList.remove('avatar-uploading');
+                        uploadBtn.disabled = false;
+                        uploadBtn.innerHTML = originalText;
+                        // Réinitialise l'input pour permettre de re-sélectionner le même fichier
+                        fileInput.value = '';
+                    }
+                });
             }
 
             // --- Profil public ---
@@ -847,14 +905,13 @@
                     spinner.classList.remove('hidden');
                     btnText.textContent = '';
 
-                    authRedirectInProgress = true; // Empêche onAuthStateChanged de faire double redirection
+                    authRedirectInProgress = true;
                     try {
                         if (authMode === 'login') {
                             await auth.signInWithEmailAndPassword(email, password);
                         } else {
                             await auth.createUserWithEmailAndPassword(email, password);
                         }
-                        // Redirection manuelle immédiate
                         const user = auth.currentUser;
                         currentUser = user;
                         await handleAuthRedirection(user);
@@ -884,17 +941,16 @@
                     googleText.textContent = 'Connexion...';
                     googleSpinner.classList.remove('hidden');
 
-                    authRedirectInProgress = true; // onAuthStateChanged ne fera rien, on gère ici
+                    authRedirectInProgress = true;
                     const provider = new firebase.auth.GoogleAuthProvider();
                     try {
                         const result = await auth.signInWithPopup(provider);
-                        // Redirection manuelle après popup réussi
                         currentUser = result.user;
                         await handleAuthRedirection(result.user);
                     } catch (error) {
                         let message = 'Connexion Google échouée.';
                         if (error.code === 'auth/unauthorized-domain') {
-                            message = 'Domaine non autorisé. Ajoutez ce domaine dans la console Firebase (Authentication > Sign-in method > Domaines autorisés).';
+                            message = 'Domaine non autorisé. Ajoutez ce domaine dans la console Firebase.';
                         } else if (error.message) {
                             message = error.message;
                         }
@@ -920,7 +976,7 @@
                     }
                 });
 
-                // Onboarding : Passer l'étape (transition immédiate, sauvegarde en arrière-plan)
+                // Onboarding : Passer l'étape
                 document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
                     if (!currentUser) return;
                     const bio = document.getElementById('onboarding-bio').value.trim();
@@ -936,14 +992,13 @@
                         links: links,
                         onboardingCompleted: true
                     };
-                    // On n'attend PAS la validation serveur : transition instantanée
                     saveUserProfile(currentUser.uid, profileData).catch(() => {});
                     showView('view-dashboard');
                     await populateDashboard();
                     showToast('Profil créé avec succès (sauvegarde en cours).', 'info');
                 });
 
-                // Onboarding : Finaliser (on attend la sauvegarde avant de basculer)
+                // Onboarding : Finaliser
                 document.getElementById('finish-onboarding-btn').addEventListener('click', async () => {
                     if (!currentUser) return;
                     const bio = document.getElementById('onboarding-bio').value.trim();
@@ -994,7 +1049,6 @@
                 document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
                     if (!currentUser) return;
                     const name = document.getElementById('dashboard-name').value.trim();
-                    const photo = document.getElementById('dashboard-photo').value.trim();
                     const bio = document.getElementById('dashboard-bio').value.trim();
                     const links = userProfile.links ? userProfile.links.map(l => ({
                         platform: l.platform,
@@ -1003,15 +1057,14 @@
                     })) : [];
                     const saved = await saveUserProfile(currentUser.uid, {
                         displayName: name,
-                        photoURL: photo,
                         bio: bio,
                         links: links,
                         onboardingCompleted: true
+                        // photoURL n'est plus modifié ici, l'upload le gère
                     });
                     if (saved) {
                         showToast('Profil enregistré !', 'info');
                     }
-                    document.getElementById('dashboard-avatar').src = photo || generateAvatarUrl(name);
                 });
 
                 // Dashboard : Copier le lien de partage
@@ -1036,36 +1089,33 @@
                 document.getElementById('logout-btn').addEventListener('click', () => {
                     auth.signOut();
                 });
+
+                // Initialisation de l'upload avatar
+                setupAvatarUpload();
             }
 
             // --- Écouteur d'état d'authentification (chef d'orchestre) ---
             auth.onAuthStateChanged(async (user) => {
-                // Si on est en train d'effectuer une redirection manuelle, on ignore ce déclenchement
                 if (authRedirectInProgress) return;
 
-                // Mode public (profil externe) prioritaire
                 if (isPublicMode()) {
                     showView('view-profile-public');
                     await loadPublicProfile(getPublicUid());
                     return;
                 }
 
-                // Utilisateur connecté ou non
                 currentUser = user;
                 await handleAuthRedirection(user);
             });
 
             // --- Initialisation finale ---
             window.addEventListener('DOMContentLoaded', () => {
-                // Attacher tous les écouteurs (garantit qu'ils sont en place même si le DOM est prêt)
                 attachAllEventListeners();
 
-                // Si l'URL est déjà en mode public au chargement, affichage direct (avant que onAuthStateChanged ne tourne)
                 if (isPublicMode()) {
                     showView('view-profile-public');
                     loadPublicProfile(getPublicUid());
                 } else {
-                    // Par défaut, on affiche la vue auth (sera remplacée par onAuthStateChanged si utilisateur connecté)
                     showView('view-auth');
                 }
             });
