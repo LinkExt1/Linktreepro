@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>LinkExt | Cyber Linktree</title>
 
+    <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="LinkExt - Votre hub de liens nouvelle génération">
     <meta property="og:description" content="Partagez tous vos réseaux sociaux en un seul lien. Design cyberpunk et gestion simplifiée.">
-    <meta property="og:image" content="https://res.cloudinary.com/bwexbf1sj/image/upload/v1719960000/sample.jpg">
-    <meta property="og:url" content="https://linkext1.github.io/LinkExt/">
+    <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
+    <meta property="og:url" content="https://linkext1.github.io/">
     <meta property="og:type" content="website">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+    <!-- Widget Cloudinary -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    
     <style>
         :root {
             --bg-deep: #0a0b10;
@@ -174,6 +174,10 @@
         .btn-google:hover:not(:disabled) {
             background: #f0f0f0;
             box-shadow: 0 8px 20px rgba(255,255,255,0.2);
+        }
+        .btn-google img {
+            width: 20px;
+            height: 20px;
         }
         .tabs {
             display: flex;
@@ -361,7 +365,6 @@
         .social-btn.youtube { background: #FF0000; color: #fff; }
         .social-btn.x { background: #1DA1F2; color: #fff; }
         .social-btn.tiktok { background: #000000; color: #fff; border: 1px solid #ffffff40; }
-        
         #toast-container {
             position: fixed;
             top: 1.5rem;
@@ -401,34 +404,11 @@
         .mt-1 { margin-top: 1rem; }
         .mt-2 { margin-top: 1.5rem; }
         .hidden { display: none !important; }
-
-        /* Styles de la bannière d'aperçu */
-        .share-banner {
-            width: 100%;
-            border-radius: 16px 16px 0 0;
-            margin: -2rem -1.8rem 1.5rem -1.8rem;
-            width: calc(100% + 3.6rem);
-            object-fit: cover;
-            max-height: 200px;
-            display: block;
-            border-bottom: 2px solid var(--cyan);
-        }
-        .share-banner-placeholder {
-            background: linear-gradient(135deg, rgba(0,242,254,0.15), rgba(79,172,254,0.15));
-            height: 120px;
-            width: calc(100% + 3.6rem);
-            margin: -2rem -1.8rem 1.5rem -1.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            border-bottom: 2px solid var(--cyan);
-        }
     </style>
 </head>
 <body>
     <div id="app">
+        <!-- VUE AUTH -->
         <div id="view-auth" class="view">
             <div class="glass-card">
                 <div class="brand">LINKEXT</div>
@@ -466,6 +446,7 @@
             </div>
         </div>
 
+        <!-- VUE ONBOARDING -->
         <div id="view-onboarding" class="view">
             <div class="glass-card">
                 <div class="brand" style="font-size:1.8rem;">CONFIGURATION</div>
@@ -481,6 +462,7 @@
             </div>
         </div>
 
+        <!-- VUE DASHBOARD -->
         <div id="view-dashboard" class="view">
             <div class="glass-card">
                 <div style="display:flex; justify-content: space-between; align-items:center;">
@@ -499,30 +481,17 @@
                     </div>
                 </div>
 
+                <!-- Bouton Cloudinary pour changer la photo de profil -->
                 <div class="input-group mt-2">
                     <label>Photo de profil</label>
-                    <button type="button" class="btn btn-outline" id="btn-change-photo" style="justify-content: center; width:100%;">
-                        <i class="fas fa-camera"></i> Changer la photo de profil
+                    <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center;">
+                        <i class="fas fa-camera"></i> 📷 Changer la photo de profil
                     </button>
                 </div>
 
                 <div class="input-group mt-2">
                     <label>Biographie</label>
                     <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
-                </div>
-
-                <div class="mt-2 p-2" style="background: rgba(0,242,254,0.05); border-radius: 14px; border: 1px solid var(--border-glow);">
-                    <div class="input-group">
-                        <label style="font-size:0.9rem; color:var(--cyan);">🖼️ Image d'aperçu de partage</label>
-                        <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:0.5rem;">Cette image sera affichée en haut de votre profil pour vos amis.</p>
-                        <button type="button" class="btn btn-outline" id="btn-upload-share-preview" style="justify-content: center; width:100%;">
-                            <i class="fas fa-image"></i> Téléverser l'image d'aperçu
-                        </button>
-                        <div id="share-preview-thumb" class="mt-1" style="display: none; position: relative;">
-                            <img id="share-preview-img" src="" alt="aperçu" style="width:100%; border-radius:10px; max-height:120px; object-fit:cover; border:1px solid var(--cyan);">
-                            <button type="button" id="remove-share-preview" class="btn" style="position: absolute; top: 5px; right: 5px; padding:0.3rem 0.6rem; font-size:0.7rem; background: var(--danger); color:white; border:none; border-radius:6px;">✕</button>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
@@ -535,9 +504,9 @@
             </div>
         </div>
 
+        <!-- VUE PROFIL PUBLIC -->
         <div id="view-profile-public" class="view">
             <div class="glass-card" style="text-align:center; padding-top: 0;">
-                <div id="public-banner-container"></div>
                 <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
                 <h2 id="public-name" style="font-family:var(--font-heading); margin-top:1rem;"></h2>
                 <p id="public-bio" style="color:var(--text-secondary); margin-top:0.5rem;"></p>
@@ -549,13 +518,14 @@
 
     <div id="toast-container"></div>
 
+    <!-- Firebase Compat SDKs (Auth + Firestore, PAS de Storage) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <script>
         (function() {
-            // --- Configuration Firebase ---
+            // ----- CONFIGURATION FIREBASE -----
             const firebaseConfig = {
                 apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
                 authDomain: "linkext-83984.firebaseapp.com",
@@ -569,10 +539,11 @@
             const auth = firebase.auth();
             const db = firebase.firestore();
 
-            // --- Configuration Cloudinary RÉELLE et Non Signée ---
-            const CLOUDINARY_CLOUD_NAME = "bwexbf1sj";
-            const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
+            // ----- CONFIGURATION CLOUDINARY (UNSIGNED, sans clé API) -----
+            const CLOUDINARY_CLOUD_NAME = "sole";          // Cloud name correct
+            const CLOUDINARY_UPLOAD_PRESET = "LinkExt";    // Preset non signé
 
+            // ----- PLATEFORMES DISPONIBLES -----
             const PLATFORMS = [
                 { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp', colorClass: 'whatsapp' },
                 { id: 'telegram', name: 'Telegram', icon: 'fab fa-telegram-plane', colorClass: 'telegram' },
@@ -583,13 +554,16 @@
                 { id: 'tiktok', name: 'TikTok', icon: 'fab fa-tiktok', colorClass: 'tiktok' }
             ];
 
+            // ----- ÉTAT GLOBAL -----
             let currentUser = null;
-            let userProfile = null;
+            let userProfile = null;            // Contiendra le profil chargé, ou un objet par défaut
             let authMode = 'login';
             let selectedOnboardingPlatforms = new Set();
             let onboardingUrls = {};
             let authRedirectInProgress = false;
+            let isCloudinaryWidgetOpen = false;
 
+            // ----- VUES -----
             const views = {
                 auth: document.getElementById('view-auth'),
                 onboarding: document.getElementById('view-onboarding'),
@@ -597,16 +571,16 @@
                 publicProfile: document.getElementById('view-profile-public')
             };
 
+            // ----- UTILITAIRES UI -----
             function showView(viewId) {
                 const target = document.getElementById(viewId);
                 if (!target) return;
-                Object.values(views).forEach(v => { if(v) v.classList.remove('active'); });
+                Object.values(views).forEach(v => v.classList.remove('active'));
                 target.classList.add('active');
             }
 
             function showToast(message, type = 'info') {
                 const container = document.getElementById('toast-container');
-                if(!container) return;
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
                 toast.textContent = message;
@@ -625,76 +599,125 @@
                 return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
             }
 
+            // ----- FIRESTORE ROBUSTE (ne gèle jamais l'interface) -----
             async function loadUserProfile(uid) {
                 try {
-                    const doc = await db.collection('users').doc(uid).get();
+                    const docRef = db.collection('users').doc(uid);
+                    const doc = await docRef.get();
                     if (doc.exists) {
                         userProfile = doc.data();
                         userProfile._id = uid;
                         return userProfile;
+                    } else {
+                        // Document inexistant → on fabrique un profil par défaut (local)
+                        userProfile = createDefaultProfile();
+                        userProfile._id = uid;
+                        return userProfile;
                     }
-                    return null;
                 } catch (error) {
-                    showToast('Erreur lors de la lecture du profil.', 'error');
-                    return null;
+                    console.warn('Erreur Firestore (lecture) :', error);
+                    showToast('Connexion à la base de données impossible. Mode dégradé.', 'error');
+                    // On continue avec un profil local pour ne pas bloquer l'UI
+                    userProfile = createDefaultProfile();
+                    userProfile._id = uid;
+                    return userProfile;
                 }
+            }
+
+            function createDefaultProfile(overrides = {}) {
+                return {
+                    displayName: currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Utilisateur',
+                    photoURL: currentUser?.photoURL || '',
+                    bio: '',
+                    links: [],
+                    onboardingCompleted: false,
+                    ...overrides
+                };
             }
 
             async function saveUserProfile(uid, data) {
                 try {
-                    await db.collection('users').doc(uid).set(data, { merge: true });
+                    const docRef = db.collection('users').doc(uid);
+                    await docRef.set(data, { merge: true });
+                    // Mise à jour locale seulement si pas d'erreur (sinon on garde l'ancien état)
                     userProfile = { ...userProfile, ...data, _id: uid };
                     return true;
                 } catch (error) {
-                    showToast('Échec de la sauvegarde sur le serveur.', 'error');
+                    console.warn('Erreur Firestore (écriture) :', error);
+                    showToast('Sauvegarde cloud échouée. Modifications conservées en local.', 'error');
+                    // Mise à jour locale quand même pour que l'utilisateur voie ses changements
+                    userProfile = { ...userProfile, ...data, _id: uid };
                     return false;
                 }
             }
 
+            // ----- ROUTAGE CENTRAL (avec fallback sécurisé) -----
             async function handleAuthRedirection(user) {
                 if (!user) {
+                    userProfile = null;
                     showView('view-auth');
+                    updateAuthUIForMode('login');
                     return;
                 }
+
+                // Chargement du profil (ou création d'un profil local si échec)
                 const profile = await loadUserProfile(user.uid);
-                if (!profile || profile.onboardingCompleted !== true) {
+                userProfile = profile;   // Quoi qu'il arrive, userProfile est défini (objet par défaut)
+
+                if (!profile.onboardingCompleted) {
+                    // Onboarding pas encore fait
                     selectedOnboardingPlatforms.clear();
                     onboardingUrls = {};
                     renderOnboardingGrid();
-                    document.getElementById('onboarding-bio').value = profile ? (profile.bio || '') : '';
+                    document.getElementById('onboarding-bio').value = profile.bio || '';
                     showView('view-onboarding');
                 } else {
+                    // Profil complet → dashboard
                     showView('view-dashboard');
                     await populateDashboard();
                 }
             }
 
+            // ----- UI AUTH -----
+            function updateAuthUIForMode(mode) {
+                authMode = mode;
+                document.querySelectorAll('#auth-tabs .tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === mode);
+                });
+                document.getElementById('auth-btn-text').textContent = mode === 'login' ? 'Se connecter' : 'Créer un compte';
+            }
+
+            // ----- ONBOARDING -----
             function renderOnboardingGrid() {
                 const grid = document.getElementById('onboarding-grid');
-                if(!grid) return;
                 grid.innerHTML = '';
                 PLATFORMS.forEach(p => {
                     const div = document.createElement('div');
                     div.className = `platform-item ${selectedOnboardingPlatforms.has(p.id) ? 'selected' : ''}`;
+                    div.dataset.platform = p.id;
                     div.innerHTML = `<i class="${p.icon}"></i><span>${p.name}</span>`;
-                    div.onclick = () => {
-                        if (selectedOnboardingPlatforms.has(p.id)) {
-                            selectedOnboardingPlatforms.delete(p.id);
-                            delete onboardingUrls[p.id];
-                        } else {
-                            selectedOnboardingPlatforms.add(p.id);
-                            onboardingUrls[p.id] = '';
-                        }
-                        renderOnboardingGrid();
-                    };
+                    div.addEventListener('click', () => toggleOnboardingPlatform(p.id));
                     grid.appendChild(div);
+                });
+                renderOnboardingUrlInputs();
+            }
+
+            function toggleOnboardingPlatform(platformId) {
+                if (selectedOnboardingPlatforms.has(platformId)) {
+                    selectedOnboardingPlatforms.delete(platformId);
+                    delete onboardingUrls[platformId];
+                } else {
+                    selectedOnboardingPlatforms.add(platformId);
+                    onboardingUrls[platformId] = '';
+                }
+                document.querySelectorAll('#onboarding-grid .platform-item').forEach(el => {
+                    el.classList.toggle('selected', selectedOnboardingPlatforms.has(el.dataset.platform));
                 });
                 renderOnboardingUrlInputs();
             }
 
             function renderOnboardingUrlInputs() {
                 const container = document.getElementById('onboarding-urls');
-                if(!container) return;
                 container.innerHTML = '';
                 selectedOnboardingPlatforms.forEach(platformId => {
                     const platform = PLATFORMS.find(p => p.id === platformId);
@@ -703,47 +726,38 @@
                     wrapper.className = 'input-group url-input-animated mt-1';
                     wrapper.innerHTML = `
                         <label><i class="${platform.icon}"></i> Lien ${platform.name}</label>
-                        <input type="text" class="input-field onboarding-url-input" data-platform="${platformId}" placeholder="https://..." value="${onboardingUrls[platformId] || ''}">
+                        <input type="text" class="input-field onboarding-url-input" data-platform="${platformId}" 
+                               placeholder="https://..." value="${onboardingUrls[platformId] || ''}">
                     `;
                     container.appendChild(wrapper);
                 });
-
-                container.oninput = (e) => {
-                    if (e.target.classList.contains('onboarding-url-input')) {
+                document.querySelectorAll('.onboarding-url-input').forEach(input => {
+                    input.addEventListener('input', (e) => {
                         onboardingUrls[e.target.dataset.platform] = e.target.value;
-                    }
-                };
+                    });
+                });
             }
 
+            // ----- DASHBOARD -----
             async function populateDashboard() {
-                if (!currentUser) return;
-                if (!userProfile) await loadUserProfile(currentUser.uid);
-                
-                document.getElementById('dashboard-name').value = userProfile?.displayName || '';
-                document.getElementById('dashboard-bio').value = userProfile?.bio || '';
-                
-                const avatarImg = document.getElementById('dashboard-avatar');
-                if(avatarImg) {
-                    avatarImg.src = userProfile?.photoURL || generateAvatarUrl(userProfile?.displayName || 'User');
-                }
+                // userProfile est garanti défini (même en local)
+                if (!userProfile) userProfile = createDefaultProfile();
 
-                const shareThumb = document.getElementById('share-preview-thumb');
-                const shareImg = document.getElementById('share-preview-img');
-                if (userProfile?.sharePreviewURL) {
-                    shareImg.src = userProfile.sharePreviewURL;
-                    shareThumb.style.display = 'block';
-                } else {
-                    shareThumb.style.display = 'none';
-                }
+                document.getElementById('dashboard-name').value = userProfile.displayName || '';
+                document.getElementById('dashboard-bio').value = userProfile.bio || '';
+                const avatarImg = document.getElementById('dashboard-avatar');
+                avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
+                avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
 
                 renderDashboardLinks();
             }
 
             function renderDashboardLinks() {
                 const container = document.getElementById('dashboard-links-container');
-                if(!container) return;
                 container.innerHTML = '';
-                if (!userProfile || !userProfile.links) return;
+                if (!userProfile || !userProfile.links) {
+                    userProfile.links = [];
+                }
                 userProfile.links.forEach((link, index) => {
                     const platform = PLATFORMS.find(p => p.id === link.platform);
                     if (!platform) return;
@@ -753,15 +767,17 @@
                         <i class="${platform.icon} platform-icon" style="color:var(--cyan);"></i>
                         <input type="text" class="input-field link-url-input" value="${link.url || ''}" placeholder="URL" data-index="${index}">
                         <div class="toggle-switch ${link.active ? 'active' : ''}" data-index="${index}" data-action="toggle"></div>
-                        <button type="button" class="delete-link-btn" data-index="${index}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
+                        <button class="delete-link-btn" data-index="${index}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
                     `;
                     container.appendChild(div);
                 });
 
+                // Gestion des événements par délégation
                 container.onclick = (e) => {
                     const btn = e.target.closest('[data-action]');
                     if (!btn) return;
                     const index = parseInt(btn.dataset.index);
+                    if (isNaN(index)) return;
                     if (btn.dataset.action === 'toggle') {
                         userProfile.links[index].active = !userProfile.links[index].active;
                         renderDashboardLinks();
@@ -774,40 +790,87 @@
                 container.oninput = (e) => {
                     if (e.target.classList.contains('link-url-input')) {
                         const index = parseInt(e.target.dataset.index);
-                        userProfile.links[index].url = e.target.value;
+                        if (!isNaN(index) && userProfile.links[index]) {
+                            userProfile.links[index].url = e.target.value;
+                        }
                     }
                 };
             }
 
-            // --- Logique Sécurisée d'Ouverture du Widget Cloudinary (Strictement UNSIGNED) ---
-            function openCloudinaryWidget(onSuccessCallback) {
-                if (typeof cloudinary === 'undefined') {
-                    showToast("Le script de téléversement n'est pas encore chargé. Réessayez.", "error");
+            // ----- WIDGET CLOUDINARY (UNSIGNED) -----
+            function openCloudinaryWidget({ button, onSuccess }) {
+                if (!currentUser) {
+                    showToast('Connectez-vous pour continuer.', 'error');
                     return;
                 }
+                if (isCloudinaryWidgetOpen) return;
+                isCloudinaryWidgetOpen = true;
+                const originalHTML = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner"></span> Ouverture...';
 
-                cloudinary.openUploadWidget({
-                    cloudName: CLOUDINARY_CLOUD_NAME,
-                    uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-                    sources: ["local", "url", "camera"],
-                    multiple: false,
-                    cropping: true,
-                    resourceType: "image"
-                }, (error, result) => {
-                    if (error) {
-                        console.error("Erreur d'upload :", error);
-                        showToast("Impossible d'ouvrir l'interface de téléversement.", "error");
-                        return;
+                // Appel EXACT avec cloudName et uploadPreset, AUCUNE clé API
+                const widget = cloudinary.openUploadWidget(
+                    {
+                        cloudName: CLOUDINARY_CLOUD_NAME,
+                        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                        sources: ["local", "url", "camera"],
+                        multiple: false,
+                        cropping: true,
+                        resourceType: "image"
+                    },
+                    (error, result) => {
+                        if (error) {
+                            console.error("Détail erreur Cloudinary:", error);
+                            showToast('Erreur Cloudinary : ' + (error.message || 'inconnue'), 'error');
+                            button.disabled = false;
+                            button.innerHTML = originalHTML;
+                            isCloudinaryWidgetOpen = false;
+                            return;
+                        }
+                        if (result && result.event === "success") {
+                            const imageUrl = result.info.secure_url;
+                            if (imageUrl && onSuccess) {
+                                onSuccess(imageUrl);
+                            }
+                        }
+                        if (result && (result.event === "success" || result.event === "close" || result.event === "abort")) {
+                            button.disabled = false;
+                            button.innerHTML = originalHTML;
+                            isCloudinaryWidgetOpen = false;
+                        }
                     }
-                    if (result && result.event === "success") {
-                        onSuccessCallback(result.info.secure_url);
-                    }
+                );
+
+                // Sécurité fermeture imprévue
+                widget.on('close', () => {
+                    button.disabled = false;
+                    button.innerHTML = originalHTML;
+                    isCloudinaryWidgetOpen = false;
                 });
             }
 
+            function setupAvatarUpload() {
+                const btn = document.getElementById('btn-change-photo');
+                btn.addEventListener('click', () => {
+                    openCloudinaryWidget({
+                        button: btn,
+                        onSuccess: (url) => {
+                            document.getElementById('dashboard-avatar').src = url;
+                            if (currentUser) {
+                                saveUserProfile(currentUser.uid, { photoURL: url });
+                            }
+                            showToast('Photo de profil mise à jour !', 'info');
+                        }
+                    });
+                });
+            }
+
+            // ----- PROFIL PUBLIC -----
             async function loadPublicProfile(uid) {
                 try {
-                    const doc = await db.collection('users').doc(uid).get();
+                    const docRef = db.collection('users').doc(uid);
+                    const doc = await docRef.get();
                     if (!doc.exists) {
                         showToast('Profil introuvable.', 'error');
                         return;
@@ -815,27 +878,13 @@
                     const data = doc.data();
                     document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                     document.getElementById('public-bio').textContent = data.bio || '';
-                    
                     const avatar = document.getElementById('public-avatar');
                     avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
-
-                    const bannerContainer = document.getElementById('public-banner-container');
-                    bannerContainer.innerHTML = '';
-                    if (data.sharePreviewURL) {
-                        const img = document.createElement('img');
-                        img.src = data.sharePreviewURL;
-                        img.className = 'share-banner';
-                        bannerContainer.appendChild(img);
-                    } else {
-                        const placeholder = document.createElement('div');
-                        placeholder.className = 'share-banner-placeholder';
-                        placeholder.innerHTML = '<span>🖼️ Aucune bannière configurée</span>';
-                        bannerContainer.appendChild(placeholder);
-                    }
+                    avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
 
                     const linksContainer = document.getElementById('public-links');
                     linksContainer.innerHTML = '';
-                    if (data.links) {
+                    if (data.links && Array.isArray(data.links)) {
                         data.links.filter(l => l.active).forEach(link => {
                             const platform = PLATFORMS.find(p => p.id === link.platform);
                             if (!platform || !link.url) return;
@@ -849,33 +898,72 @@
                         });
                     }
                 } catch (err) {
-                    showToast('Erreur de chargement public.', 'error');
+                    showToast('Erreur chargement profil public.', 'error');
                 }
             }
 
-            function isPublicMode() { return new URLSearchParams(window.location.search).has('id'); }
-            function getPublicUid() { return new URLSearchParams(window.location.search).get('id'); }
+            // ----- DÉTECTION MODE PUBLIC -----
+            function checkPublicNode() {
+                const params = new URLSearchParams(window.location.search);
+                const uid = params.get('id');
+                if (uid) {
+                    showView('view-profile-public');
+                    loadPublicProfile(uid);
+                    return true;
+                }
+                return false;
+            }
 
-            function setupEventListeners() {
-                // Gestion des Onglets
-                document.getElementById('auth-tabs').onclick = (e) => {
-                    if (e.target.classList.contains('tab')) {
-                        authMode = e.target.dataset.tab;
-                        document.querySelectorAll('#auth-tabs .tab').forEach(t => t.classList.toggle('active', t === e.target));
-                        document.getElementById('auth-btn-text').textContent = authMode === 'login' ? 'Se connecter' : 'Créer un compte';
-                    }
-                };
+            // ----- ÉCOUTEUR D'ÉTAT D'AUTHENTIFICATION (ultra-robuste) -----
+            auth.onAuthStateChanged(async (user) => {
+                if (authRedirectInProgress) return;  // éviter boucles
 
-                // Formulaire Soumission
-                document.getElementById('auth-form').onsubmit = async (e) => {
+                // Priorité absolue à la vue publique
+                if (checkPublicNode()) return;
+
+                currentUser = user;
+                if (user) {
+                    // Appel à handleAuthRedirection qui gère tous les cas sans planter
+                    await handleAuthRedirection(user);
+                } else {
+                    // Déconnecté
+                    userProfile = null;
+                    showView('view-auth');
+                    updateAuthUIForMode('login');
+                }
+            });
+
+            // ----- INITIALISATION AU CHARGEMENT DE LA PAGE -----
+            window.addEventListener('DOMContentLoaded', () => {
+                // Attache les écouteurs de tous les boutons (y compris "+ Ajouter")
+                attachAllEventListeners();
+
+                // Si on est déjà en mode public, pas besoin d'attendre l'auth
+                if (!checkPublicNode()) {
+                    // On affiche la vue auth par défaut (sera modifiée par onAuthStateChanged si déjà connecté)
+                    showView('view-auth');
+                }
+            });
+
+            // ----- ATTACHE DE TOUS LES ÉCOUTEURS (pour que "+ Ajouter" fonctionne) -----
+            function attachAllEventListeners() {
+                // Tabs auth
+                document.getElementById('auth-tabs').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tab')) updateAuthUIForMode(e.target.dataset.tab);
+                });
+
+                // Formulaire email/password
+                document.getElementById('auth-form').addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const email = document.getElementById('auth-email').value.trim();
                     const password = document.getElementById('auth-password').value;
-                    const btn = document.getElementById('auth-submit-btn');
-                    
-                    btn.disabled = true;
-                    document.getElementById('auth-spinner').classList.remove('hidden');
+                    const submitBtn = document.getElementById('auth-submit-btn');
+                    const spinner = document.getElementById('auth-spinner');
+                    const btnText = document.getElementById('auth-btn-text');
 
+                    submitBtn.disabled = true;
+                    spinner.classList.remove('hidden');
+                    btnText.textContent = '';
                     authRedirectInProgress = true;
                     try {
                         if (authMode === 'login') {
@@ -883,121 +971,172 @@
                         } else {
                             await auth.createUserWithEmailAndPassword(email, password);
                         }
-                        currentUser = auth.currentUser;
-                        await handleAuthRedirection(currentUser);
-                    } catch (err) {
-                        showToast("Identifiants incorrects ou compte existant.", "error");
+                        const user = auth.currentUser;
+                        currentUser = user;
+                        await handleAuthRedirection(user);
+                    } catch (error) {
+                        let message = "Échec de l'authentification.";
+                        if (error.code === 'auth/wrong-password') message = 'Mot de passe incorrect.';
+                        else if (error.code === 'auth/user-not-found') message = 'Aucun compte associé.';
+                        else if (error.code === 'auth/email-already-in-use') message = 'Email déjà utilisé.';
+                        else if (error.code === 'auth/weak-password') message = 'Mot de passe trop faible.';
+                        else if (error.code === 'auth/invalid-credential') message = 'Identifiants invalides.';
+                        showToast(message, 'error');
                     } finally {
                         authRedirectInProgress = false;
-                        btn.disabled = false;
-                        document.getElementById('auth-spinner').classList.add('hidden');
+                        submitBtn.disabled = false;
+                        spinner.classList.add('hidden');
+                        btnText.textContent = authMode === 'login' ? 'Se connecter' : 'Créer un compte';
                     }
-                };
+                });
 
-                // Bouton Google Connexion
-                document.getElementById('google-signin-btn').onclick = async () => {
+                // Google Sign-In
+                document.getElementById('google-signin-btn').addEventListener('click', async () => {
+                    const googleBtn = document.getElementById('google-signin-btn');
+                    const googleText = document.getElementById('google-btn-text');
+                    const googleSpinner = document.getElementById('google-spinner');
+
+                    googleBtn.disabled = true;
+                    googleText.textContent = 'Connexion...';
+                    googleSpinner.classList.remove('hidden');
                     authRedirectInProgress = true;
                     const provider = new firebase.auth.GoogleAuthProvider();
                     try {
                         const result = await auth.signInWithPopup(provider);
                         currentUser = result.user;
-                        await handleAuthRedirection(currentUser);
-                    } catch (err) {
-                        showToast("Connexion Google annulée ou interdite.", "error");
+                        await handleAuthRedirection(result.user);
+                    } catch (error) {
+                        let message = 'Connexion Google échouée.';
+                        if (error.code === 'auth/unauthorized-domain') {
+                            message = 'Domaine non autorisé. Ajoutez linkext1.github.io dans la console Firebase.';
+                        } else if (error.message) {
+                            message = error.message;
+                        }
+                        showToast(message, 'error');
                     } finally {
                         authRedirectInProgress = false;
+                        googleBtn.disabled = false;
+                        googleText.textContent = 'Continuer avec Google';
+                        googleSpinner.classList.add('hidden');
                     }
-                };
+                });
 
-                // Actionneurs Cloudinary sur les clics de boutons
-                document.getElementById('btn-change-photo').onclick = () => {
-                    openCloudinaryWidget((url) => {
-                        document.getElementById('dashboard-avatar').src = url;
-                        if(currentUser) saveUserProfile(currentUser.uid, { photoURL: url });
-                        showToast("Photo de profil mise à jour !", "success");
-                    });
-                };
+                // Mot de passe oublié
+                document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const email = prompt('Entrez votre email :');
+                    if (!email) return;
+                    try {
+                        await auth.sendPasswordResetEmail(email);
+                        showToast('Email de réinitialisation envoyé.', 'info');
+                    } catch (error) {
+                        showToast('Erreur : ' + error.message, 'error');
+                    }
+                });
 
-                document.getElementById('btn-upload-share-preview').onclick = () => {
-                    openCloudinaryWidget((url) => {
-                        document.getElementById('share-preview-img').src = url;
-                        document.getElementById('share-preview-thumb').style.display = 'block';
-                        if(currentUser) saveUserProfile(currentUser.uid, { sharePreviewURL: url });
-                        showToast("Image d'aperçu enregistrée !", "success");
-                    });
-                };
-
-                document.getElementById('remove-share-preview').onclick = () => {
-                    document.getElementById('share-preview-thumb').style.display = 'none';
-                    document.getElementById('share-preview-img').src = '';
-                    if(currentUser) saveUserProfile(currentUser.uid, { sharePreviewURL: '' });
-                };
-
-                // Actions Onboarding
-                document.getElementById('finish-onboarding-btn').onclick = async () => {
+                // Onboarding : Passer l'étape
+                document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
                     if (!currentUser) return;
+                    const bio = document.getElementById('onboarding-bio').value.trim();
                     const links = [];
-                    selectedOnboardingPlatforms.forEach(pId => {
-                        if (onboardingUrls[pId]) links.push({ platform: pId, url: sanitizeUrl(onboardingUrls[pId]), active: true });
+                    selectedOnboardingPlatforms.forEach(platformId => {
+                        const url = sanitizeUrl(onboardingUrls[platformId] || '');
+                        if (url) links.push({ platform: platformId, url, active: true });
                     });
                     await saveUserProfile(currentUser.uid, {
-                        displayName: currentUser.email.split('@')[0],
-                        bio: document.getElementById('onboarding-bio').value.trim(),
-                        links: links,
+                        displayName: currentUser.displayName || (currentUser.email?.split('@')[0] || 'Utilisateur'),
+                        photoURL: currentUser.photoURL || '',
+                        bio,
+                        links,
                         onboardingCompleted: true
                     });
                     showView('view-dashboard');
                     await populateDashboard();
-                };
+                });
 
-                document.getElementById('skip-onboarding-btn').onclick = async () => {
+                // Onboarding : Finaliser
+                document.getElementById('finish-onboarding-btn').addEventListener('click', async () => {
                     if (!currentUser) return;
-                    await saveUserProfile(currentUser.uid, { onboardingCompleted: true });
+                    const bio = document.getElementById('onboarding-bio').value.trim();
+                    const links = [];
+                    selectedOnboardingPlatforms.forEach(platformId => {
+                        const url = sanitizeUrl(onboardingUrls[platformId] || '');
+                        if (url) links.push({ platform: platformId, url, active: true });
+                    });
+                    await saveUserProfile(currentUser.uid, {
+                        displayName: currentUser.displayName || (currentUser.email?.split('@')[0] || 'Utilisateur'),
+                        photoURL: currentUser.photoURL || '',
+                        bio,
+                        links,
+                        onboardingCompleted: true
+                    });
                     showView('view-dashboard');
                     await populateDashboard();
-                };
+                });
 
-                // Sauvegarde globale Dashboard
-                document.getElementById('save-dashboard-btn').onclick = async () => {
+                // Dashboard : "+ Ajouter" (fonctionnel même hors ligne)
+                document.getElementById('add-link-btn').addEventListener('click', () => {
+                    if (!userProfile) userProfile = createDefaultProfile();
+                    if (!userProfile.links) userProfile.links = [];
+                    const available = PLATFORMS.filter(p => !userProfile.links.some(l => l.platform === p.id));
+                    if (available.length === 0) {
+                        showToast('Tous les réseaux sont déjà ajoutés.', 'info');
+                        return;
+                    }
+                    const names = available.map((p, i) => `${i+1}. ${p.name}`).join('\n');
+                    const choice = prompt(`Choisissez un réseau :\n${names}\nNuméro :`);
+                    if (!choice) return;
+                    const idx = parseInt(choice) - 1;
+                    if (idx >= 0 && idx < available.length) {
+                        userProfile.links.push({ platform: available[idx].id, url: '', active: true });
+                        renderDashboardLinks();
+                    } else {
+                        showToast('Choix invalide.', 'error');
+                    }
+                });
+
+                // Dashboard : Enregistrer
+                document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
                     if (!currentUser) return;
+                    const name = document.getElementById('dashboard-name').value.trim();
+                    const bio = document.getElementById('dashboard-bio').value.trim();
+                    const links = userProfile.links ? userProfile.links.map(l => ({
+                        platform: l.platform,
+                        url: sanitizeUrl(l.url),
+                        active: l.active
+                    })) : [];
                     await saveUserProfile(currentUser.uid, {
-                        displayName: document.getElementById('dashboard-name').value.trim(),
-                        bio: document.getElementById('dashboard-bio').value.trim(),
-                        links: userProfile.links || []
+                        displayName: name,
+                        bio,
+                        links,
+                        onboardingCompleted: true
                     });
-                    showToast("Modifications enregistrées !", "success");
-                };
+                    showToast('Profil enregistré.', 'info');
+                });
 
-                // Copie du lien
-                document.getElementById('copy-share-link-btn').onclick = () => {
+                // Dashboard : Copier lien
+                document.getElementById('copy-share-link-btn').addEventListener('click', () => {
                     if (!currentUser) return;
-                    const link = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
-                    navigator.clipboard.writeText(link).then(() => showToast("Lien de partage copié !", "success"));
-                };
+                    const shareUrl = `${window.location.origin}${window.location.pathname}?id=${currentUser.uid}`;
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        showToast('Lien copié ! 🚀', 'info');
+                    }).catch(() => {
+                        const input = document.createElement('input');
+                        input.value = shareUrl;
+                        document.body.appendChild(input);
+                        input.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(input);
+                        showToast('Lien copié !', 'info');
+                    });
+                });
 
-                document.getElementById('logout-btn').onclick = () => { auth.signOut(); };
+                // Déconnexion
+                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+
+                // Initialisation de l'upload Cloudinary (avatar)
+                setupAvatarUpload();
             }
-
-            auth.onAuthStateChanged(async (user) => {
-                if (authRedirectInProgress) return;
-                if (isPublicMode()) {
-                    showView('view-profile-public');
-                    await loadPublicProfile(getPublicUid());
-                    return;
-                }
-                currentUser = user;
-                await handleAuthRedirection(user);
-            });
-
-            window.addEventListener('DOMContentLoaded', () => {
-                setupEventListeners();
-                if (isPublicMode()) {
-                    showView('view-profile-public');
-                    loadPublicProfile(getPublicUid());
-                } else {
-                    showView('view-auth');
-                }
-            });
         })();
     </script>
 </body>
