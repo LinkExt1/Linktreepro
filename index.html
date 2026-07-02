@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>LinkExt | Cyber Linktree</title>
+
+    <!-- Open Graph Meta Tags (pour aperçu riche sur réseaux sociaux) -->
+    <meta property="og:title" content="LinkExt - Votre hub de liens nouvelle génération">
+    <meta property="og:description" content="Partagez tous vos réseaux sociaux en un seul lien. Design cyberpunk et gestion simplifiée.">
+    <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
+    <meta property="og:url" content="https://linkext.example.com">
+    <meta property="og:type" content="website">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Widget Cloudinary -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
         :root {
             --bg-deep: #0a0b10;
@@ -472,14 +482,13 @@
                         </div>
                     </div>
                 </div>
-                <!-- NOUVEAU : Upload avatar -->
+                <!-- Upload avatar via Cloudinary -->
                 <div class="input-group mt-2">
                     <label>Photo de profil</label>
-                    <input type="file" id="avatar-input" accept="image/*" style="display:none;">
                     <button class="btn btn-outline" id="btn-upload-avatar" style="justify-content: center;">
-                        <i class="fas fa-camera"></i> Changer ma photo
+                        <i class="fas fa-camera"></i> 📷 Changer la photo de profil
                     </button>
-                    <small style="color:var(--text-secondary); font-size:0.75rem; margin-top:0.3rem;">Formats acceptés : JPG, PNG, GIF (max 5 Mo)</small>
+                    <small style="color:var(--text-secondary); font-size:0.75rem; margin-top:0.3rem;">Formats acceptés : JPG, PNG, GIF (via Cloudinary)</small>
                 </div>
                 <div class="input-group mt-2">
                     <label>Biographie</label>
@@ -509,12 +518,10 @@
 
     <div id="toast-container"></div>
 
-    <!-- Firebase Compat SDKs -->
+    <!-- Firebase Compat SDKs (Auth + Firestore uniquement) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <!-- Firebase Storage Compat (ajout) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
     <script>
         (function() {
@@ -531,7 +538,10 @@
             firebase.initializeApp(firebaseConfig);
             const auth = firebase.auth();
             const db = firebase.firestore();
-            const storage = firebase.storage(); // initialisation du storage compat
+
+            // --- Configuration Cloudinary ---
+            const CLOUDINARY_CLOUD_NAME = "bwexbf1sj";
+            const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
 
             // --- Plateformes disponibles ---
             const PLATFORMS = [
@@ -547,10 +557,11 @@
             // --- État global ---
             let currentUser = null;
             let userProfile = null;
-            let authMode = 'login'; // 'login' ou 'register'
+            let authMode = 'login';
             let selectedOnboardingPlatforms = new Set();
             let onboardingUrls = {};
-            let authRedirectInProgress = false; // Évite les doubles redirections
+            let authRedirectInProgress = false;
+            let isCloudinaryWidgetOpen = false;
 
             // --- Vues ---
             const views = {
@@ -588,7 +599,7 @@
                 return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
             }
 
-            // --- Gestion Firestore ultra-robuste ---
+            // --- Firestore robuste ---
             async function loadUserProfile(uid) {
                 try {
                     const docRef = db.collection('users').doc(uid);
@@ -623,16 +634,14 @@
                 }
             }
 
-            // --- Routage central (unique chef d'orchestre) ---
+            // --- Routage central ---
             async function handleAuthRedirection(user) {
                 if (!user) {
                     showView('view-auth');
                     updateAuthUIForMode('login');
                     return;
                 }
-
                 const profile = await loadUserProfile(user.uid);
-
                 if (!profile) {
                     const defaultProfile = {
                         displayName: user.displayName || user.email?.split('@')[0] || 'Utilisateur',
@@ -659,7 +668,6 @@
                 }
             }
 
-            // --- UI Auth ---
             function updateAuthUIForMode(mode) {
                 authMode = mode;
                 document.querySelectorAll('#auth-tabs .tab').forEach(tab => {
@@ -736,7 +744,6 @@
                 const avatarImg = document.getElementById('dashboard-avatar');
                 avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
                 avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
-                // Pas de champ URL texte, l'upload gère tout
                 renderDashboardLinks();
             }
 
@@ -782,61 +789,90 @@
                 };
             }
 
-            // --- Upload avatar (Firebase Storage) ---
-            function setupAvatarUpload() {
-                const fileInput = document.getElementById('avatar-input');
+            // --- Upload avatar via Cloudinary Widget ---
+            function setupCloudinaryUpload() {
                 const uploadBtn = document.getElementById('btn-upload-avatar');
                 const avatarImg = document.getElementById('dashboard-avatar');
 
                 uploadBtn.addEventListener('click', () => {
-                    fileInput.click();
-                });
-
-                fileInput.addEventListener('change', async (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    // Vérification du type et de la taille (5 Mo max)
-                    if (!file.type.startsWith('image/')) {
-                        showToast('Veuillez sélectionner une image.', 'error');
-                        return;
-                    }
-                    if (file.size > 5 * 1024 * 1024) {
-                        showToast('L\'image ne doit pas dépasser 5 Mo.', 'error');
-                        return;
-                    }
-
                     if (!currentUser) {
-                        showToast('Vous devez être connecté.', 'error');
+                        showToast('Connectez-vous pour changer votre photo.', 'error');
                         return;
                     }
+                    if (isCloudinaryWidgetOpen) return;
 
-                    // Effet visuel : opacité réduite sur l'avatar
-                    avatarImg.classList.add('avatar-uploading');
+                    isCloudinaryWidgetOpen = true;
                     uploadBtn.disabled = true;
-                    const originalText = uploadBtn.innerHTML;
-                    uploadBtn.innerHTML = '<span class="spinner"></span> Téléversement...';
+                    const originalHTML = uploadBtn.innerHTML;
+                    uploadBtn.innerHTML = '<span class="spinner"></span> Ouverture...';
 
-                    try {
-                        const storageRef = storage.ref();
-                        const avatarRef = storageRef.child(`avatars/${currentUser.uid}/${file.name}`);
-                        const snapshot = await avatarRef.put(file);
-                        const downloadURL = await snapshot.ref.getDownloadURL();
+                    const widget = cloudinary.openUploadWidget(
+                        {
+                            cloudName: CLOUDINARY_CLOUD_NAME,
+                            uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                            sources: ['local', 'url', 'camera'],
+                            multiple: false,
+                            clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                            maxFileSize: 5000000, // 5 Mo
+                            showAdvancedOptions: false,
+                            cropping: true,
+                            croppingAspectRatio: 1,
+                            folder: 'avatars',
+                            styles: {
+                                palette: {
+                                    window: "#0a0b10",
+                                    windowBorder: "#00f2fe",
+                                    tabIcon: "#00f2fe",
+                                    menuIcons: "#a0a0c0",
+                                    textDark: "#e0e0ff",
+                                    textLight: "#0a0b10",
+                                    link: "#00f2fe",
+                                    action: "#4facfe",
+                                    inactiveTabIcon: "#a0a0c0",
+                                    error: "#ff4d6d",
+                                    inProgress: "#00f2fe",
+                                    complete: "#2ecc71",
+                                    sourceBg: "#1e1e2e"
+                                }
+                            }
+                        },
+                        (error, result) => {
+                            // Ce callback est appelé pour divers événements
+                            if (error) {
+                                console.error('Cloudinary error:', error);
+                                showToast('Erreur Cloudinary : ' + error.message, 'error');
+                                return;
+                            }
+                            if (result.event === 'success') {
+                                const secureUrl = result.info.secure_url;
+                                if (secureUrl) {
+                                    // Mise à jour de l'avatar dans le dashboard
+                                    avatarImg.src = secureUrl;
+                                    // Sauvegarde dans Firestore
+                                    saveUserProfile(currentUser.uid, { photoURL: secureUrl })
+                                        .then(() => {
+                                            showToast('Photo de profil mise à jour !', 'info');
+                                        })
+                                        .catch(() => {
+                                            // localement déjà à jour
+                                        });
+                                }
+                            }
+                            // Réactivation du bouton après fermeture du widget
+                            if (result.event === 'close' || result.event === 'success' || result.event === 'abort') {
+                                uploadBtn.disabled = false;
+                                uploadBtn.innerHTML = originalHTML;
+                                isCloudinaryWidgetOpen = false;
+                            }
+                        }
+                    );
 
-                        // Sauvegarde dans Firestore et mise à jour locale
-                        await saveUserProfile(currentUser.uid, { photoURL: downloadURL });
-                        avatarImg.src = downloadURL;
-                        showToast('Photo de profil mise à jour !', 'info');
-                    } catch (error) {
-                        console.error('Erreur upload avatar:', error);
-                        showToast('Erreur lors du téléversement : ' + error.message, 'error');
-                    } finally {
-                        avatarImg.classList.remove('avatar-uploading');
+                    // Gestion de la fermeture imprévue
+                    widget.on('close', () => {
                         uploadBtn.disabled = false;
-                        uploadBtn.innerHTML = originalText;
-                        // Réinitialise l'input pour permettre de re-sélectionner le même fichier
-                        fileInput.value = '';
-                    }
+                        uploadBtn.innerHTML = originalHTML;
+                        isCloudinaryWidgetOpen = false;
+                    });
                 });
             }
 
@@ -1060,7 +1096,6 @@
                         bio: bio,
                         links: links,
                         onboardingCompleted: true
-                        // photoURL n'est plus modifié ici, l'upload le gère
                     });
                     if (saved) {
                         showToast('Profil enregistré !', 'info');
@@ -1090,11 +1125,11 @@
                     auth.signOut();
                 });
 
-                // Initialisation de l'upload avatar
-                setupAvatarUpload();
+                // Upload Cloudinary
+                setupCloudinaryUpload();
             }
 
-            // --- Écouteur d'état d'authentification (chef d'orchestre) ---
+            // --- Écouteur d'état d'authentification ---
             auth.onAuthStateChanged(async (user) => {
                 if (authRedirectInProgress) return;
 
