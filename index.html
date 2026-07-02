@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>LinkExt | Cyber Linktree</title>
 
-    <!-- Open Graph Meta Tags (pour aperçu riche sur réseaux sociaux) -->
+    <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="LinkExt - Votre hub de liens nouvelle génération">
     <meta property="og:description" content="Partagez tous vos réseaux sociaux en un seul lien. Design cyberpunk et gestion simplifiée.">
     <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
@@ -80,7 +80,6 @@
             padding: 2rem 1.8rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,242,254,0.04);
             transition: var(--transition);
-            overflow: hidden;
         }
         .brand {
             font-family: var(--font-heading);
@@ -267,6 +266,9 @@
             display: block;
             transition: opacity 0.2s;
         }
+        .avatar-uploading {
+            opacity: 0.5;
+        }
         .link-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.08);
@@ -405,28 +407,28 @@
         .mt-2 { margin-top: 1.5rem; }
         .hidden { display: none !important; }
 
-        /* Styles pour la bannière d'aperçu (profil public) */
-        .share-banner {
+        /* Styles pour la bannière d'aperçu sur la vue publique */
+        .public-banner {
             width: 100%;
-            border-radius: 16px 16px 0 0;
-            margin: -2rem -1.8rem 1.5rem -1.8rem;
-            width: calc(100% + 3.6rem);
+            border-radius: 16px;
+            margin-bottom: 1rem;
             object-fit: cover;
             max-height: 200px;
-            display: block;
-            border-bottom: 2px solid var(--cyan);
+            box-shadow: 0 8px 20px rgba(0,242,254,0.3);
+            border: 1px solid var(--cyan);
         }
-        .share-banner-placeholder {
-            background: linear-gradient(135deg, rgba(0,242,254,0.15), rgba(79,172,254,0.15));
-            height: 120px;
-            width: calc(100% + 3.6rem);
-            margin: -2rem -1.8rem 1.5rem -1.8rem;
+        .share-preview-box {
+            margin-top: 0.8rem;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            border-bottom: 2px solid var(--cyan);
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .share-preview-box img {
+            border-radius: 12px;
+            max-width: 100%;
+            max-height: 100px;
+            object-fit: cover;
+            border: 1px solid var(--border-glow);
         }
     </style>
 </head>
@@ -504,33 +506,31 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Bouton pour changer la photo de profil (Cloudinary) -->
+                <!-- Upload avatar via Cloudinary -->
                 <div class="input-group mt-2">
                     <label>Photo de profil</label>
                     <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center;">
                         <i class="fas fa-camera"></i> 📷 Changer la photo de profil
                     </button>
+                    <small style="color:var(--text-secondary); font-size:0.75rem; margin-top:0.3rem;">Formats acceptés : JPG, PNG, GIF (via Cloudinary)</small>
                 </div>
-
                 <div class="input-group mt-2">
                     <label>Biographie</label>
                     <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
                 </div>
 
-                <!-- Section Image d'aperçu de partage -->
-                <div class="mt-2 p-2" style="background: rgba(0,242,254,0.05); border-radius: 14px; border: 1px solid var(--border-glow);">
-                    <div class="input-group">
-                        <label style="font-size:0.9rem; color:var(--cyan);">🖼️ Image d'aperçu de partage</label>
-                        <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:0.5rem;">Cette image sera utilisée comme visuel principal en haut de votre profil public.</p>
-                        <button class="btn btn-outline" id="btn-upload-share-preview" style="justify-content: center;">
-                            <i class="fas fa-image"></i> Téléverser l'image d'aperçu de mon lien
-                        </button>
-                        <div id="share-preview-thumb" class="mt-1" style="display: none; position: relative;">
-                            <img id="share-preview-img" src="" alt="aperçu" style="width:100%; border-radius:10px; max-height:120px; object-fit:cover; border:1px solid var(--cyan);">
-                            <button id="remove-share-preview" class="btn" style="position: absolute; top: 5px; right: 5px; padding:0.3rem 0.6rem; font-size:0.7rem; background: var(--danger); color:white; border:none; border-radius:6px;">✕</button>
-                        </div>
+                <!-- NOUVELLE SECTION : Image d'aperçu de partage -->
+                <div class="mt-2" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.2rem;">
+                    <label style="color:var(--text-primary); font-weight:600;">🖼️ Image d'aperçu de partage</label>
+                    <p style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:0.6rem;">
+                        Cette image sera utilisée comme visuel principal en haut de votre profil public.
+                    </p>
+                    <div class="share-preview-box" id="share-preview-box">
+                        <img id="share-preview-img" src="" alt="Aperçu" style="display: none;">
                     </div>
+                    <button class="btn btn-outline mt-1" id="btn-upload-share-preview" style="justify-content: center;">
+                        <i class="fas fa-image"></i> Téléverser l'image d'aperçu de mon lien
+                    </button>
                 </div>
 
                 <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
@@ -545,9 +545,9 @@
 
         <!-- VUE PROFIL PUBLIC -->
         <div id="view-profile-public" class="view">
-            <div class="glass-card" style="text-align:center; padding-top: 0;">
-                <!-- Bannière d'aperçu -->
-                <div id="public-banner-container"></div>
+            <div class="glass-card" style="text-align:center;">
+                <!-- Bannière d'aperçu (si disponible) -->
+                <img id="public-banner" class="public-banner" src="" alt="bannière" style="display: none;">
                 <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
                 <h2 id="public-name" style="font-family:var(--font-heading); margin-top:1rem;"></h2>
                 <p id="public-bio" style="color:var(--text-secondary); margin-top:0.5rem;"></p>
@@ -559,7 +559,7 @@
 
     <div id="toast-container"></div>
 
-    <!-- Firebase Compat SDKs (Auth + Firestore uniquement, pas de Storage) -->
+    <!-- Firebase Compat SDKs (Auth + Firestore) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -602,7 +602,6 @@
             let selectedOnboardingPlatforms = new Set();
             let onboardingUrls = {};
             let authRedirectInProgress = false;
-            let isCloudinaryWidgetOpen = false;
 
             // --- Vues ---
             const views = {
@@ -640,7 +639,7 @@
                 return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
             }
 
-            // --- Firestore robuste ---
+            // --- Firestore ---
             async function loadUserProfile(uid) {
                 try {
                     const docRef = db.collection('users').doc(uid);
@@ -675,7 +674,7 @@
                 }
             }
 
-            // --- Routage central ---
+            // --- Routage ---
             async function handleAuthRedirection(user) {
                 if (!user) {
                     showView('view-auth');
@@ -689,8 +688,8 @@
                         photoURL: user.photoURL || '',
                         bio: '',
                         links: [],
-                        onboardingCompleted: false,
-                        sharePreviewURL: ''
+                        sharePreviewURL: '',
+                        onboardingCompleted: false
                     };
                     saveUserProfile(user.uid, defaultProfile).catch(() => {});
                     selectedOnboardingPlatforms.clear();
@@ -788,14 +787,13 @@
                 avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
                 avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
 
-                // Mise à jour de l'aperçu de la bannière de partage
-                const shareThumb = document.getElementById('share-preview-thumb');
-                const shareImg = document.getElementById('share-preview-img');
+                // Aperçu de l'image de partage
+                const sharePreviewImg = document.getElementById('share-preview-img');
                 if (userProfile.sharePreviewURL) {
-                    shareImg.src = userProfile.sharePreviewURL;
-                    shareThumb.style.display = 'block';
+                    sharePreviewImg.src = userProfile.sharePreviewURL;
+                    sharePreviewImg.style.display = 'block';
                 } else {
-                    shareThumb.style.display = 'none';
+                    sharePreviewImg.style.display = 'none';
                 }
 
                 renderDashboardLinks();
@@ -843,116 +841,58 @@
                 };
             }
 
-            // --- Fonction générique pour ouvrir le widget Cloudinary ---
-            function openCloudinaryWidget({ button, onSuccess, onClose }) {
+            // --- Ouverture générique du widget Cloudinary (non signé) ---
+            function openCloudinaryWidget(callback) {
+                // Le widget est déjà chargé globalement
+                cloudinary.openUploadWidget({
+                    cloudName: CLOUDINARY_CLOUD_NAME,
+                    uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                    sources: ["local", "url", "camera"],
+                    multiple: false,
+                    cropping: true,  // Recadrage optionnel
+                    resourceType: "image"
+                }, (error, result) => {
+                    if (!error && result && result.event === "success") {
+                        const secureUrl = result.info.secure_url;
+                        callback(secureUrl);
+                    } else if (error) {
+                        console.error("Détail erreur Cloudinary:", error);
+                        showToast("Erreur Cloudinary : " + (error.message || "Vérifiez la console"), 'error');
+                    }
+                    // Réactiver les boutons éventuellement désactivés (géré par les appels spécifiques)
+                });
+            }
+
+            // --- Upload photo de profil ---
+            document.getElementById('btn-change-photo').addEventListener('click', () => {
                 if (!currentUser) {
-                    showToast('Connectez-vous pour continuer.', 'error');
+                    showToast('Connectez-vous pour changer votre photo.', 'error');
                     return;
                 }
-                if (isCloudinaryWidgetOpen) return;
-                isCloudinaryWidgetOpen = true;
-                const originalHTML = button.innerHTML;
-                button.disabled = true;
-                button.innerHTML = '<span class="spinner"></span> Ouverture...';
-
-                const widget = cloudinary.openUploadWidget(
-                    {
-                        cloudName: CLOUDINARY_CLOUD_NAME,
-                        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-                        sources: ['local', 'url', 'camera'],
-                        multiple: false,
-                        clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                        maxFileSize: 5000000,
-                        showAdvancedOptions: false,
-                        cropping: true,
-                        croppingAspectRatio: 1,
-                        folder: 'linkext',
-                        styles: {
-                            palette: {
-                                window: "#0a0b10",
-                                windowBorder: "#00f2fe",
-                                tabIcon: "#00f2fe",
-                                menuIcons: "#a0a0c0",
-                                textDark: "#e0e0ff",
-                                textLight: "#0a0b10",
-                                link: "#00f2fe",
-                                action: "#4facfe",
-                                inactiveTabIcon: "#a0a0c0",
-                                error: "#ff4d6d",
-                                inProgress: "#00f2fe",
-                                complete: "#2ecc71",
-                                sourceBg: "#1e1e2e"
-                            }
-                        }
-                    },
-                    (error, result) => {
-                        if (error) {
-                            console.error('Cloudinary error:', error);
-                            showToast('Erreur Cloudinary : ' + error.message, 'error');
-                            return;
-                        }
-                        if (result.event === 'success') {
-                            const secureUrl = result.info.secure_url;
-                            if (secureUrl && onSuccess) onSuccess(secureUrl);
-                        }
-                        if (result.event === 'close' || result.event === 'success' || result.event === 'abort') {
-                            button.disabled = false;
-                            button.innerHTML = originalHTML;
-                            isCloudinaryWidgetOpen = false;
-                            if (onClose) onClose();
-                        }
-                    }
-                );
-
-                widget.on('close', () => {
-                    button.disabled = false;
-                    button.innerHTML = originalHTML;
-                    isCloudinaryWidgetOpen = false;
-                    if (onClose) onClose();
+                openCloudinaryWidget((secureUrl) => {
+                    const avatarImg = document.getElementById('dashboard-avatar');
+                    avatarImg.src = secureUrl;
+                    saveUserProfile(currentUser.uid, { photoURL: secureUrl }).catch(() => {});
+                    showToast('Photo de profil mise à jour !', 'info');
                 });
-            }
-
-            // --- Upload avatar via Cloudinary ---
-            function setupAvatarUpload() {
-                const btn = document.getElementById('btn-change-photo');
-                btn.addEventListener('click', () => {
-                    openCloudinaryWidget({
-                        button: btn,
-                        onSuccess: (url) => {
-                            document.getElementById('dashboard-avatar').src = url;
-                            saveUserProfile(currentUser.uid, { photoURL: url }).catch(() => {});
-                            showToast('Photo de profil mise à jour !', 'info');
-                        }
-                    });
-                });
-            }
+            });
 
             // --- Upload image d'aperçu de partage ---
-            function setupSharePreviewUpload() {
-                const btn = document.getElementById('btn-upload-share-preview');
-                const shareThumb = document.getElementById('share-preview-thumb');
-                const shareImg = document.getElementById('share-preview-img');
-                const removeBtn = document.getElementById('remove-share-preview');
-
-                btn.addEventListener('click', () => {
-                    openCloudinaryWidget({
-                        button: btn,
-                        onSuccess: (url) => {
-                            shareImg.src = url;
-                            shareThumb.style.display = 'block';
-                            saveUserProfile(currentUser.uid, { sharePreviewURL: url }).catch(() => {});
-                            showToast('Image d\'aperçu enregistrée !', 'info');
-                        }
-                    });
+            document.getElementById('btn-upload-share-preview').addEventListener('click', () => {
+                if (!currentUser) {
+                    showToast('Connectez-vous pour téléverser une image.', 'error');
+                    return;
+                }
+                openCloudinaryWidget((secureUrl) => {
+                    // Afficher l'aperçu dans le dashboard
+                    const previewImg = document.getElementById('share-preview-img');
+                    previewImg.src = secureUrl;
+                    previewImg.style.display = 'block';
+                    // Sauvegarder dans Firestore
+                    saveUserProfile(currentUser.uid, { sharePreviewURL: secureUrl }).catch(() => {});
+                    showToast('Image d\'aperçu enregistrée !', 'info');
                 });
-
-                removeBtn.addEventListener('click', async () => {
-                    shareThumb.style.display = 'none';
-                    shareImg.src = '';
-                    await saveUserProfile(currentUser.uid, { sharePreviewURL: '' });
-                    showToast('Image d\'aperçu supprimée.', 'info');
-                });
-            }
+            });
 
             // --- Profil public ---
             async function loadPublicProfile(uid) {
@@ -966,26 +906,23 @@
                     const data = doc.data();
                     document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                     document.getElementById('public-bio').textContent = data.bio || '';
+
+                    // Avatar
                     const avatar = document.getElementById('public-avatar');
                     avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                     avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
 
-                    // Gestion de la bannière d'aperçu
-                    const bannerContainer = document.getElementById('public-banner-container');
-                    bannerContainer.innerHTML = '';
+                    // Bannière d'aperçu
+                    const banner = document.getElementById('public-banner');
                     if (data.sharePreviewURL) {
-                        const img = document.createElement('img');
-                        img.src = data.sharePreviewURL;
-                        img.className = 'share-banner';
-                        img.alt = 'Bannière de profil';
-                        bannerContainer.appendChild(img);
+                        banner.src = data.sharePreviewURL;
+                        banner.style.display = 'block';
+                        banner.onerror = () => { banner.style.display = 'none'; };
                     } else {
-                        const placeholder = document.createElement('div');
-                        placeholder.className = 'share-banner-placeholder';
-                        placeholder.innerHTML = '<span>🖼️ Aucune bannière</span>';
-                        bannerContainer.appendChild(placeholder);
+                        banner.style.display = 'none';
                     }
 
+                    // Liens sociaux
                     const linksContainer = document.getElementById('public-links');
                     linksContainer.innerHTML = '';
                     if (data.links && Array.isArray(data.links)) {
@@ -1080,7 +1017,7 @@
                     } catch (error) {
                         let message = 'Connexion Google échouée.';
                         if (error.code === 'auth/unauthorized-domain') {
-                            message = 'Domaine non autorisé.';
+                            message = 'Domaine non autorisé. Ajoutez ce domaine dans la console Firebase.';
                         } else if (error.message) {
                             message = error.message;
                         }
@@ -1120,7 +1057,6 @@
                         photoURL: currentUser.photoURL || '',
                         bio: bio,
                         links: links,
-                        sharePreviewURL: '',
                         onboardingCompleted: true
                     };
                     saveUserProfile(currentUser.uid, profileData).catch(() => {});
@@ -1143,14 +1079,13 @@
                         photoURL: currentUser.photoURL || '',
                         bio: bio,
                         links: links,
-                        sharePreviewURL: '',
                         onboardingCompleted: true
                     };
                     const saved = await saveUserProfile(currentUser.uid, profileData);
                     if (saved) {
                         showToast('Profil créé avec succès !', 'info');
                     } else {
-                        showToast('Profil enregistré localement.', 'error');
+                        showToast('Profil enregistré localement, synchronisation cloud à venir.', 'error');
                     }
                     showView('view-dashboard');
                     await populateDashboard();
@@ -1220,10 +1155,6 @@
                 document.getElementById('logout-btn').addEventListener('click', () => {
                     auth.signOut();
                 });
-
-                // Initialisation des uploads Cloudinary
-                setupAvatarUpload();
-                setupSharePreviewUpload();
             }
 
             // --- Écouteur d'état d'authentification ---
