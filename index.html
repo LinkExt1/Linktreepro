@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>LinkExt | Cyber Linktree</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #0a0b10;
+            --bg-card: rgba(10, 11, 16, 0.7);
+            --border-glow: rgba(0, 242, 254, 0.2);
+            --cyan: #00f2fe;
+            --violet: #4facfe;
+            --text-primary: #e0e0ff;
+            --text-secondary: #a0a0c0;
+            --danger: #ff4d6d;
+            --success: #2ecc71;
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --transition: 0.3s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-deep);
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
+                              radial-gradient(circle at 100% 30%, rgba(79, 172, 254, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* ----- VUES ----- */
+        .view {
+            display: none;
+            flex-direction: column;
+            gap: 1.8rem;
+            animation: fadeSlideIn 0.4s ease-out;
+        }
+        .view.active {
+            display: flex;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ----- CARTES, CONTAINERS ----- */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,242,254,0.04);
+            transition: var(--transition);
+        }
+
+        .brand {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ----- FORM ELEMENTS ----- */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .input-field {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            font-size: 0.95rem;
+            color: white;
+            font-family: var(--font-body);
+            transition: var(--transition);
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 12px rgba(0,242,254,0.3);
+            background: rgba(255,255,255,0.08);
+        }
+        .input-field::placeholder {
+            color: rgba(255,255,255,0.35);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            border: none;
+            border-radius: 14px;
+            padding: 0.9rem 1.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #0a0b10;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-body);
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,242,254,0.35);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(30%);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            background: rgba(0,242,254,0.05);
+        }
+        .btn-outline:hover:not(:disabled) {
+            background: rgba(0,242,254,0.15);
+            box-shadow: 0 0 20px rgba(0,242,254,0.3);
+        }
+        .btn-google {
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-weight: 600;
+        }
+        .btn-google:hover:not(:disabled) {
+            background: #f0f0f0;
+            box-shadow: 0 8px 20px rgba(255,255,255,0.2);
+        }
+        .btn-google img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ----- TABS AUTH ----- */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 0.3rem;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.7rem;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+        .tab.active {
+            background: rgba(0,242,254,0.15);
+            color: var(--cyan);
+            box-shadow: 0 0 15px rgba(0,242,254,0.2);
+        }
+
+        /* ----- ONBOARDING GRID ----- */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+        .platform-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 0.8rem 0.3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .platform-item i {
+            font-size: 1.8rem;
+            transition: var(--transition);
+        }
+        .platform-item.selected {
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0,242,254,0.5);
+            background: rgba(0,242,254,0.1);
+            color: white;
+            transform: scale(1.02);
+        }
+        .platform-item.selected i {
+            color: var(--cyan);
+        }
+        .url-input-animated {
+            animation: slideDown 0.3s ease-out;
+            overflow: hidden;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; margin-top: 0; }
+            to { opacity: 1; max-height: 80px; margin-top: 0.6rem; }
+        }
+
+        /* ----- DASHBOARD ----- */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .avatar-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(var(--cyan), var(--violet), var(--cyan));
+            padding: 2px;
+        }
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #0a0b10;
+            display: block;
+        }
+        .link-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            transition: var(--transition);
+        }
+        .link-item .platform-icon {
+            font-size: 1.6rem;
+            width: 2rem;
+            text-align: center;
+        }
+        .link-item input {
+            flex: 1;
+            min-width: 150px;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .toggle-switch.active {
+            background: var(--cyan);
+            box-shadow: 0 0 12px var(--cyan);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .toggle-switch.active::after {
+            left: 25px;
+        }
+        .delete-link-btn {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        .delete-link-btn:hover {
+            color: #ff2040;
+            transform: scale(1.1);
+        }
+
+        /* ----- PUBLIC PROFILE ----- */
+        .public-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--cyan);
+            box-shadow: 0 0 30px rgba(0,242,254,0.5);
+            animation: pulseGlow 2s infinite;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(0,242,254,0.4); }
+            50% { box-shadow: 0 0 35px rgba(0,242,254,0.8); }
+            100% { box-shadow: 0 0 15px rgba(0,242,254,0.4); }
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.9rem 1.4rem;
+            border-radius: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+            transition: var(--transition);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: var(--font-body);
+        }
+        .social-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.2);
+        }
+        .social-btn.whatsapp { background: #25D366; color: #fff; }
+        .social-btn.telegram { background: #0088cc; color: #fff; }
+        .social-btn.facebook { background: #1877F2; color: #fff; }
+        .social-btn.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
+        .social-btn.youtube { background: #FF0000; color: #fff; }
+        .social-btn.x { background: #1DA1F2; color: #fff; }
+        .social-btn.tiktok { background: #000000; color: #fff; border: 1px solid #ffffff40; }
+
+        /* ----- TOASTS ----- */
+        #toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .toast {
+            background: #0a0b10;
+            border: 1px solid var(--cyan);
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            color: white;
+            backdrop-filter: blur(10px);
+            animation: slideInRight 0.3s ease-out;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+        .toast.error { border-color: var(--danger); }
+        @keyframes slideInRight {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .text-center { text-align: center; }
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 1.5rem; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- VUE AUTH -->
+        <div id="view-auth" class="view">
+            <div class="glass-card">
+                <div class="brand">LINKEXT</div>
+                <div class="tabs" id="auth-tabs">
+                    <div class="tab active" data-tab="login">Connexion</div>
+                    <div class="tab" data-tab="register">Inscription</div>
+                </div>
+                <form id="auth-form" autocomplete="off">
+                    <div class="input-group mt-1">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" class="input-field" id="auth-email" placeholder="vous@exemple.com" required>
+                    </div>
+                    <div class="input-group mt-1">
+                        <label><i class="fas fa-lock"></i> Mot de passe</label>
+                        <input type="password" class="input-field" id="auth-password" placeholder="••••••••" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn mt-2" id="auth-submit-btn" style="width:100%">
+                        <span id="auth-btn-text">Se connecter</span>
+                        <span id="auth-spinner" class="spinner hidden"></span>
+                    </button>
+                </form>
+                <div class="text-center mt-1">
+                    <a href="#" id="forgot-password-link" style="color:var(--cyan); font-size:0.85rem;">Mot de passe oublié ?</a>
+                </div>
+                <div class="mt-2" style="display:flex; align-items:center; gap:0.8rem;">
+                    <div style="flex:1; height:1px; background:rgba(255,255,255,0.15);"></div>
+                    <span style="font-size:0.8rem; color:var(--text-secondary);">ou</span>
+                    <div style="flex:1; height:1px; background:rgba(255,255,255,0.15);"></div>
+                </div>
+                <button class="btn btn-google mt-2" id="google-signin-btn" style="width:100%">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" height="20">
+                    Continuer avec Google
+                </button>
+            </div>
+        </div>
+
+        <!-- VUE ONBOARDING -->
+        <div id="view-onboarding" class="view">
+            <div class="glass-card">
+                <div class="brand" style="font-size:1.8rem;">CONFIGURATION</div>
+                <p style="color:var(--text-secondary); text-align:center;">Sélectionnez vos réseaux et ajoutez vos liens</p>
+                <div class="platform-grid" id="onboarding-grid"></div>
+                <div id="onboarding-urls" class="mt-1"></div>
+                <div class="input-group mt-2">
+                    <label><i class="fas fa-pen"></i> Bio courte</label>
+                    <textarea class="input-field" id="onboarding-bio" rows="2" maxlength="150" placeholder="Décrivez-vous en quelques mots..."></textarea>
+                </div>
+                <button class="btn mt-2" id="finish-onboarding-btn" style="width:100%">Finaliser et créer mon profil</button>
+                <button class="btn btn-outline mt-1" id="skip-onboarding-btn" style="width:100%">Passer l'étape</button>
+            </div>
+        </div>
+
+        <!-- VUE DASHBOARD -->
+        <div id="view-dashboard" class="view">
+            <div class="glass-card">
+                <div style="display:flex; justify-content: space-between; align-items:center;">
+                    <div class="brand" style="font-size:1.5rem; margin:0;">DASHBOARD</div>
+                    <button class="btn btn-outline" id="logout-btn" style="padding:0.5rem 1rem;"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+                <div class="profile-header mt-2">
+                    <div class="avatar-wrapper">
+                        <img id="dashboard-avatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=128" alt="avatar">
+                    </div>
+                    <div style="flex:1;">
+                        <div class="input-group">
+                            <label>Nom affiché</label>
+                            <input type="text" class="input-field" id="dashboard-name" placeholder="Votre nom">
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mt-2">
+                    <label>URL photo de profil</label>
+                    <input type="url" class="input-field" id="dashboard-photo" placeholder="https://...">
+                </div>
+                <div class="input-group mt-2">
+                    <label>Biographie</label>
+                    <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
+                </div>
+                <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
+                    <h3 style="font-family:var(--font-heading); font-size:1rem;">🔗 Mes liens</h3>
+                    <button class="btn btn-outline" id="add-link-btn" style="padding:0.4rem 1rem;"><i class="fas fa-plus"></i> Ajouter</button>
+                </div>
+                <div id="dashboard-links-container" class="mt-1" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
+                <button class="btn mt-2" id="save-dashboard-btn" style="width:100%">Enregistrer les modifications</button>
+                <button class="btn btn-outline mt-1" id="copy-share-link-btn" style="width:100%"><i class="fas fa-copy"></i> Copier mon lien de partage</button>
+            </div>
+        </div>
+
+        <!-- VUE PROFIL PUBLIC -->
+        <div id="view-profile-public" class="view">
+            <div class="glass-card" style="text-align:center;">
+                <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
+                <h2 id="public-name" style="font-family:var(--font-heading); margin-top:1rem;"></h2>
+                <p id="public-bio" style="color:var(--text-secondary); margin-top:0.5rem;"></p>
+                <div id="public-links" class="mt-2" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
+            </div>
+            <p class="text-center" style="font-size:0.8rem; color:var(--text-secondary);">Propulsé par LinkExt</p>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        (function() {
+            // ----- CONFIGURATION FIREBASE -----
+            const firebaseConfig = {
+                apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
+                authDomain: "linkext-83984.firebaseapp.com",
+                projectId: "linkext-83984",
+                storageBucket: "linkext-83984.firebasestorage.app",
+                messagingSenderId: "252759128333",
+                appId: "1:252759128333:web:faa50e87e8e86699b6d844",
+                measurementId: "G-FT8V3C652D"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            // ----- PLATEFORMES PRÉDÉFINIES -----
+            const PLATFORMS = [
+                { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp', colorClass: 'whatsapp' },
+                { id: 'telegram', name: 'Telegram', icon: 'fab fa-telegram-plane', colorClass: 'telegram' },
+                { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook', colorClass: 'facebook' },
+                { id: 'instagram', name: 'Instagram', icon: 'fab fa-instagram', colorClass: 'instagram' },
+                { id: 'youtube', name: 'YouTube', icon: 'fab fa-youtube', colorClass: 'youtube' },
+                { id: 'x', name: 'X (Twitter)', icon: 'fab fa-x-twitter', colorClass: 'x' },
+                { id: 'tiktok', name: 'TikTok', icon: 'fab fa-tiktok', colorClass: 'tiktok' }
+            ];
+
+            // ----- ÉTAT GLOBAL -----
+            let currentUser = null;
+            let userProfile = null; // Données Firestore
+            let authMode = 'login'; // 'login' ou 'register'
+            let selectedOnboardingPlatforms = new Set();
+            let onboardingUrls = {};
+
+            // ----- RÉFÉRENCES DOM -----
+            const views = {
+                auth: document.getElementById('view-auth'),
+                onboarding: document.getElementById('view-onboarding'),
+                dashboard: document.getElementById('view-dashboard'),
+                publicProfile: document.getElementById('view-profile-public')
+            };
+
+            // ----- UTILITAIRES -----
+            function showView(viewId) {
+                Object.values(views).forEach(v => v.classList.remove('active'));
+                const target = document.getElementById(viewId);
+                if (target) target.classList.add('active');
+            }
+
+            function showToast(message, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }
+
+            function sanitizeUrl(url) {
+                if (!url) return '';
+                url = url.trim();
+                if (!/^https?:\/\//i.test(url)) {
+                    return 'https://' + url;
+                }
+                return url;
+            }
+
+            function generateAvatarUrl(name) {
+                return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
+            }
+
+            // ----- AUTHENTIFICATION -----
+            function updateAuthUIForMode(mode) {
+                authMode = mode;
+                document.querySelectorAll('#auth-tabs .tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === mode);
+                });
+                const btnText = document.getElementById('auth-btn-text');
+                btnText.textContent = mode === 'login' ? 'Se connecter' : 'Créer un compte';
+            }
+
+            document.getElementById('auth-tabs').addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab')) {
+                    updateAuthUIForMode(e.target.dataset.tab);
+                }
+            });
+
+            document.getElementById('auth-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('auth-email').value.trim();
+                const password = document.getElementById('auth-password').value;
+                const submitBtn = document.getElementById('auth-submit-btn');
+                const spinner = document.getElementById('auth-spinner');
+                const btnText = document.getElementById('auth-btn-text');
+
+                submitBtn.disabled = true;
+                spinner.classList.remove('hidden');
+                btnText.textContent = '';
+
+                try {
+                    if (authMode === 'login') {
+                        await auth.signInWithEmailAndPassword(email, password);
+                    } else {
+                        await auth.createUserWithEmailAndPassword(email, password);
+                    }
+                } catch (error) {
+                    let message = "Erreur d'authentification.";
+                    if (error.code === 'auth/email-already-in-use') message = 'Cet email est déjà utilisé.';
+                    else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') message = 'Email ou mot de passe incorrect.';
+                    else if (error.code === 'auth/weak-password') message = 'Mot de passe trop faible (min. 6 caractères).';
+                    else message = error.message;
+                    showToast(message, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    spinner.classList.add('hidden');
+                    btnText.textContent = authMode === 'login' ? 'Se connecter' : 'Créer un compte';
+                }
+            });
+
+            document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
+                e.preventDefault();
+                const email = prompt('Entrez votre adresse email pour réinitialiser le mot de passe :');
+                if (!email) return;
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    showToast('Email de réinitialisation envoyé ! Vérifiez votre boîte.', 'info');
+                } catch (error) {
+                    showToast('Erreur : ' + error.message, 'error');
+                }
+            });
+
+            document.getElementById('google-signin-btn').addEventListener('click', async () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                try {
+                    await auth.signInWithPopup(provider);
+                } catch (error) {
+                    showToast('Connexion Google échouée : ' + error.message, 'error');
+                }
+            });
+
+            // ----- DÉCONNEXION -----
+            document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+
+            // ----- CHARGEMENT PROFIL FIRESTORE -----
+            async function loadUserProfile(uid) {
+                const docRef = db.collection('users').doc(uid);
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    userProfile = doc.data();
+                    userProfile._id = uid;
+                } else {
+                    userProfile = null;
+                }
+                return userProfile;
+            }
+
+            async function saveUserProfile(uid, data) {
+                const docRef = db.collection('users').doc(uid);
+                await docRef.set(data, { merge: true });
+                userProfile = { ...userProfile, ...data, _id: uid };
+            }
+
+            // ----- ONBOARDING -----
+            function renderOnboardingGrid() {
+                const grid = document.getElementById('onboarding-grid');
+                grid.innerHTML = '';
+                PLATFORMS.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = `platform-item ${selectedOnboardingPlatforms.has(p.id) ? 'selected' : ''}`;
+                    div.dataset.platform = p.id;
+                    div.innerHTML = `<i class="${p.icon}"></i><span>${p.name}</span>`;
+                    div.addEventListener('click', () => toggleOnboardingPlatform(p.id));
+                    grid.appendChild(div);
+                });
+                renderOnboardingUrlInputs();
+            }
+
+            function toggleOnboardingPlatform(platformId) {
+                if (selectedOnboardingPlatforms.has(platformId)) {
+                    selectedOnboardingPlatforms.delete(platformId);
+                    delete onboardingUrls[platformId];
+                } else {
+                    selectedOnboardingPlatforms.add(platformId);
+                    onboardingUrls[platformId] = '';
+                }
+                document.querySelectorAll('#onboarding-grid .platform-item').forEach(el => {
+                    el.classList.toggle('selected', selectedOnboardingPlatforms.has(el.dataset.platform));
+                });
+                renderOnboardingUrlInputs();
+            }
+
+            function renderOnboardingUrlInputs() {
+                const container = document.getElementById('onboarding-urls');
+                container.innerHTML = '';
+                selectedOnboardingPlatforms.forEach(platformId => {
+                    const platform = PLATFORMS.find(p => p.id === platformId);
+                    if (!platform) return;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'input-group url-input-animated mt-1';
+                    wrapper.innerHTML = `
+                        <label><i class="${platform.icon}"></i> Lien ${platform.name}</label>
+                        <input type="text" class="input-field onboarding-url-input" data-platform="${platformId}" 
+                               placeholder="https://..." value="${onboardingUrls[platformId] || ''}">
+                    `;
+                    container.appendChild(wrapper);
+                });
+                document.querySelectorAll('.onboarding-url-input').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        onboardingUrls[e.target.dataset.platform] = e.target.value;
+                    });
+                });
+            }
+
+            document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
+                if (!currentUser) return;
+                try {
+                    await saveUserProfile(currentUser.uid, {
+                        displayName: currentUser.displayName || '',
+                        photoURL: currentUser.photoURL || '',
+                        bio: '',
+                        links: [],
+                        onboardingCompleted: true
+                    });
+                    showView('view-dashboard');
+                    await populateDashboard();
+                } catch (err) {
+                    showToast('Erreur: ' + err.message, 'error');
+                }
+            });
+
+            document.getElementById('finish-onboarding-btn').addEventListener('click', async () => {
+                if (!currentUser) return;
+                const bio = document.getElementById('onboarding-bio').value.trim();
+                const links = [];
+                selectedOnboardingPlatforms.forEach(platformId => {
+                    const url = sanitizeUrl(onboardingUrls[platformId] || '');
+                    if (url) {
+                        links.push({ platform: platformId, url, active: true });
+                    }
+                });
+                try {
+                    await saveUserProfile(currentUser.uid, {
+                        displayName: currentUser.displayName || currentUser.email.split('@')[0],
+                        photoURL: currentUser.photoURL || '',
+                        bio: bio,
+                        links: links,
+                        onboardingCompleted: true
+                    });
+                    showView('view-dashboard');
+                    await populateDashboard();
+                } catch (err) {
+                    showToast('Erreur lors de la sauvegarde: ' + err.message, 'error');
+                }
+            });
+
+            // ----- DASHBOARD -----
+            async function populateDashboard() {
+                if (!currentUser || !userProfile) {
+                    await loadUserProfile(currentUser.uid);
+                    if (!userProfile) {
+                        userProfile = {
+                            displayName: currentUser.displayName || '',
+                            photoURL: currentUser.photoURL || '',
+                            bio: '',
+                            links: [],
+                            onboardingCompleted: false
+                        };
+                    }
+                }
+                document.getElementById('dashboard-name').value = userProfile.displayName || '';
+                document.getElementById('dashboard-photo').value = userProfile.photoURL || '';
+                document.getElementById('dashboard-bio').value = userProfile.bio || '';
+                const avatarImg = document.getElementById('dashboard-avatar');
+                avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
+                avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
+                renderDashboardLinks();
+            }
+
+            function renderDashboardLinks() {
+                const container = document.getElementById('dashboard-links-container');
+                container.innerHTML = '';
+                if (!userProfile || !userProfile.links) return;
+                userProfile.links.forEach((link, index) => {
+                    const platform = PLATFORMS.find(p => p.id === link.platform);
+                    if (!platform) return;
+                    const div = document.createElement('div');
+                    div.className = 'link-item';
+                    div.innerHTML = `
+                        <i class="${platform.icon} platform-icon" style="color:var(--cyan);"></i>
+                        <input type="text" class="input-field link-url-input" value="${link.url || ''}" placeholder="URL" data-index="${index}">
+                        <div class="toggle-switch ${link.active ? 'active' : ''}" data-index="${index}" data-action="toggle"></div>
+                        <button class="delete-link-btn" data-index="${index}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
+                    `;
+                    container.appendChild(div);
+                });
+
+                container.addEventListener('click', (e) => {
+                    const index = e.target.closest('[data-index]')?.dataset.index;
+                    if (index === undefined) return;
+                    const action = e.target.closest('[data-action]')?.dataset.action;
+                    if (action === 'toggle') {
+                        userProfile.links[index].active = !userProfile.links[index].active;
+                        renderDashboardLinks();
+                    } else if (action === 'delete') {
+                        userProfile.links.splice(index, 1);
+                        renderDashboardLinks();
+                    }
+                });
+
+                container.addEventListener('input', (e) => {
+                    if (e.target.classList.contains('link-url-input')) {
+                        const index = e.target.dataset.index;
+                        if (index !== undefined && userProfile.links[index]) {
+                            userProfile.links[index].url = e.target.value;
+                        }
+                    }
+                });
+            }
+
+            document.getElementById('add-link-btn').addEventListener('click', () => {
+                const availablePlatforms = PLATFORMS.filter(p => !userProfile.links.some(l => l.platform === p.id));
+                if (availablePlatforms.length === 0) {
+                    showToast('Tous les réseaux sont déjà ajoutés.', 'info');
+                    return;
+                }
+                const platformNames = availablePlatforms.map((p, i) => `${i+1}. ${p.name}`).join('\n');
+                const choice = prompt(`Choisissez un réseau à ajouter :\n${platformNames}\nEntrez le numéro :`);
+                if (!choice) return;
+                const idx = parseInt(choice) - 1;
+                if (idx >= 0 && idx < availablePlatforms.length) {
+                    userProfile.links.push({ platform: availablePlatforms[idx].id, url: '', active: true });
+                    renderDashboardLinks();
+                } else {
+                    showToast('Choix invalide.', 'error');
+                }
+            });
+
+            document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
+                if (!currentUser) return;
+                const name = document.getElementById('dashboard-name').value.trim();
+                const photo = document.getElementById('dashboard-photo').value.trim();
+                const bio = document.getElementById('dashboard-bio').value.trim();
+                const links = userProfile.links.map(l => ({
+                    platform: l.platform,
+                    url: sanitizeUrl(l.url),
+                    active: l.active
+                }));
+                try {
+                    await saveUserProfile(currentUser.uid, {
+                        displayName: name,
+                        photoURL: photo,
+                        bio: bio,
+                        links: links,
+                        onboardingCompleted: true
+                    });
+                    showToast('Profil enregistré avec succès !', 'info');
+                    document.getElementById('dashboard-avatar').src = photo || generateAvatarUrl(name);
+                } catch (err) {
+                    showToast('Erreur sauvegarde: ' + err.message, 'error');
+                }
+            });
+
+            document.getElementById('copy-share-link-btn').addEventListener('click', async () => {
+                if (!currentUser) return;
+                const shareUrl = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    showToast('Lien copié ! 🚀', 'info');
+                } catch {
+                    const input = document.createElement('input');
+                    input.value = shareUrl;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    showToast('Lien copié !', 'info');
+                }
+            });
+
+            // ----- PROFIL PUBLIC -----
+            async function loadPublicProfile(uid) {
+                try {
+                    const docRef = db.collection('users').doc(uid);
+                    const doc = await docRef.get();
+                    if (!doc.exists) {
+                        showToast('Profil introuvable.', 'error');
+                        return;
+                    }
+                    const data = doc.data();
+                    document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
+                    document.getElementById('public-bio').textContent = data.bio || '';
+                    const avatar = document.getElementById('public-avatar');
+                    avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
+                    avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
+
+                    const linksContainer = document.getElementById('public-links');
+                    linksContainer.innerHTML = '';
+                    if (data.links && Array.isArray(data.links)) {
+                        data.links.filter(l => l.active).forEach(link => {
+                            const platform = PLATFORMS.find(p => p.id === link.platform);
+                            if (!platform || !link.url) return;
+                            const a = document.createElement('a');
+                            a.href = sanitizeUrl(link.url);
+                            a.target = '_blank';
+                            a.rel = 'noopener noreferrer';
+                            a.className = `social-btn ${platform.colorClass}`;
+                            a.innerHTML = `<i class="${platform.icon}"></i> ${platform.name}`;
+                            linksContainer.appendChild(a);
+                        });
+                    }
+                } catch (err) {
+                    showToast('Erreur chargement profil: ' + err.message, 'error');
+                }
+            }
+
+            // ----- ROUTAGE PRINCIPAL -----
+            function checkPublicMode() {
+                const params = new URLSearchParams(window.location.search);
+                const uid = params.get('id');
+                if (uid) {
+                    showView('view-profile-public');
+                    loadPublicProfile(uid);
+                    return true;
+                }
+                return false;
+            }
+
+            // ----- GESTION ÉTAT AUTH -----
+            auth.onAuthStateChanged(async (user) => {
+                if (checkPublicMode()) return; // priorité vue publique
+
+                currentUser = user;
+                if (user) {
+                    await loadUserProfile(user.uid);
+                    if (!userProfile || !userProfile.onboardingCompleted) {
+                        // Premier passage ou onboarding non complété
+                        showView('view-onboarding');
+                        selectedOnboardingPlatforms.clear();
+                        onboardingUrls = {};
+                        renderOnboardingGrid();
+                        document.getElementById('onboarding-bio').value = '';
+                    } else {
+                        showView('view-dashboard');
+                        await populateDashboard();
+                    }
+                } else {
+                    userProfile = null;
+                    showView('view-auth');
+                    updateAuthUIForMode('login');
+                }
+            });
+
+            // Vérification initiale au chargement
+            window.addEventListener('DOMContentLoaded', () => {
+                if (!checkPublicMode()) {
+                    // Firebase auth state va gérer l'affichage
+                    showView('view-auth'); // fallback temporaire
+                }
+            });
+
+            // Nettoyage liens onboarding lors changement vue
+        })();
+    </script>
+</body>
+</html>
