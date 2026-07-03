@@ -5,21 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>LinkExt | Cyber Linktree</title>
 
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="LinkExt - Votre hub de liens nouvelle génération">
-    <meta property="og:description" content="Partagez tous vos réseaux sociaux en un seul lien. Design cyberpunk et gestion simplifiée.">
-    <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
-    <meta property="og:url" content="https://linkext.example.com">
-    <meta property="og:type" content="website">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Widget Cloudinary -->
+    <!-- Cloudinary Widget -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
-        /* ===== VARIABLES GLOBALES ===== */
+        /* ===== VARIABLES ===== */
         :root {
             --bg-deep: #0a0b10;
             --bg-card: rgba(10, 11, 16, 0.7);
@@ -33,8 +26,6 @@
             --font-heading: 'Orbitron', sans-serif;
             --font-body: 'Inter', sans-serif;
             --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            --glow-cyan: 0 0 30px rgba(0, 242, 254, 0.4);
-            --glow-green: 0 0 30px rgba(37, 211, 102, 0.5);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -351,7 +342,7 @@
             align-items: center;
             gap: 0.5rem;
         }
-        /* Statut Flash - pastille */
+        /* Statut Flash */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -374,7 +365,6 @@
         .status-badge.disponible .dot { background: #2ecc71; }
         .status-badge.occupe .dot { background: #f39c12; }
         .status-badge.enlive .dot { background: #e74c3c; }
-        /* Sélecteur statut */
         .status-selector {
             display: flex;
             gap: 0.5rem;
@@ -405,7 +395,7 @@
         .status-selector .status-option[data-value="disponible"] .dot { background: #2ecc71; }
         .status-selector .status-option[data-value="occupe"] .dot { background: #f39c12; }
         .status-selector .status-option[data-value="enlive"] .dot { background: #e74c3c; }
-        /* Mode maintenance toggle */
+        /* Maintenance toggle */
         .maintenance-toggle {
             display: flex;
             align-items: center;
@@ -496,9 +486,7 @@
             border-color: var(--cyan);
         }
 
-        /* ============================================================
-           VUE DÉDIÉE : AJOUT DE LIEN
-           ============================================================ */
+        /* ===== VUE AJOUT DE LIEN ===== */
         .back-btn {
             background: transparent;
             border: none;
@@ -577,53 +565,31 @@
         .link-input-container .btn {
             width: 100%;
         }
+        .link-input-container .upload-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            justify-content: flex-start;
+        }
+        .link-input-container .upload-row .btn-outline {
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+        }
+        .link-input-container .upload-row .image-preview {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-deep);
+        }
 
-        /* ============================================================
-           PROFIL PUBLIC - NOUVELLE REFONTE (SANS EMOJI)
-           ============================================================ */
+        /* ===== PROFIL PUBLIC ===== */
         #view-profile-public .glass-card {
             padding: 0 1.8rem 2rem 1.8rem;
             overflow: visible;
         }
-        /* Bannière */
-        #public-banner-container {
-            margin: 0 -1.8rem 1.2rem -1.8rem;
-            border-radius: 0;
-            overflow: hidden;
-            line-height: 0;
-            background: rgba(0,242,254,0.05);
-        }
-        #public-banner-container .share-banner-link {
-            display: block;
-            margin: 0;
-            width: 100%;
-            border-bottom: 2px solid var(--cyan);
-            border-radius: 0;
-            overflow: hidden;
-        }
-        #public-banner-container .share-banner-link img {
-            width: 100%;
-            object-fit: cover;
-            max-height: 200px;
-            display: block;
-            transition: transform 0.4s ease;
-        }
-        #public-banner-container .share-banner-link:hover img {
-            transform: scale(1.02);
-        }
-        #public-banner-container .share-banner-placeholder {
-            background: linear-gradient(135deg, rgba(0,242,254,0.15), rgba(79,172,254,0.15));
-            height: 120px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            border-bottom: 2px solid var(--cyan);
-        }
-
-        /* En-tête (avatar + boutons + nom + bio) - NON CLIQUABLE */
+        /* En-tête (avatar + boutons) */
         .public-header {
             margin-bottom: 1rem;
         }
@@ -701,7 +667,7 @@
             opacity: 0.3;
         }
 
-        /* ===== CARTES RICH PREVIEW (liens unifiés) ===== */
+        /* ===== CARTES RICH PREVIEW ===== */
         .rich-link-card {
             display: flex;
             flex-direction: column;
@@ -730,12 +696,27 @@
             letter-spacing: 0.3px;
             text-align: left;
         }
-        .rich-link-card .link-image {
+        .rich-link-card .card-media {
             width: 100%;
             aspect-ratio: 16/9;
             object-fit: cover;
             display: block;
             background: var(--bg-deep);
+        }
+        .rich-link-card .card-media-default {
+            width: 100%;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.03) 0%, transparent 70%);
+            font-size: 4rem;
+            color: rgba(255,255,255,0.1);
+            transition: color 0.3s ease;
+        }
+        .rich-link-card:hover .card-media-default {
+            color: rgba(255,255,255,0.25);
         }
         .rich-link-card .link-action-bar {
             display: flex;
@@ -758,7 +739,6 @@
             opacity: 0.8;
         }
 
-        /* Animation Lien Vedette (pulsation) */
         .lien-vedette {
             animation: pulseLink 1.8s ease-in-out infinite;
             border: 2px solid var(--cyan) !important;
@@ -768,11 +748,6 @@
             0% { transform: scale(1); box-shadow: 0 0 15px rgba(0,242,254,0.3); }
             50% { transform: scale(1.02); box-shadow: 0 0 40px rgba(0,242,254,0.8); }
             100% { transform: scale(1); box-shadow: 0 0 15px rgba(0,242,254,0.3); }
-        }
-
-        /* Boutons QR & Vcard dans le public */
-        .public-actions {
-            display: none; /* caché car déjà dans l'en-tête */
         }
 
         .maintenance-message {
@@ -796,9 +771,6 @@
         @media (max-width: 420px) {
             #view-profile-public .glass-card {
                 padding: 0 1rem 1.5rem 1rem;
-            }
-            #public-banner-container {
-                margin: 0 -1rem 1rem -1rem;
             }
             .public-header-top .avatar-glow-ring {
                 width: 64px;
@@ -828,6 +800,9 @@
             .rich-link-card .link-action-bar {
                 font-size: 0.75rem;
                 padding: 8px 12px;
+            }
+            .rich-link-card .card-media-default {
+                font-size: 3rem;
             }
         }
     </style>
@@ -945,21 +920,7 @@
                 <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
             </div>
 
-            <!-- Image d'aperçu -->
-            <div class="mt-2 p-2" style="background: rgba(0,242,254,0.05); border-radius: 14px; border: 1px solid var(--border-glow);">
-                <div class="input-group">
-                    <label style="font-size:0.9rem; color:var(--cyan);"><i class="fas fa-image"></i> Image d'aperçu</label>
-                    <button class="btn btn-outline" id="btn-upload-share-preview" style="justify-content: center;">
-                        <i class="fas fa-upload"></i> Téléverser
-                    </button>
-                    <div id="share-preview-thumb" class="mt-1" style="display: none; position: relative;">
-                        <img id="share-preview-img" src="" alt="aperçu" style="width:100%; border-radius:10px; max-height:120px; object-fit:cover; border:1px solid var(--cyan);">
-                        <button id="remove-share-preview" class="btn" style="position: absolute; top: 5px; right: 5px; padding:0.3rem 0.6rem; font-size:0.7rem; background: var(--danger); color:white; border:none; border-radius:6px;">✕</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lien personnalisé pour bannière -->
+            <!-- Lien personnalisé pour bannière (conservé, mais la bannière a été supprimée du public) -->
             <div class="input-group mt-2">
                 <label><i class="fas fa-link"></i> Lien de clic sur la bannière (personnalisé)</label>
                 <input type="url" class="input-field" id="dashboard-banner-link" placeholder="https://..." value="">
@@ -988,18 +949,22 @@
             <div class="networks-grid" id="add-link-grid"></div>
             <div class="link-input-container" id="link-input-container">
                 <input type="url" id="new-link-url" placeholder="Entrez votre lien..." autocomplete="off">
+                <!-- Upload image optionnel -->
+                <div class="upload-row">
+                    <button class="btn btn-outline" id="btn-upload-link-image" style="padding:0.4rem 1rem; font-size:0.85rem;">
+                        <i class="fas fa-image"></i> Ajouter une image d'illustration (Optionnel)
+                    </button>
+                    <img id="link-image-preview" class="image-preview hidden" src="" alt="aperçu">
+                </div>
                 <button class="btn" id="validate-link-btn">Valider et Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <!-- ========== VUE PROFIL PUBLIC (REFONTE) ========== -->
+    <!-- ========== VUE PROFIL PUBLIC ========== -->
     <div id="view-profile-public" class="view">
         <div class="glass-card" style="text-align:center; padding-top:0;">
-            <!-- Bannière -->
-            <div id="public-banner-container"></div>
-
-            <!-- En-tête : avatar + boutons + nom + bio -->
+            <!-- En-tête (avatar + boutons) - sans bannière -->
             <div class="public-header">
                 <div class="public-header-top">
                     <div class="avatar-glow-ring">
@@ -1017,7 +982,6 @@
                 </div>
             </div>
 
-            <!-- Séparateur -->
             <div class="public-links-divider"></div>
 
             <!-- Liste des cartes Rich Link -->
@@ -1084,6 +1048,7 @@
         let authRedirectInProgress = false;
         let isCloudinaryWidgetOpen = false;
         let selectedNetworkType = null;
+        let linkImageUrl = ''; // stocke l'URL de l'image uploadée pour le lien en cours
 
         // --- Vues ---
         const views = {
@@ -1133,6 +1098,9 @@
                     if (userProfile.links && Array.isArray(userProfile.links)) {
                         userProfile.links = userProfile.links.map(l => {
                             if (typeof l.clicks !== 'number') l.clicks = 0;
+                            if (!l.id) l.id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+                            if (!l.description) l.description = '';
+                            if (!l.imageUrl) l.imageUrl = '';
                             return l;
                         });
                     }
@@ -1175,15 +1143,15 @@
             }
         }
 
-        async function incrementLinkClick(uid, linkIndex) {
+        async function incrementLinkClick(uid, linkId) {
             try {
                 const docRef = db.collection('users').doc(uid);
                 const doc = await docRef.get();
                 if (!doc.exists) return;
                 const data = doc.data();
-                if (!data.links || !data.links[linkIndex]) return;
-                const updatedLinks = data.links.map((l, i) => {
-                    if (i === linkIndex) {
+                if (!data.links) return;
+                const updatedLinks = data.links.map(l => {
+                    if (l.id === linkId) {
                         return { ...l, clicks: (l.clicks || 0) + 1 };
                     }
                     return l;
@@ -1211,7 +1179,6 @@
                     photoURL: user.photoURL || '',
                     bio: '',
                     links: [],
-                    sharePreviewURL: '',
                     bannerLink: '',
                     status: 'disponible',
                     maintenance: false,
@@ -1245,7 +1212,7 @@
             document.getElementById('auth-btn-text').textContent = mode === 'login' ? 'Se connecter' : 'Créer un compte';
         }
 
-        // --- Onboarding ---
+        // --- Onboarding (inchangé) ---
         function renderOnboardingGrid() {
             const grid = document.getElementById('onboarding-grid');
             grid.innerHTML = '';
@@ -1305,7 +1272,6 @@
                     photoURL: currentUser.photoURL || '',
                     bio: '',
                     links: [],
-                    sharePreviewURL: '',
                     bannerLink: '',
                     status: 'disponible',
                     maintenance: false,
@@ -1323,15 +1289,6 @@
             const avatarImg = document.getElementById('dashboard-avatar');
             avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
             avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
-
-            const shareThumb = document.getElementById('share-preview-thumb');
-            const shareImg = document.getElementById('share-preview-img');
-            if (userProfile.sharePreviewURL) {
-                shareImg.src = userProfile.sharePreviewURL;
-                shareThumb.style.display = 'block';
-            } else {
-                shareThumb.style.display = 'none';
-            }
 
             updateStatusUI(userProfile.status || 'disponible');
             updateMaintenanceUI(userProfile.maintenance || false);
@@ -1414,8 +1371,8 @@
             track.classList.toggle('active', enabled);
         }
 
-        // --- Cloudinary Widget ---
-        function openCloudinaryWidget({ button, onSuccess }) {
+        // --- Cloudinary Widget (générique) ---
+        function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
                 showToast('Connectez-vous pour continuer.', 'error');
                 return;
@@ -1449,6 +1406,7 @@
                         button.disabled = false;
                         button.innerHTML = originalHTML;
                         isCloudinaryWidgetOpen = false;
+                        if (onError) onError(message);
                         return;
                     }
                     if (!error && result && result.event === "success") {
@@ -1471,6 +1429,7 @@
             });
         }
 
+        // --- Upload pour la photo de profil (Dashboard) ---
         function setupAvatarUpload() {
             const btn = document.getElementById('btn-change-photo');
             btn.addEventListener('click', () => {
@@ -1485,29 +1444,25 @@
             });
         }
 
-        function setupSharePreviewUpload() {
-            const btn = document.getElementById('btn-upload-share-preview');
-            const shareThumb = document.getElementById('share-preview-thumb');
-            const shareImg = document.getElementById('share-preview-img');
-            const removeBtn = document.getElementById('remove-share-preview');
+        // --- Upload pour l'image d'un lien (vue add-link) ---
+        function setupLinkImageUpload() {
+            const btn = document.getElementById('btn-upload-link-image');
+            const preview = document.getElementById('link-image-preview');
 
             btn.addEventListener('click', () => {
                 openCloudinaryWidget({
                     button: btn,
                     onSuccess: (url) => {
-                        shareImg.src = url;
-                        shareThumb.style.display = 'block';
-                        saveUserProfile(currentUser.uid, { sharePreviewURL: url }).catch(() => {});
-                        showToast('Image d\'aperçu enregistrée !', 'info');
+                        linkImageUrl = url;
+                        preview.src = url;
+                        preview.classList.remove('hidden');
+                        showToast('Image téléversée avec succès !', 'info');
+                    },
+                    onError: () => {
+                        linkImageUrl = '';
+                        preview.classList.add('hidden');
                     }
                 });
-            });
-
-            removeBtn.addEventListener('click', async () => {
-                shareThumb.style.display = 'none';
-                shareImg.src = '';
-                await saveUserProfile(currentUser.uid, { sharePreviewURL: '' });
-                showToast('Image d\'aperçu supprimée.', 'info');
             });
         }
 
@@ -1577,6 +1532,9 @@
             input.placeholder = `Entrez votre lien ${platform.name}...`;
             input.value = '';
             input.focus();
+            // Réinitialiser l'image précédente
+            linkImageUrl = '';
+            document.getElementById('link-image-preview').classList.add('hidden');
         }
 
         async function validateAndAddLink() {
@@ -1596,8 +1554,11 @@
             }
 
             const newLink = {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
                 platform: selectedNetworkType,
                 url: sanitizeUrl(url),
+                description: `Rejoindre ${PLATFORMS.find(p => p.id === selectedNetworkType).name}`,
+                imageUrl: linkImageUrl || '',
                 active: true,
                 clicks: 0
             };
@@ -1612,6 +1573,8 @@
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
                 document.getElementById('link-input-container').classList.remove('visible');
                 document.getElementById('new-link-url').value = '';
+                linkImageUrl = '';
+                document.getElementById('link-image-preview').classList.add('hidden');
 
                 showToast('Lien ajouté avec succès !', 'info');
                 showView('view-dashboard');
@@ -1622,9 +1585,7 @@
             }
         }
 
-        // ============================================================
-        //  PROFIL PUBLIC - GÉNÉRATION DES CARTES RICH PREVIEW
-        // ============================================================
+        // --- Profil Public (Rich Cards avec image ou logo par défaut) ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1649,49 +1610,7 @@
                     return;
                 }
 
-                // --- BANNIÈRE ---
-                const bannerContainer = document.getElementById('public-banner-container');
-                bannerContainer.innerHTML = '';
-                let bannerTargetUrl = null;
-                if (data.bannerLink && data.bannerLink.trim() !== '') {
-                    bannerTargetUrl = sanitizeUrl(data.bannerLink);
-                } else {
-                    if (data.links && Array.isArray(data.links)) {
-                        const activeLink = data.links.find(l => l.active && l.url && l.url.trim() !== '');
-                        if (activeLink) {
-                            bannerTargetUrl = sanitizeUrl(activeLink.url);
-                        }
-                    }
-                }
-                if (data.sharePreviewURL) {
-                    if (bannerTargetUrl) {
-                        const link = document.createElement('a');
-                        link.className = 'share-banner-link';
-                        link.href = bannerTargetUrl;
-                        link.target = '_blank';
-                        link.rel = 'noopener noreferrer';
-                        const img = document.createElement('img');
-                        img.src = data.sharePreviewURL;
-                        img.alt = 'Bannière de profil';
-                        link.appendChild(img);
-                        bannerContainer.appendChild(link);
-                    } else {
-                        const div = document.createElement('div');
-                        div.className = 'share-banner-link';
-                        const img = document.createElement('img');
-                        img.src = data.sharePreviewURL;
-                        img.alt = 'Bannière de profil';
-                        div.appendChild(img);
-                        bannerContainer.appendChild(div);
-                    }
-                } else {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'share-banner-placeholder';
-                    placeholder.innerHTML = '<i class="fas fa-image" style="margin-right:0.5rem;"></i> Aucune bannière';
-                    bannerContainer.appendChild(placeholder);
-                }
-
-                // --- EN-TÊTE (avatar, nom, bio, statut) ---
+                // --- En-tête ---
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
@@ -1709,43 +1628,62 @@
                 statusBadge.className = `status-badge ${st.class}`;
                 statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
 
-                // --- CARTES RICH PREVIEW ---
+                // --- Cartes Rich Link ---
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
                 if (data.links && Array.isArray(data.links)) {
-                    data.links.forEach((link, index) => {
+                    data.links.forEach((link) => {
                         if (!link.active) return;
                         const platform = PLATFORMS.find(p => p.id === link.platform);
                         if (!platform || !link.url) return;
 
-                        // Carte entièrement cliquable
                         const card = document.createElement('a');
                         card.className = 'rich-link-card';
-                        if (data.featuredLink === index) {
-                            card.classList.add('lien-vedette');
+                        if (data.featuredLink !== null && data.featuredLink !== undefined) {
+                            const featuredIndex = data.links.findIndex(l => l.id === link.id);
+                            if (featuredIndex === data.featuredLink) {
+                                card.classList.add('lien-vedette');
+                            }
                         }
                         card.href = sanitizeUrl(link.url);
                         card.target = '_blank';
                         card.rel = 'noopener noreferrer';
 
-                        // 1. Description
+                        // Description
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
-                        desc.textContent = `Rejoindre ${platform.name}`;
+                        desc.textContent = link.description || `Rejoindre ${platform.name}`;
 
-                        // 2. Image d'aperçu (logo du réseau par défaut)
-                        const img = document.createElement('img');
-                        img.className = 'link-image';
-                        // Logo via icons8 (ou fallback sur placeholder)
-                        const logoUrl = `https://img.icons8.com/color/96/000000/${platform.id}.png`;
-                        img.src = logoUrl;
-                        img.alt = platform.name;
-                        img.onerror = () => {
-                            img.src = `https://placehold.co/400x200/0a0b10/00f2fe?text=${platform.name}`;
-                        };
+                        // Média (image ou logo par défaut)
+                        const media = document.createElement('div');
+                        if (link.imageUrl && link.imageUrl !== '') {
+                            const img = document.createElement('img');
+                            img.className = 'card-media';
+                            img.src = link.imageUrl;
+                            img.alt = platform.name;
+                            media.appendChild(img);
+                        } else {
+                            const defaultContainer = document.createElement('div');
+                            defaultContainer.className = 'card-media-default';
+                            const icon = document.createElement('i');
+                            icon.className = platform.icon;
+                            // Appliquer la couleur du réseau si possible
+                            const colorMap = {
+                                whatsapp: '#25D366',
+                                telegram: '#0088cc',
+                                tiktok: '#ffffff',
+                                instagram: '#E4405F',
+                                youtube: '#FF0000',
+                                facebook: '#1877F2',
+                                x: '#1DA1F2'
+                            };
+                            icon.style.color = colorMap[platform.id] || '#ffffff';
+                            defaultContainer.appendChild(icon);
+                            media.appendChild(defaultContainer);
+                        }
 
-                        // 3. Barre d'action collée en bas
+                        // Barre d'action
                         const actionBar = document.createElement('div');
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
@@ -1754,24 +1692,24 @@
                         `;
 
                         card.appendChild(desc);
-                        card.appendChild(img);
+                        card.appendChild(media);
                         card.appendChild(actionBar);
 
-                        // Incrémenter les clics
+                        // Écouteur de clic
                         card.addEventListener('click', (e) => {
-                            incrementLinkClick(uid, index).catch(() => {});
+                            incrementLinkClick(uid, link.id).catch(() => {});
                         });
 
                         linksContainer.appendChild(card);
                     });
                 }
 
-                // --- QR CODE (modale) ---
+                // QR Code
                 const qrImg = document.getElementById('qr-image');
                 const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
 
-                // --- Vcard ---
+                // Vcard
                 window._vcardData = {
                     displayName: data.displayName || 'Utilisateur',
                     links: data.links || []
@@ -1945,14 +1883,23 @@ URL:${urlProfil}
                 const links = [];
                 selectedOnboardingPlatforms.forEach(platformId => {
                     const url = sanitizeUrl(onboardingUrls[platformId] || '');
-                    if (url) links.push({ platform: platformId, url, active: true, clicks: 0 });
+                    if (url) {
+                        links.push({
+                            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                            platform: platformId,
+                            url: url,
+                            description: `Rejoindre ${PLATFORMS.find(p => p.id === platformId).name}`,
+                            imageUrl: '',
+                            active: true,
+                            clicks: 0
+                        });
+                    }
                 });
                 const profileData = {
                     displayName: currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Utilisateur'),
                     photoURL: currentUser.photoURL || '',
                     bio: bio,
                     links: links,
-                    sharePreviewURL: '',
                     bannerLink: '',
                     status: 'disponible',
                     maintenance: false,
@@ -1973,14 +1920,23 @@ URL:${urlProfil}
                 const links = [];
                 selectedOnboardingPlatforms.forEach(platformId => {
                     const url = sanitizeUrl(onboardingUrls[platformId] || '');
-                    if (url) links.push({ platform: platformId, url, active: true, clicks: 0 });
+                    if (url) {
+                        links.push({
+                            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                            platform: platformId,
+                            url: url,
+                            description: `Rejoindre ${PLATFORMS.find(p => p.id === platformId).name}`,
+                            imageUrl: '',
+                            active: true,
+                            clicks: 0
+                        });
+                    }
                 });
                 const profileData = {
                     displayName: currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Utilisateur'),
                     photoURL: currentUser.photoURL || '',
                     bio: bio,
                     links: links,
-                    sharePreviewURL: '',
                     bannerLink: '',
                     status: 'disponible',
                     maintenance: false,
@@ -2004,6 +1960,8 @@ URL:${urlProfil}
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
                 document.getElementById('link-input-container').classList.remove('visible');
                 document.getElementById('new-link-url').value = '';
+                linkImageUrl = '';
+                document.getElementById('link-image-preview').classList.add('hidden');
                 showView('view-add-link');
             });
 
@@ -2022,8 +1980,11 @@ URL:${urlProfil}
                 const bio = document.getElementById('dashboard-bio').value.trim();
                 const bannerLink = document.getElementById('dashboard-banner-link').value.trim();
                 const links = userProfile.links ? userProfile.links.map(l => ({
+                    id: l.id || Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
                     platform: l.platform,
                     url: sanitizeUrl(l.url),
+                    description: l.description || '',
+                    imageUrl: l.imageUrl || '',
                     active: l.active,
                     clicks: l.clicks || 0
                 })) : [];
@@ -2063,9 +2024,9 @@ URL:${urlProfil}
                 auth.signOut();
             });
 
-            // Uploads Cloudinary
+            // Uploads
             setupAvatarUpload();
-            setupSharePreviewUpload();
+            setupLinkImageUpload();
 
             // Événements dashboard (statut, maintenance)
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
