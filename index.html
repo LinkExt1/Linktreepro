@@ -863,14 +863,20 @@
                         sources: ["local", "url", "camera"],
                         multiple: false,
                         cropping: true,
-                        resourceType: "image"
+                        resourceType: "image",
+                        // Forcer le mode "unsigned" pour éviter toute demande de clé API
+                        signature: false
                     },
                     (error, result) => {
                         if (error) {
                             console.error("Détail erreur Cloudinary:", error);
-                            const message = error.message || "Erreur inconnue lors de l'upload.";
+                            let message = "Erreur lors de l'upload.";
+                            if (error.message && error.message.includes("Unknown API key")) {
+                                message = "Clé API inconnue. Vérifiez votre uploadPreset et cloudName.";
+                            } else if (error.message) {
+                                message = error.message;
+                            }
                             showToast('Erreur Cloudinary : ' + message, 'error');
-                            // Réinitialisation du bouton en cas d'erreur
                             button.disabled = false;
                             button.innerHTML = originalHTML;
                             isCloudinaryWidgetOpen = false;
