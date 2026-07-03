@@ -497,7 +497,7 @@
         }
 
         /* ============================================================
-           VUE DÉDIÉE : AJOUT DE LIEN (view-add-link)
+           VUE DÉDIÉE : AJOUT DE LIEN
            ============================================================ */
         .back-btn {
             background: transparent;
@@ -579,12 +579,13 @@
         }
 
         /* ============================================================
-           PROFIL PUBLIC - RICH LINK CARD (inchangé)
+           PROFIL PUBLIC - NOUVELLE REFONTE (SANS EMOJI)
            ============================================================ */
         #view-profile-public .glass-card {
             padding: 0 1.8rem 2rem 1.8rem;
             overflow: visible;
         }
+        /* Bannière */
         #public-banner-container {
             margin: 0 -1.8rem 1.2rem -1.8rem;
             border-radius: 0;
@@ -621,89 +622,51 @@
             font-size: 0.9rem;
             border-bottom: 2px solid var(--cyan);
         }
-        .header-card-link {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border-radius: 20px;
-            padding: 1.2rem 0.5rem 0.8rem 0.5rem;
-            margin: 0 -0.5rem;
-            position: relative;
-            cursor: pointer;
+
+        /* En-tête (avatar + boutons + nom + bio) - NON CLIQUABLE */
+        .public-header {
+            margin-bottom: 1rem;
         }
-        .header-card-link:hover {
-            transform: scale(1.01);
-        }
-        .header-card-link:hover .avatar-glow-ring {
-            box-shadow: 0 0 50px rgba(0, 242, 254, 0.7), 0 0 80px rgba(0, 242, 254, 0.3);
-        }
-        .header-card-link:hover .whatsapp-fused {
-            box-shadow: 0 0 40px rgba(37, 211, 102, 0.6);
-        }
-        .avatar-whatsapp-stack {
+        .public-header-top {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 0;
-            position: relative;
+            justify-content: space-between;
+            gap: 1rem;
             margin-bottom: 0.8rem;
         }
-        .avatar-glow-ring {
-            width: 120px;
-            height: 120px;
+        .public-header-top .avatar-glow-ring {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            padding: 3px;
+            padding: 2px;
             background: conic-gradient(var(--cyan), var(--violet), var(--cyan));
-            box-shadow: var(--glow-cyan);
-            transition: box-shadow 0.4s ease;
+            box-shadow: 0 0 20px rgba(0,242,254,0.3);
             flex-shrink: 0;
-            position: relative;
-            z-index: 2;
+            transition: box-shadow 0.3s ease;
         }
-        .avatar-glow-ring .public-avatar {
+        .public-header-top .avatar-glow-ring .public-avatar {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
             display: block;
-            border: none;
-            animation: none;
-            box-shadow: none;
             background: var(--bg-deep);
         }
-        .whatsapp-fused {
+        .public-header-actions {
             display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 0.6rem;
-            background: #25D366;
-            color: #fff;
-            font-weight: 700;
-            font-size: 1rem;
-            padding: 0.7rem 1.8rem;
-            border-radius: 60px;
-            margin-top: -10px;
-            position: relative;
-            z-index: 3;
-            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4), var(--glow-green);
-            transition: box-shadow 0.4s ease, transform 0.3s ease;
-            font-family: var(--font-body);
-            letter-spacing: 0.3px;
-            border: 1px solid rgba(255,255,255,0.15);
-            min-width: 140px;
         }
-        .whatsapp-fused i { font-size: 1.3rem; }
-        .whatsapp-fused:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(37, 211, 102, 0.6);
+        .public-header-actions .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            border-radius: 30px;
         }
         .public-name {
             font-family: var(--font-heading);
             font-size: 1.6rem;
             font-weight: 600;
             text-align: center;
-            margin: 0.4rem 0 0.2rem 0;
+            margin: 0.2rem 0 0.1rem 0;
             letter-spacing: 0.5px;
             background: linear-gradient(135deg, #fff, var(--cyan));
             -webkit-background-clip: text;
@@ -712,7 +675,7 @@
         }
         .public-bio-text {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             text-align: center;
             padding: 0 0.5rem;
             font-style: italic;
@@ -723,45 +686,79 @@
         .public-status-wrap {
             display: flex;
             justify-content: center;
-            margin-top: 0.6rem;
+            margin-top: 0.4rem;
         }
         .public-status-wrap .status-badge {
             font-size: 0.7rem;
             padding: 0.2rem 1rem;
         }
+
         .public-links-divider {
             width: 60%;
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-            margin: 1.2rem auto 1rem auto;
+            margin: 1rem auto 1.2rem auto;
             opacity: 0.3;
         }
-        #public-links {
+
+        /* ===== CARTES RICH PREVIEW (liens unifiés) ===== */
+        .rich-link-card {
             display: flex;
             flex-direction: column;
-            gap: 0.7rem;
-            margin-top: 0.5rem;
-        }
-        #public-links .social-btn {
-            padding: 0.8rem 1.2rem;
-            font-size: 0.95rem;
-            border-radius: 14px;
+            overflow: hidden;
+            text-decoration: none;
+            color: #fff;
             background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
-            transition: var(--transition);
-            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            transition: all var(--transition);
+            margin-bottom: 1rem;
+            cursor: pointer;
         }
-        #public-links .social-btn:hover {
+        .rich-link-card:hover {
+            border-color: var(--cyan);
+            box-shadow: 0 0 30px rgba(0,242,254,0.2);
             transform: translateY(-2px);
-            filter: brightness(1.3);
-            border-color: rgba(255,255,255,0.2);
         }
-        #public-links .social-btn .link-clicks-count {
-            font-size: 0.6rem;
-            opacity: 0.5;
-            margin-left: auto;
-            font-weight: 300;
+        .rich-link-card .link-description {
+            padding: 12px 14px 8px 14px;
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.2);
+            letter-spacing: 0.3px;
+            text-align: left;
         }
+        .rich-link-card .link-image {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block;
+            background: var(--bg-deep);
+        }
+        .rich-link-card .link-action-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 10px 14px;
+            margin: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+        .rich-link-card .link-action-bar i {
+            font-size: 1.3rem;
+            color: var(--cyan);
+        }
+        .rich-link-card .link-action-bar span {
+            opacity: 0.8;
+        }
+
+        /* Animation Lien Vedette (pulsation) */
         .lien-vedette {
             animation: pulseLink 1.8s ease-in-out infinite;
             border: 2px solid var(--cyan) !important;
@@ -769,21 +766,15 @@
         }
         @keyframes pulseLink {
             0% { transform: scale(1); box-shadow: 0 0 15px rgba(0,242,254,0.3); }
-            50% { transform: scale(1.03); box-shadow: 0 0 40px rgba(0,242,254,0.8); }
+            50% { transform: scale(1.02); box-shadow: 0 0 40px rgba(0,242,254,0.8); }
             100% { transform: scale(1); box-shadow: 0 0 15px rgba(0,242,254,0.3); }
         }
+
+        /* Boutons QR & Vcard dans le public */
         .public-actions {
-            display: flex;
-            gap: 0.8rem;
-            justify-content: center;
-            margin: 0.5rem 0 0.2rem 0;
+            display: none; /* caché car déjà dans l'en-tête */
         }
-        .public-actions .btn-outline {
-            padding: 0.3rem 1rem;
-            font-size: 0.8rem;
-            border-radius: 30px;
-            background: rgba(255,255,255,0.03);
-        }
+
         .maintenance-message {
             text-align: center;
             padding: 3rem 1rem;
@@ -801,24 +792,24 @@
         .maintenance-message p {
             color: var(--text-secondary);
         }
+
         @media (max-width: 420px) {
-            .avatar-glow-ring {
-                width: 100px;
-                height: 100px;
-            }
-            .whatsapp-fused {
-                font-size: 0.85rem;
-                padding: 0.5rem 1.2rem;
-                min-width: 110px;
-            }
-            .public-name {
-                font-size: 1.3rem;
-            }
             #view-profile-public .glass-card {
                 padding: 0 1rem 1.5rem 1rem;
             }
             #public-banner-container {
                 margin: 0 -1rem 1rem -1rem;
+            }
+            .public-header-top .avatar-glow-ring {
+                width: 64px;
+                height: 64px;
+            }
+            .public-header-actions .btn {
+                padding: 0.3rem 0.7rem;
+                font-size: 0.7rem;
+            }
+            .public-name {
+                font-size: 1.3rem;
             }
             .networks-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -829,6 +820,14 @@
             }
             .network-card i {
                 font-size: 1.8rem;
+            }
+            .rich-link-card .link-description {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+            .rich-link-card .link-action-bar {
+                font-size: 0.75rem;
+                padding: 8px 12px;
             }
         }
     </style>
@@ -937,7 +936,7 @@
             <div class="input-group mt-2">
                 <label>Photo de profil</label>
                 <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center;">
-                    <i class="fas fa-camera"></i>  Changer la photo
+                    <i class="fas fa-camera"></i> Changer la photo
                 </button>
             </div>
 
@@ -949,9 +948,9 @@
             <!-- Image d'aperçu -->
             <div class="mt-2 p-2" style="background: rgba(0,242,254,0.05); border-radius: 14px; border: 1px solid var(--border-glow);">
                 <div class="input-group">
-                    <label style="font-size:0.9rem; color:var(--cyan);">🖼️ Image d'aperçu</label>
+                    <label style="font-size:0.9rem; color:var(--cyan);"><i class="fas fa-image"></i> Image d'aperçu</label>
                     <button class="btn btn-outline" id="btn-upload-share-preview" style="justify-content: center;">
-                        <i class="fas fa-image"></i> Téléverser
+                        <i class="fas fa-upload"></i> Téléverser
                     </button>
                     <div id="share-preview-thumb" class="mt-1" style="display: none; position: relative;">
                         <img id="share-preview-img" src="" alt="aperçu" style="width:100%; border-radius:10px; max-height:120px; object-fit:cover; border:1px solid var(--cyan);">
@@ -969,8 +968,7 @@
 
             <!-- Liste des liens -->
             <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
-                <h3 style="font-family:var(--font-heading); font-size:1rem;">🔗 Mes liens</h3>
-                <!-- Le bouton "+ Ajouter" ouvre maintenant la vue dédiée -->
+                <h3 style="font-family:var(--font-heading); font-size:1rem;"><i class="fas fa-link"></i> Mes liens</h3>
                 <button class="btn btn-outline" id="add-link-btn" style="padding:0.4rem 1rem;"><i class="fas fa-plus"></i> Ajouter</button>
             </div>
             <div id="dashboard-links-container" class="mt-1" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
@@ -980,19 +978,14 @@
         </div>
     </div>
 
-    <!-- ========== NOUVELLE VUE : AJOUTER UN LIEN ========== -->
+    <!-- ========== VUE AJOUTER UN LIEN ========== -->
     <div id="view-add-link" class="view">
         <div class="glass-card">
-            <!-- En-tête avec bouton retour -->
             <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
                 <button class="back-btn" id="back-from-add-link"><i class="fas fa-arrow-left"></i> Retour</button>
                 <div class="brand" style="font-size:1.2rem; margin:0; flex:1; text-align:center;">Ajouter un réseau</div>
             </div>
-
-            <!-- Grille des réseaux sociaux -->
             <div class="networks-grid" id="add-link-grid"></div>
-
-            <!-- Zone dynamique : champ de saisie + bouton valider -->
             <div class="link-input-container" id="link-input-container">
                 <input type="url" id="new-link-url" placeholder="Entrez votre lien..." autocomplete="off">
                 <button class="btn" id="validate-link-btn">Valider et Enregistrer</button>
@@ -1000,30 +993,34 @@
         </div>
     </div>
 
-    <!-- ========== VUE PROFIL PUBLIC ========== -->
+    <!-- ========== VUE PROFIL PUBLIC (REFONTE) ========== -->
     <div id="view-profile-public" class="view">
         <div class="glass-card" style="text-align:center; padding-top:0;">
+            <!-- Bannière -->
             <div id="public-banner-container"></div>
-            <a class="header-card-link" id="header-card-link" href="#" target="_blank" rel="noopener noreferrer">
-                <div class="avatar-whatsapp-stack">
+
+            <!-- En-tête : avatar + boutons + nom + bio -->
+            <div class="public-header">
+                <div class="public-header-top">
                     <div class="avatar-glow-ring">
                         <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
                     </div>
-                    <div class="whatsapp-fused" id="whatsapp-fused-btn">
-                        <i class="fab fa-whatsapp"></i> <span id="whatsapp-label">WhatsApp</span>
+                    <div class="public-header-actions">
+                        <button class="btn btn-outline" id="qr-code-btn" style="padding:0.5rem 1rem;"><i class="fas fa-qrcode"></i> QR Code</button>
+                        <button class="btn btn-outline" id="vcard-btn" style="padding:0.5rem 1rem;"><i class="fas fa-user-plus"></i> Vcard</button>
                     </div>
                 </div>
                 <h2 id="public-name" class="public-name">Utilisateur</h2>
                 <p id="public-bio-text" class="public-bio-text">Bio du profil</p>
-            </a>
-            <div class="public-status-wrap">
-                <span id="public-status-badge" class="status-badge disponible"><span class="dot"></span> Disponible</span>
+                <div class="public-status-wrap">
+                    <span id="public-status-badge" class="status-badge disponible"><span class="dot"></span> Disponible</span>
+                </div>
             </div>
-            <div class="public-actions">
-                <button class="btn btn-outline" id="qr-code-btn" style="padding:0.3rem 1rem; font-size:0.8rem;"><i class="fas fa-qrcode"></i> QR Code</button>
-                <button class="btn btn-outline" id="vcard-btn" style="padding:0.3rem 1rem; font-size:0.8rem;"><i class="fas fa-user-plus"></i> Vcard</button>
-            </div>
+
+            <!-- Séparateur -->
             <div class="public-links-divider"></div>
+
+            <!-- Liste des cartes Rich Link -->
             <div id="public-links"></div>
         </div>
         <p class="text-center" style="font-size:0.8rem; color:var(--text-secondary);">Propulsé par LinkExt</p>
@@ -1067,7 +1064,7 @@
         const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
         const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
 
-        // --- Plateformes (pour la grille d'ajout) ---
+        // --- Plateformes ---
         const PLATFORMS = [
             { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp' },
             { id: 'telegram', name: 'Telegram', icon: 'fab fa-telegram-plane' },
@@ -1077,16 +1074,6 @@
             { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook' },
             { id: 'x', name: 'X (Twitter)', icon: 'fab fa-x-twitter' }
         ];
-        // Pour la correspondance des couleurs (utilisé dans le style des cartes)
-        const PLATFORM_COLORS = {
-            whatsapp: '#25D366',
-            telegram: '#0088cc',
-            tiktok: '#000000',
-            instagram: '#E4405F',
-            youtube: '#FF0000',
-            facebook: '#1877F2',
-            x: '#1DA1F2'
-        };
 
         // --- État global ---
         let currentUser = null;
@@ -1096,8 +1083,6 @@
         let onboardingUrls = {};
         let authRedirectInProgress = false;
         let isCloudinaryWidgetOpen = false;
-
-        // État pour la vue d'ajout de lien
         let selectedNetworkType = null;
 
         // --- Vues ---
@@ -1190,7 +1175,6 @@
             }
         }
 
-        // --- Incrémenter les clics d'un lien ---
         async function incrementLinkClick(uid, linkIndex) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1261,7 +1245,7 @@
             document.getElementById('auth-btn-text').textContent = mode === 'login' ? 'Se connecter' : 'Créer un compte';
         }
 
-        // --- Onboarding (inchangé) ---
+        // --- Onboarding ---
         function renderOnboardingGrid() {
             const grid = document.getElementById('onboarding-grid');
             grid.innerHTML = '';
@@ -1419,7 +1403,6 @@
             };
         }
 
-        // --- Statut / Maintenance UI ---
         function updateStatusUI(status) {
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
                 el.classList.toggle('active', el.dataset.value === status);
@@ -1431,7 +1414,7 @@
             track.classList.toggle('active', enabled);
         }
 
-        // --- Cloudinary Widget (inchangé) ---
+        // --- Cloudinary Widget ---
         function openCloudinaryWidget({ button, onSuccess }) {
             if (!currentUser) {
                 showToast('Connectez-vous pour continuer.', 'error');
@@ -1528,9 +1511,7 @@
             });
         }
 
-        // ============================================================
-        //  RÉINITIALISATION : remet à zéro les clics ET les vues
-        // ============================================================
+        // --- Réinitialisation des stats ---
         async function resetAllStats() {
             if (!currentUser) {
                 showToast('Vous devez être connecté.', 'error');
@@ -1541,13 +1522,12 @@
                 return;
             }
             if (!userProfile.links || userProfile.links.length === 0) {
-                // On réinitialise quand même les vues
                 try {
                     const docRef = db.collection('users').doc(currentUser.uid);
                     await docRef.update({ views: 0 });
                     userProfile.views = 0;
                     document.getElementById('views-count-display').textContent = '0';
-                    showToast(' Vues réinitialisées !', 'info');
+                    showToast('Vues réinitialisées !', 'info');
                 } catch (e) {
                     showToast('Erreur lors de la réinitialisation.', 'error');
                 }
@@ -1557,37 +1537,21 @@
             if (!confirm('Voulez-vous vraiment remettre tous les compteurs de clics et les vues à zéro ?')) return;
 
             try {
-                // 1. Réinitialiser les clics des liens
-                const resetLinks = userProfile.links.map(link => ({
-                    ...link,
-                    clicks: 0
-                }));
-
-                // 2. Mettre à jour Firestore : links + views = 0
+                const resetLinks = userProfile.links.map(link => ({ ...link, clicks: 0 }));
                 const docRef = db.collection('users').doc(currentUser.uid);
-                await docRef.update({
-                    links: resetLinks,
-                    views: 0
-                });
-
-                // 3. Mettre à jour la variable globale
+                await docRef.update({ links: resetLinks, views: 0 });
                 userProfile.links = resetLinks;
                 userProfile.views = 0;
-
-                // 4. Re-rendre le tableau de bord et le compteur
                 renderDashboardLinks();
                 document.getElementById('views-count-display').textContent = '0';
-
-                showToast(' Compteurs réinitialisés !', 'info');
+                showToast('Compteurs réinitialisés !', 'info');
             } catch (error) {
                 console.error('Erreur lors de la réinitialisation :', error);
                 showToast('Erreur lors de la réinitialisation.', 'error');
             }
         }
 
-        // ============================================================
-        //  VUE D'AJOUT DE LIEN
-        // ============================================================
+        // --- Vue Ajout de lien ---
         function renderAddLinkGrid() {
             const grid = document.getElementById('add-link-grid');
             grid.innerHTML = '';
@@ -1603,11 +1567,9 @@
 
         function selectNetwork(platformId) {
             selectedNetworkType = platformId;
-            // Mettre à jour l'UI
             document.querySelectorAll('.network-card').forEach(el => {
                 el.classList.toggle('selected', el.dataset.platform === platformId);
             });
-            // Afficher le champ de saisie avec le placeholder dynamique
             const container = document.getElementById('link-input-container');
             container.classList.add('visible');
             const input = document.getElementById('new-link-url');
@@ -1633,7 +1595,6 @@
                 return;
             }
 
-            // Préparer le nouvel objet lien
             const newLink = {
                 platform: selectedNetworkType,
                 url: sanitizeUrl(url),
@@ -1642,23 +1603,17 @@
             };
 
             try {
-                // Ajouter au tableau local
                 if (!userProfile.links) userProfile.links = [];
                 userProfile.links.push(newLink);
-
-                // Mettre à jour Firestore
                 const docRef = db.collection('users').doc(currentUser.uid);
                 await docRef.update({ links: userProfile.links });
 
-                // Réinitialiser l'état de la vue
                 selectedNetworkType = null;
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
                 document.getElementById('link-input-container').classList.remove('visible');
                 document.getElementById('new-link-url').value = '';
 
-                showToast(' Lien ajouté avec succès !', 'info');
-
-                // Revenir au dashboard et rafraîchir
+                showToast('Lien ajouté avec succès !', 'info');
                 showView('view-dashboard');
                 await populateDashboard();
             } catch (error) {
@@ -1667,7 +1622,9 @@
             }
         }
 
-        // --- Profil public (inchangé) ---
+        // ============================================================
+        //  PROFIL PUBLIC - GÉNÉRATION DES CARTES RICH PREVIEW
+        // ============================================================
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1692,7 +1649,7 @@
                     return;
                 }
 
-                // Bannière
+                // --- BANNIÈRE ---
                 const bannerContainer = document.getElementById('public-banner-container');
                 bannerContainer.innerHTML = '';
                 let bannerTargetUrl = null;
@@ -1730,54 +1687,14 @@
                 } else {
                     const placeholder = document.createElement('div');
                     placeholder.className = 'share-banner-placeholder';
-                    placeholder.innerHTML = '<span>🖼️ Aucune bannière</span>';
+                    placeholder.innerHTML = '<i class="fas fa-image" style="margin-right:0.5rem;"></i> Aucune bannière';
                     bannerContainer.appendChild(placeholder);
                 }
 
-                // Bloc cliquable
-                let primaryLink = null;
-                if (data.links && Array.isArray(data.links)) {
-                    const whatsappLink = data.links.find(l => l.platform === 'whatsapp' && l.active && l.url);
-                    if (whatsappLink) {
-                        primaryLink = sanitizeUrl(whatsappLink.url);
-                    } else {
-                        const firstActive = data.links.find(l => l.active && l.url);
-                        if (firstActive) {
-                            primaryLink = sanitizeUrl(firstActive.url);
-                        }
-                    }
-                }
-                if (data.bannerLink && data.bannerLink.trim() !== '') {
-                    primaryLink = sanitizeUrl(data.bannerLink);
-                }
-
-                const headerLink = document.getElementById('header-card-link');
-                if (primaryLink) {
-                    headerLink.href = primaryLink;
-                    headerLink.target = '_blank';
-                    headerLink.rel = 'noopener noreferrer';
-                    headerLink.style.cursor = 'pointer';
-                } else {
-                    headerLink.href = '#';
-                    headerLink.target = '';
-                    headerLink.rel = '';
-                    headerLink.style.cursor = 'default';
-                }
-
+                // --- EN-TÊTE (avatar, nom, bio, statut) ---
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
-
-                const whatsappLabel = document.getElementById('whatsapp-label');
-                const whatsappBtn = document.getElementById('whatsapp-fused-btn');
-                if (primaryLink) {
-                    whatsappBtn.style.cursor = 'pointer';
-                    const platformName = data.links && data.links.find(l => l.platform === 'whatsapp' && l.active) ? 'WhatsApp' : 'Lien principal';
-                    whatsappLabel.textContent = platformName;
-                } else {
-                    whatsappLabel.textContent = 'Aucun lien';
-                    whatsappBtn.style.opacity = '0.5';
-                }
 
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
@@ -1792,40 +1709,69 @@
                 statusBadge.className = `status-badge ${st.class}`;
                 statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
 
-                // Liens sociaux
+                // --- CARTES RICH PREVIEW ---
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
+
                 if (data.links && Array.isArray(data.links)) {
                     data.links.forEach((link, index) => {
                         if (!link.active) return;
                         const platform = PLATFORMS.find(p => p.id === link.platform);
                         if (!platform || !link.url) return;
-                        const a = document.createElement('a');
-                        a.href = sanitizeUrl(link.url);
-                        a.target = '_blank';
-                        a.rel = 'noopener noreferrer';
-                        a.className = `social-btn ${platform.colorClass ? platform.colorClass : ''}`;
+
+                        // Carte entièrement cliquable
+                        const card = document.createElement('a');
+                        card.className = 'rich-link-card';
                         if (data.featuredLink === index) {
-                            a.classList.add('lien-vedette');
+                            card.classList.add('lien-vedette');
                         }
-                        const clicks = link.clicks || 0;
-                        a.innerHTML = `
-                            <i class="${platform.icon}"></i> ${platform.name}
-                            <span class="link-clicks-count">${clicks}</span>
+                        card.href = sanitizeUrl(link.url);
+                        card.target = '_blank';
+                        card.rel = 'noopener noreferrer';
+
+                        // 1. Description
+                        const desc = document.createElement('div');
+                        desc.className = 'link-description';
+                        desc.textContent = `Rejoindre ${platform.name}`;
+
+                        // 2. Image d'aperçu (logo du réseau par défaut)
+                        const img = document.createElement('img');
+                        img.className = 'link-image';
+                        // Logo via icons8 (ou fallback sur placeholder)
+                        const logoUrl = `https://img.icons8.com/color/96/000000/${platform.id}.png`;
+                        img.src = logoUrl;
+                        img.alt = platform.name;
+                        img.onerror = () => {
+                            img.src = `https://placehold.co/400x200/0a0b10/00f2fe?text=${platform.name}`;
+                        };
+
+                        // 3. Barre d'action collée en bas
+                        const actionBar = document.createElement('div');
+                        actionBar.className = 'link-action-bar';
+                        actionBar.innerHTML = `
+                            <i class="${platform.icon}"></i>
+                            <span>Cliqué ici pour rejoindre</span>
                         `;
-                        a.addEventListener('click', (e) => {
+
+                        card.appendChild(desc);
+                        card.appendChild(img);
+                        card.appendChild(actionBar);
+
+                        // Incrémenter les clics
+                        card.addEventListener('click', (e) => {
                             incrementLinkClick(uid, index).catch(() => {});
                         });
-                        linksContainer.appendChild(a);
+
+                        linksContainer.appendChild(card);
                     });
                 }
 
-                // QR Code
+                // --- QR CODE (modale) ---
                 const qrImg = document.getElementById('qr-image');
                 const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
 
-                // Vcard
+                // --- Vcard ---
                 window._vcardData = {
                     displayName: data.displayName || 'Utilisateur',
                     links: data.links || []
@@ -1887,7 +1833,7 @@ URL:${urlProfil}
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                showToast(' Contact enregistré !', 'info');
+                showToast('Contact enregistré !', 'info');
             });
         }
 
@@ -2052,9 +1998,8 @@ URL:${urlProfil}
                 await populateDashboard();
             });
 
-            // Dashboard : Ajouter un lien → OUVRE LA VUE DÉDIÉE
+            // Dashboard : Ajouter un lien → vue dédiée
             document.getElementById('add-link-btn').addEventListener('click', () => {
-                // Réinitialiser l'état de la vue add-link
                 selectedNetworkType = null;
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
                 document.getElementById('link-input-container').classList.remove('visible');
@@ -2101,7 +2046,7 @@ URL:${urlProfil}
                 const shareUrl = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
                 try {
                     await navigator.clipboard.writeText(shareUrl);
-                    showToast('Lien copié ! 🚀', 'info');
+                    showToast('Lien copié !', 'info');
                 } catch {
                     const input = document.createElement('input');
                     input.value = shareUrl;
@@ -2141,14 +2086,14 @@ URL:${urlProfil}
                 }
             });
 
-            // BOUTON RÉINITIALISATION (correction : réinitialise aussi les vues)
+            // Réinitialisation des stats
             document.getElementById('reset-clicks-btn').addEventListener('click', resetAllStats);
 
             // QR Code et Vcard
             setupQRModal();
             setupVcard();
 
-            // Initialisation de la grille d'ajout
+            // Grille d'ajout
             renderAddLinkGrid();
         }
 
