@@ -19,7 +19,7 @@
     <!-- Widget Cloudinary -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
-        /* ===== STYLES ===== */
+        /* ===== STYLES (complets) ===== */
         :root {
             --bg-deep: #0a0b10;
             --bg-card: rgba(10, 11, 16, 0.7);
@@ -326,11 +326,13 @@
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             font-family: var(--font-body);
+            position: relative;
         }
         .social-btn:hover {
             transform: translateY(-2px);
             filter: brightness(1.2);
         }
+        /* Style des boutons sociaux par plateforme */
         .social-btn.whatsapp { background: #25D366; color: #fff; }
         .social-btn.telegram { background: #0088cc; color: #fff; }
         .social-btn.facebook { background: #1877F2; color: #fff; }
@@ -338,6 +340,19 @@
         .social-btn.youtube { background: #FF0000; color: #fff; }
         .social-btn.x { background: #1DA1F2; color: #fff; }
         .social-btn.tiktok { background: #000000; color: #fff; border: 1px solid #ffffff40; }
+
+        /* Animation Lien Vedette (pulsation) */
+        .lien-vedette {
+            animation: pulse 1.5s ease-in-out infinite;
+            border: 2px solid var(--cyan) !important;
+            box-shadow: 0 0 20px rgba(0,242,254,0.6);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(0,242,254,0.4); }
+            50% { transform: scale(1.03); box-shadow: 0 0 30px rgba(0,242,254,0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(0,242,254,0.4); }
+        }
+
         #toast-container {
             position: fixed;
             top: 1.5rem;
@@ -377,6 +392,105 @@
         .mt-1 { margin-top: 1rem; }
         .mt-2 { margin-top: 1.5rem; }
         .hidden { display: none !important; }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Statut Flash - pastille */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-badge.disponible .dot { background: #2ecc71; }
+        .status-badge.occupe .dot { background: #f39c12; }
+        .status-badge.enlive .dot { background: #e74c3c; }
+
+        /* Selecteur statut */
+        .status-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .status-selector .status-option {
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: var(--transition);
+        }
+        .status-selector .status-option.active {
+            border-color: var(--cyan);
+            background: rgba(0,242,254,0.15);
+            color: white;
+        }
+        .status-selector .status-option .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .status-selector .status-option[data-value="disponible"] .dot { background: #2ecc71; }
+        .status-selector .status-option[data-value="occupe"] .dot { background: #f39c12; }
+        .status-selector .status-option[data-value="enlive"] .dot { background: #e74c3c; }
+
+        /* Mode maintenance toggle */
+        .maintenance-toggle {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .maintenance-toggle .toggle-track {
+            width: 50px;
+            height: 28px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        .maintenance-toggle .toggle-track.active {
+            background: var(--danger);
+        }
+        .maintenance-toggle .toggle-track::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .maintenance-toggle .toggle-track.active::after {
+            left: 25px;
+        }
 
         /* Bannière d'aperçu (profil public) */
         .share-banner-link {
@@ -430,11 +544,79 @@
             color: var(--cyan);
         }
         .views-counter i { font-size: 1rem; }
+
+        /* MODAL QR Code */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 1.5rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--bg-deep);
+            border: 1px solid var(--cyan);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0,242,254,0.3);
+        }
+        .modal-content img {
+            width: 100%;
+            max-width: 280px;
+            border-radius: 12px;
+            background: white;
+            padding: 0.5rem;
+        }
+        .modal-content .close-modal {
+            margin-top: 1rem;
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            padding: 0.5rem 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .modal-content .close-modal:hover {
+            background: var(--cyan);
+            color: #0a0b10;
+            border-color: var(--cyan);
+        }
+
+        /* Maintenance public */
+        .maintenance-message {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .maintenance-message i {
+            font-size: 4rem;
+            color: var(--cyan);
+            margin-bottom: 1rem;
+        }
+        .maintenance-message h2 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .maintenance-message p {
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
 <div id="app">
-    <!-- VUE AUTH -->
+
+    <!-- ========== VUE AUTH ========== -->
     <div id="view-auth" class="view">
         <div class="glass-card">
             <div class="brand">LINKEXT</div>
@@ -472,7 +654,7 @@
         </div>
     </div>
 
-    <!-- VUE ONBOARDING -->
+    <!-- ========== VUE ONBOARDING ========== -->
     <div id="view-onboarding" class="view">
         <div class="glass-card">
             <div class="brand" style="font-size:1.8rem;">CONFIGURATION</div>
@@ -488,7 +670,7 @@
         </div>
     </div>
 
-    <!-- VUE DASHBOARD -->
+    <!-- ========== VUE DASHBOARD ========== -->
     <div id="view-dashboard" class="view">
         <div class="glass-card">
             <div style="display:flex; justify-content: space-between; align-items:center;">
@@ -496,8 +678,28 @@
                 <button class="btn btn-outline" id="logout-btn" style="padding:0.5rem 1rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
-            <div style="display:flex; justify-content: flex-end; margin-top: 0.5rem;">
+            <!-- Statut Flash & Maintenance -->
+            <div class="mt-2 flex-between">
+                <div>
+                    <label style="font-size:0.8rem; color:var(--text-secondary);">Statut Flash</label>
+                    <div class="status-selector" id="status-selector">
+                        <span class="status-option active" data-value="disponible"><span class="dot"></span> Disponible</span>
+                        <span class="status-option" data-value="occupe"><span class="dot"></span> Occupé</span>
+                        <span class="status-option" data-value="enlive"><span class="dot"></span> En Live</span>
+                    </div>
+                </div>
+                <div class="maintenance-toggle">
+                    <span style="font-size:0.8rem; color:var(--text-secondary);">Mode Maintenance</span>
+                    <div class="toggle-track" id="maintenance-toggle"></div>
+                </div>
+            </div>
+
+            <!-- Compteur vues et réinitialisation -->
+            <div class="flex-between" style="margin-top:0.5rem;">
                 <span class="views-counter"><i class="fas fa-eye"></i> <span id="views-count-display">0</span> vues</span>
+                <button class="btn btn-outline" id="reset-clicks-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                    <i class="fas fa-redo"></i> Réinitialiser les clics
+                </button>
             </div>
 
             <div class="profile-header mt-2">
@@ -515,7 +717,7 @@
             <div class="input-group mt-2">
                 <label>Photo de profil</label>
                 <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center;">
-                    <i class="fas fa-camera"></i> 📷 Changer la photo de profil
+                    <i class="fas fa-camera"></i> 📷 Changer la photo
                 </button>
             </div>
 
@@ -524,13 +726,12 @@
                 <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
             </div>
 
-            <!-- Section Image d'aperçu de partage -->
+            <!-- Image d'aperçu -->
             <div class="mt-2 p-2" style="background: rgba(0,242,254,0.05); border-radius: 14px; border: 1px solid var(--border-glow);">
                 <div class="input-group">
-                    <label style="font-size:0.9rem; color:var(--cyan);">🖼️ Image d'aperçu de partage</label>
-                    <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:0.5rem;">Cette image sera utilisée comme bannière en haut de votre profil public.</p>
+                    <label style="font-size:0.9rem; color:var(--cyan);">🖼️ Image d'aperçu</label>
                     <button class="btn btn-outline" id="btn-upload-share-preview" style="justify-content: center;">
-                        <i class="fas fa-image"></i> Téléverser l'image d'aperçu
+                        <i class="fas fa-image"></i> Téléverser
                     </button>
                     <div id="share-preview-thumb" class="mt-1" style="display: none; position: relative;">
                         <img id="share-preview-img" src="" alt="aperçu" style="width:100%; border-radius:10px; max-height:120px; object-fit:cover; border:1px solid var(--cyan);">
@@ -539,39 +740,65 @@
                 </div>
             </div>
 
-            <!-- Champ Lien de clic sur la bannière (personnalisé) -->
+            <!-- Lien personnalisé pour bannière -->
             <div class="input-group mt-2">
                 <label><i class="fas fa-link"></i> Lien de clic sur la bannière (personnalisé)</label>
                 <input type="url" class="input-field" id="dashboard-banner-link" placeholder="https://..." value="">
-                <p style="color:var(--text-secondary); font-size:0.7rem;">Laissez vide pour utiliser automatiquement le premier lien social actif.</p>
+                <p style="color:var(--text-secondary); font-size:0.7rem;">Laissez vide pour utiliser le premier lien social actif.</p>
             </div>
 
+            <!-- Liste des liens -->
             <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
                 <h3 style="font-family:var(--font-heading); font-size:1rem;">🔗 Mes liens</h3>
                 <button class="btn btn-outline" id="add-link-btn" style="padding:0.4rem 1rem;"><i class="fas fa-plus"></i> Ajouter</button>
             </div>
             <div id="dashboard-links-container" class="mt-1" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
+
             <button class="btn mt-2" id="save-dashboard-btn" style="width:100%">Enregistrer les modifications</button>
             <button class="btn btn-outline mt-1" id="copy-share-link-btn" style="width:100%"><i class="fas fa-copy"></i> Copier mon lien de partage</button>
         </div>
     </div>
 
-    <!-- VUE PROFIL PUBLIC -->
+    <!-- ========== VUE PROFIL PUBLIC ========== -->
     <div id="view-profile-public" class="view">
         <div class="glass-card" style="text-align:center; padding-top: 0;">
-            <!-- Bannière cliquable -->
+            <!-- Conteneur bannière -->
             <div id="public-banner-container"></div>
+
             <!-- Description sous la bannière -->
             <div id="public-bio-under-banner" class="public-bio-under-banner"></div>
-            <!-- Avatar et nom -->
-            <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
-            <h2 id="public-name" style="font-family:var(--font-heading); margin-top:1rem;"></h2>
+
+            <!-- Statut + Avatar + Nom -->
+            <div style="display:flex; justify-content:center; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
+                <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
+                <div>
+                    <h2 id="public-name" style="font-family:var(--font-heading);"></h2>
+                    <span id="public-status-badge" class="status-badge disponible"><span class="dot"></span> Disponible</span>
+                </div>
+            </div>
+
+            <!-- Boutons QR Code & Vcard -->
+            <div style="display:flex; gap:0.8rem; justify-content:center; margin-top:1rem;">
+                <button class="btn btn-outline" id="qr-code-btn" style="padding:0.4rem 1rem; font-size:0.9rem;"><i class="fas fa-qrcode"></i> QR Code</button>
+                <button class="btn btn-outline" id="vcard-btn" style="padding:0.4rem 1rem; font-size:0.9rem;"><i class="fas fa-user-plus"></i> Vcard</button>
+            </div>
+
             <!-- Liens sociaux -->
             <div id="public-links" class="mt-2" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
         </div>
         <p class="text-center" style="font-size:0.8rem; color:var(--text-secondary);">Propulsé par LinkExt</p>
     </div>
-</div>
+
+    <!-- ========== MODAL QR CODE ========== -->
+    <div class="modal-overlay" id="qr-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:1rem; font-family:var(--font-heading);">QR Code du profil</h3>
+            <img id="qr-image" src="" alt="QR Code">
+            <button class="close-modal" id="close-qr-modal">Fermer</button>
+        </div>
+    </div>
+
+</div> <!-- fin #app -->
 
 <div id="toast-container"></div>
 
@@ -582,7 +809,7 @@
 
 <script>
     (function() {
-        // --- Configuration Firebase ---
+        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
             authDomain: "linkext-83984.firebaseapp.com",
@@ -596,7 +823,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // --- Configuration Cloudinary (UNSIGNED) ---
+        // --- Cloudinary ---
         const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
         const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
 
@@ -611,7 +838,7 @@
             { id: 'tiktok', name: 'TikTok', icon: 'fab fa-tiktok', colorClass: 'tiktok' }
         ];
 
-        // --- État global ---
+        // --- État ---
         let currentUser = null;
         let userProfile = null;
         let authMode = 'login';
@@ -628,7 +855,7 @@
             publicProfile: document.getElementById('view-profile-public')
         };
 
-        // --- Utilitaires UI ---
+        // --- Utilitaires ---
         function showView(viewId) {
             const target = document.getElementById(viewId);
             if (!target) return;
@@ -670,7 +897,7 @@
                     return null;
                 }
             } catch (error) {
-                console.warn('Erreur Firestore (lecture profil) :', error);
+                console.warn('Erreur Firestore (lecture) :', error);
                 userProfile = null;
                 showToast('Profil non synchronisé. Mode hors-ligne actif.', 'error');
                 return null;
@@ -684,13 +911,14 @@
                 userProfile = { ...userProfile, ...data, _id: uid };
                 return true;
             } catch (error) {
-                console.warn('Erreur Firestore (écriture profil) :', error);
+                console.warn('Erreur Firestore (écriture) :', error);
                 userProfile = { ...userProfile, ...data, _id: uid };
                 showToast('Sauvegarde cloud échouée. Modifications locales conservées.', 'error');
                 return false;
             }
         }
 
+        // --- Incrémentation vues ---
         async function incrementViews(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -699,6 +927,19 @@
                 });
             } catch (error) {
                 console.warn('Impossible d\'incrémenter les vues :', error);
+            }
+        }
+
+        // --- Incrémenter les clics d'un lien (public) ---
+        async function incrementLinkClick(uid, linkIndex) {
+            try {
+                const docRef = db.collection('users').doc(uid);
+                const key = `linkClicks.${linkIndex}`;
+                await docRef.update({
+                    [key]: firebase.firestore.FieldValue.increment(1)
+                });
+            } catch (error) {
+                console.warn('Impossible d\'incrémenter le clic :', error);
             }
         }
 
@@ -718,6 +959,10 @@
                     links: [],
                     sharePreviewURL: '',
                     bannerLink: '',
+                    status: 'disponible',
+                    maintenance: false,
+                    featuredLink: null,
+                    linkClicks: {},
                     views: 0,
                     onboardingCompleted: false
                 };
@@ -747,7 +992,7 @@
             document.getElementById('auth-btn-text').textContent = mode === 'login' ? 'Se connecter' : 'Créer un compte';
         }
 
-        // --- Onboarding ---
+        // --- Onboarding --- (inchangé)
         function renderOnboardingGrid() {
             const grid = document.getElementById('onboarding-grid');
             grid.innerHTML = '';
@@ -809,19 +1054,27 @@
                     links: [],
                     sharePreviewURL: '',
                     bannerLink: '',
+                    status: 'disponible',
+                    maintenance: false,
+                    featuredLink: null,
+                    linkClicks: {},
                     views: 0,
                     onboardingCompleted: false
                 };
             }
+
+            // Remplir les champs
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
             document.getElementById('dashboard-banner-link').value = userProfile.bannerLink || '';
             document.getElementById('views-count-display').textContent = userProfile.views || 0;
 
+            // Avatar
             const avatarImg = document.getElementById('dashboard-avatar');
             avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
             avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
 
+            // Aperçu bannière
             const shareThumb = document.getElementById('share-preview-thumb');
             const shareImg = document.getElementById('share-preview-img');
             if (userProfile.sharePreviewURL) {
@@ -830,6 +1083,14 @@
             } else {
                 shareThumb.style.display = 'none';
             }
+
+            // Statut
+            updateStatusUI(userProfile.status || 'disponible');
+
+            // Maintenance
+            updateMaintenanceUI(userProfile.maintenance || false);
+
+            // Liens
             renderDashboardLinks();
         }
 
@@ -837,9 +1098,13 @@
             const container = document.getElementById('dashboard-links-container');
             container.innerHTML = '';
             if (!userProfile || !userProfile.links) return;
+
             userProfile.links.forEach((link, index) => {
                 const platform = PLATFORMS.find(p => p.id === link.platform);
                 if (!platform) return;
+                const isFeatured = (userProfile.featuredLink === index);
+                const clicks = userProfile.linkClicks && userProfile.linkClicks[index] ? userProfile.linkClicks[index] : 0;
+
                 const div = document.createElement('div');
                 div.className = 'link-item';
                 div.innerHTML = `
@@ -847,24 +1112,47 @@
                         <input type="text" class="input-field link-url-input" value="${link.url || ''}" placeholder="URL" data-index="${index}">
                         <div class="toggle-switch ${link.active ? 'active' : ''}" data-index="${index}" data-action="toggle"></div>
                         <button class="delete-link-btn" data-index="${index}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn btn-outline feature-btn" data-index="${index}" style="padding:0.2rem 0.5rem; font-size:0.8rem;">
+                            ${isFeatured ? '<i class="fas fa-thumbtack" style="color:var(--cyan);"></i>' : '<i class="fas fa-thumbtack"></i>'}
+                        </button>
+                        <span style="font-size:0.7rem; color:var(--text-secondary);">${clicks} clics</span>
                     `;
                 container.appendChild(div);
             });
 
+            // Gestion des événements (toggle, delete, feature)
             container.onclick = (e) => {
                 const btn = e.target.closest('[data-action]');
-                if (!btn) return;
-                const index = parseInt(btn.dataset.index);
-                if (isNaN(index)) return;
-                if (btn.dataset.action === 'toggle') {
-                    userProfile.links[index].active = !userProfile.links[index].active;
-                    renderDashboardLinks();
-                } else if (btn.dataset.action === 'delete') {
-                    userProfile.links.splice(index, 1);
+                if (btn) {
+                    const index = parseInt(btn.dataset.index);
+                    if (isNaN(index)) return;
+                    if (btn.dataset.action === 'toggle') {
+                        userProfile.links[index].active = !userProfile.links[index].active;
+                        renderDashboardLinks();
+                    } else if (btn.dataset.action === 'delete') {
+                        userProfile.links.splice(index, 1);
+                        // réajuster featuredLink si nécessaire
+                        if (userProfile.featuredLink === index) userProfile.featuredLink = null;
+                        else if (userProfile.featuredLink > index) userProfile.featuredLink--;
+                        renderDashboardLinks();
+                    }
+                    return;
+                }
+                // Bouton épingler
+                const featureBtn = e.target.closest('.feature-btn');
+                if (featureBtn) {
+                    const index = parseInt(featureBtn.dataset.index);
+                    if (isNaN(index)) return;
+                    if (userProfile.featuredLink === index) {
+                        userProfile.featuredLink = null;
+                    } else {
+                        userProfile.featuredLink = index;
+                    }
                     renderDashboardLinks();
                 }
             };
 
+            // Mise à jour des URLs
             container.oninput = (e) => {
                 if (e.target.classList.contains('link-url-input')) {
                     const index = parseInt(e.target.dataset.index);
@@ -875,7 +1163,20 @@
             };
         }
 
-        // --- Cloudinary Widget ---
+        // --- Statut UI ---
+        function updateStatusUI(status) {
+            document.querySelectorAll('.status-selector .status-option').forEach(el => {
+                el.classList.toggle('active', el.dataset.value === status);
+            });
+        }
+
+        // --- Maintenance UI ---
+        function updateMaintenanceUI(enabled) {
+            const track = document.getElementById('maintenance-toggle');
+            track.classList.toggle('active', enabled);
+        }
+
+        // --- Cloudinary Widget (inchangé) ---
         function openCloudinaryWidget({ button, onSuccess }) {
             if (!currentUser) {
                 showToast('Connectez-vous pour continuer.', 'error');
@@ -972,7 +1273,7 @@
             });
         }
 
-        // --- Profil public (avec bannière redirigeant vers le premier lien social actif) ---
+        // --- Profil public (avec toutes les nouvelles fonctionnalités) ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -986,16 +1287,26 @@
                 // Incrémenter les vues
                 incrementViews(uid).catch(() => {});
 
+                // Vérifier mode maintenance
+                if (data.maintenance === true) {
+                    const publicView = document.getElementById('view-profile-public');
+                    publicView.innerHTML = `
+                        <div class="glass-card maintenance-message">
+                            <i class="fas fa-tools"></i>
+                            <h2>Profil en maintenance</h2>
+                            <p>Revenez bientôt, le profil est en cours de mise à jour.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
                 // Bannière cliquable
                 const bannerContainer = document.getElementById('public-banner-container');
                 bannerContainer.innerHTML = '';
-
-                // Déterminer l'URL de destination pour la bannière
                 let bannerTargetUrl = null;
                 if (data.bannerLink && data.bannerLink.trim() !== '') {
                     bannerTargetUrl = sanitizeUrl(data.bannerLink);
                 } else {
-                    // Chercher le premier lien actif
                     if (data.links && Array.isArray(data.links)) {
                         const activeLink = data.links.find(l => l.active && l.url && l.url.trim() !== '');
                         if (activeLink) {
@@ -1003,7 +1314,6 @@
                         }
                     }
                 }
-
                 if (data.sharePreviewURL) {
                     if (bannerTargetUrl) {
                         const link = document.createElement('a');
@@ -1017,7 +1327,6 @@
                         link.appendChild(img);
                         bannerContainer.appendChild(link);
                     } else {
-                        // Image seule (non cliquable)
                         const div = document.createElement('div');
                         div.className = 'share-banner-link';
                         const img = document.createElement('img');
@@ -1033,20 +1342,32 @@
                     bannerContainer.appendChild(placeholder);
                 }
 
-                // Bio sous la bannière
+                // Bio sous bannière
                 document.getElementById('public-bio-under-banner').textContent = data.bio || '';
 
-                // Avatar et nom
+                // Avatar, nom, statut
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
 
-                // Liens sociaux
+                // Statut
+                const statusBadge = document.getElementById('public-status-badge');
+                const statusMap = {
+                    disponible: { label: 'Disponible', class: 'disponible' },
+                    occupe: { label: 'Occupé', class: 'occupe' },
+                    enlive: { label: 'En Live', class: 'enlive' }
+                };
+                const st = statusMap[data.status] || statusMap.disponible;
+                statusBadge.className = `status-badge ${st.class}`;
+                statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+
+                // Liens sociaux avec gestion du lien vedette et des clics
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
                 if (data.links && Array.isArray(data.links)) {
-                    data.links.filter(l => l.active).forEach(link => {
+                    data.links.forEach((link, index) => {
+                        if (!link.active) return;
                         const platform = PLATFORMS.find(p => p.id === link.platform);
                         if (!platform || !link.url) return;
                         const a = document.createElement('a');
@@ -1054,15 +1375,163 @@
                         a.target = '_blank';
                         a.rel = 'noopener noreferrer';
                         a.className = `social-btn ${platform.colorClass}`;
-                        a.innerHTML = `<i class="${platform.icon}"></i> ${platform.name}`;
+                        if (data.featuredLink === index) {
+                            a.classList.add('lien-vedette');
+                        }
+                        // Ajouter un petit compteur de clics (optionnel)
+                        const clicks = data.linkClicks && data.linkClicks[index] ? data.linkClicks[index] : 0;
+                        a.innerHTML = `<i class="${platform.icon}"></i> ${platform.name} <span style="font-size:0.6rem; opacity:0.6; margin-left:auto;">${clicks}</span>`;
+
+                        // Incrémenter les clics au clic
+                        a.addEventListener('click', (e) => {
+                            // On laisse le lien s'ouvrir, on incrémente en arrière-plan
+                            incrementLinkClick(uid, index).catch(() => {});
+                        });
+
                         linksContainer.appendChild(a);
                     });
                 }
+
+                // QR Code : on prépare l'image dans la modale
+                const qrModal = document.getElementById('qr-modal');
+                const qrImg = document.getElementById('qr-image');
+                const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
+
+                // Vcard : on prépare les données
+
             } catch (err) {
                 showToast('Erreur chargement profil public.', 'error');
             }
         }
 
+        // --- Gestion de la modal QR ---
+        function setupQRModal() {
+            const modal = document.getElementById('qr-modal');
+            const openBtn = document.getElementById('qr-code-btn');
+            const closeBtn = document.getElementById('close-qr-modal');
+
+            openBtn.addEventListener('click', () => {
+                modal.classList.add('active');
+            });
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        }
+
+        // --- Téléchargement Vcard ---
+        function setupVcard() {
+            document.getElementById('vcard-btn').addEventListener('click', () => {
+                if (!userProfile) {
+                    showToast('Profil non chargé.', 'error');
+                    return;
+                }
+                const name = userProfile.displayName || 'Utilisateur';
+                // Extraire le numéro WhatsApp du lien WhatsApp s'il existe
+                let phone = '';
+                if (userProfile.links) {
+                    const whatsappLink = userProfile.links.find(l => l.platform === 'whatsapp' && l.active);
+                    if (whatsappLink && whatsappLink.url) {
+                        const match = whatsappLink.url.match(/https?:\/\/(?:www\.)?wa\.me\/(\d+)/);
+                        if (match) phone = match[1];
+                    }
+                }
+                const urlProfil = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
+
+                // Construction du contenu VCF
+                let vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+URL:${urlProfil}
+`;
+                if (phone) {
+                    vcard += `TEL;TYPE=CELL:${phone}\n`;
+                }
+                vcard += `END:VCARD`;
+
+                // Téléchargement
+                const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `${name}.vcf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('Contact enregistré !', 'info');
+            });
+        }
+
+        // --- Réinitialisation des clics ---
+        function setupResetClicks() {
+            document.getElementById('reset-clicks-btn').addEventListener('click', async () => {
+                if (!currentUser) return;
+                if (!confirm('Voulez-vous vraiment réinitialiser tous les compteurs de clics ?')) return;
+                try {
+                    const docRef = db.collection('users').doc(currentUser.uid);
+                    await docRef.update({
+                        linkClicks: {}
+                    });
+                    userProfile.linkClicks = {};
+                    renderDashboardLinks();
+                    showToast('Compteurs réinitialisés !', 'info');
+                } catch (error) {
+                    showToast('Erreur lors de la réinitialisation.', 'error');
+                }
+            });
+        }
+
+        // --- Événements dashboard (statut, maintenance, enregistrement) ---
+        function attachDashboardEvents() {
+            // Statut
+            document.querySelectorAll('.status-selector .status-option').forEach(el => {
+                el.addEventListener('click', () => {
+                    const value = el.dataset.value;
+                    updateStatusUI(value);
+                    // Sauvegarde immédiate
+                    if (currentUser) {
+                        saveUserProfile(currentUser.uid, { status: value }).catch(() => {});
+                    }
+                });
+            });
+
+            // Maintenance
+            document.getElementById('maintenance-toggle').addEventListener('click', function() {
+                const enabled = !this.classList.contains('active');
+                updateMaintenanceUI(enabled);
+                if (currentUser) {
+                    saveUserProfile(currentUser.uid, { maintenance: enabled }).catch(() => {});
+                }
+            });
+
+            // Enregistrer les modifications (dashboard)
+            document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
+                if (!currentUser) return;
+                const name = document.getElementById('dashboard-name').value.trim();
+                const bio = document.getElementById('dashboard-bio').value.trim();
+                const bannerLink = document.getElementById('dashboard-banner-link').value.trim();
+                const links = userProfile.links ? userProfile.links.map(l => ({
+                    platform: l.platform,
+                    url: sanitizeUrl(l.url),
+                    active: l.active
+                })) : [];
+                const saved = await saveUserProfile(currentUser.uid, {
+                    displayName: name,
+                    bio: bio,
+                    bannerLink: bannerLink,
+                    links: links,
+                    onboardingCompleted: true
+                });
+                if (saved) {
+                    showToast('Profil enregistré !', 'info');
+                    document.getElementById('views-count-display').textContent = userProfile.views || 0;
+                }
+            });
+        }
+
+        // --- isPublicMode ---
         function isPublicMode() {
             return new URLSearchParams(window.location.search).has('id');
         }
@@ -1070,16 +1539,16 @@
             return new URLSearchParams(window.location.search).get('id');
         }
 
-        // ==================== ÉCOUTEURS D'ÉVÉNEMENTS ====================
+        // ==================== ATTACHEMENT GLOBAL DES ÉVÉNEMENTS ====================
         function attachAllEventListeners() {
-            // Tabs auth
+            // Auth tabs
             document.getElementById('auth-tabs').addEventListener('click', (e) => {
                 if (e.target.classList.contains('tab')) {
                     updateAuthUIForMode(e.target.dataset.tab);
                 }
             });
 
-            // Formulaire Email/Password
+            // Auth form
             document.getElementById('auth-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('auth-email').value.trim();
@@ -1179,6 +1648,10 @@
                     links: links,
                     sharePreviewURL: '',
                     bannerLink: '',
+                    status: 'disponible',
+                    maintenance: false,
+                    featuredLink: null,
+                    linkClicks: {},
                     views: 0,
                     onboardingCompleted: true
                 };
@@ -1204,6 +1677,10 @@
                     links: links,
                     sharePreviewURL: '',
                     bannerLink: '',
+                    status: 'disponible',
+                    maintenance: false,
+                    featuredLink: null,
+                    linkClicks: {},
                     views: 0,
                     onboardingCompleted: true
                 };
@@ -1238,30 +1715,6 @@
                 }
             });
 
-            // Dashboard : Enregistrer
-            document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
-                if (!currentUser) return;
-                const name = document.getElementById('dashboard-name').value.trim();
-                const bio = document.getElementById('dashboard-bio').value.trim();
-                const bannerLink = document.getElementById('dashboard-banner-link').value.trim();
-                const links = userProfile.links ? userProfile.links.map(l => ({
-                    platform: l.platform,
-                    url: sanitizeUrl(l.url),
-                    active: l.active
-                })) : [];
-                const saved = await saveUserProfile(currentUser.uid, {
-                    displayName: name,
-                    bio: bio,
-                    bannerLink: bannerLink,
-                    links: links,
-                    onboardingCompleted: true
-                });
-                if (saved) {
-                    showToast('Profil enregistré !', 'info');
-                    document.getElementById('views-count-display').textContent = userProfile.views || 0;
-                }
-            });
-
             // Dashboard : Copier le lien de partage
             document.getElementById('copy-share-link-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
@@ -1288,9 +1741,19 @@
             // Uploads Cloudinary
             setupAvatarUpload();
             setupSharePreviewUpload();
+
+            // Événements dashboard (statut, maintenance, save)
+            attachDashboardEvents();
+
+            // QR Code et Vcard
+            setupQRModal();
+            setupVcard();
+
+            // Réinitialisation des clics
+            setupResetClicks();
         }
 
-        // --- Écouteur d'état d'authentification ---
+        // --- Auth state ---
         auth.onAuthStateChanged(async (user) => {
             if (authRedirectInProgress) return;
 
@@ -1304,7 +1767,7 @@
             await handleAuthRedirection(user);
         });
 
-        // --- Initialisation ---
+        // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
 
@@ -1315,6 +1778,7 @@
                 showView('view-auth');
             }
         });
+
     })();
 </script>
 </body>
