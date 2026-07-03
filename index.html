@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Cloudinary Widget -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
         /* ===== VARIABLES (thème sombre par défaut) ===== */
@@ -736,6 +735,61 @@
             color: var(--text-secondary);
         }
 
+        /* ===== REDIRECTION UNIQUE TOGGLE (Dashboard) ===== */
+        .redirect-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .redirect-toggle .toggle-track {
+            width: 44px;
+            height: 24px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .redirect-toggle .toggle-track.enabled {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        body.light-mode .redirect-toggle .toggle-track {
+            background: rgba(0,0,0,0.15);
+        }
+        .redirect-toggle .toggle-track.active {
+            background: var(--cyan);
+        }
+        body.light-mode .redirect-toggle .toggle-track.active {
+            background: #0066cc;
+        }
+        .redirect-toggle .toggle-track::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .redirect-toggle .toggle-track.active::after {
+            left: 22px;
+        }
+        .redirect-toggle .status-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .redirect-toggle .status-label.active {
+            color: var(--cyan);
+        }
+        body.light-mode .redirect-toggle .status-label.active {
+            color: #0066cc;
+        }
+
         /* Compteur de vues global */
         .views-counter {
             display: inline-flex;
@@ -946,14 +1000,46 @@
         }
 
         /* ===== PROFIL PUBLIC ===== */
+        /* Wrapper global pour la redirection unique */
+        .public-wrapper {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+        }
         #view-profile-public .glass-card {
             padding: 0 0 1.2rem 0;
             overflow: visible;
             border-radius: 20px;
+            position: relative;
         }
         .public-header {
             padding: 1.2rem 1.8rem 0.4rem 1.8rem;
             margin: 0;
+            position: relative;
+            z-index: 2;
+            pointer-events: none; /* le wrapper global capte les clics */
+        }
+        .public-header .public-header-actions,
+        .public-header .public-status-wrap,
+        .public-header .public-name,
+        .public-header .public-bio-text {
+            pointer-events: none;
+        }
+        /* Les boutons QR et Vcard doivent rester cliquables */
+        .public-header-actions .btn,
+        .theme-toggle,
+        #qr-code-btn,
+        #vcard-btn {
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 3;
+        }
+        /* Le wrapper <a> englobe tout sauf ces éléments exclus */
+        .public-wrapper .exclude-click {
+            position: relative;
+            z-index: 4;
+            pointer-events: auto !important;
         }
         .public-header-top {
             display: flex;
@@ -971,6 +1057,7 @@
             box-shadow: 0 0 20px rgba(0,242,254,0.3);
             flex-shrink: 0;
             transition: box-shadow 0.3s ease;
+            pointer-events: none;
         }
         body.light-mode .public-header-top .avatar-glow-ring {
             background: conic-gradient(#0066cc, #4facfe, #0066cc);
@@ -992,6 +1079,7 @@
             padding: 0.3rem 0.8rem;
             font-size: 0.7rem;
             border-radius: 30px;
+            pointer-events: auto !important;
         }
         .public-name {
             font-family: var(--font-heading);
@@ -1029,6 +1117,7 @@
         .public-status-wrap .status-badge {
             font-size: 0.65rem;
             padding: 0.1rem 0.8rem;
+            pointer-events: none;
         }
 
         .public-links-divider {
@@ -1037,6 +1126,7 @@
             background: linear-gradient(90deg, transparent, var(--cyan), transparent);
             margin: 0.6rem auto 0.8rem auto;
             opacity: 0.3;
+            pointer-events: none;
         }
 
         #public-links {
@@ -1045,6 +1135,11 @@
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
+            pointer-events: none; /* dans le wrapper global, les cartes ne sont plus cliquables individuellement */
+        }
+        /* Mais on veut que les cartes ne soient pas cliquables si redirection unique activée */
+        .public-wrapper .rich-link-card {
+            pointer-events: none;
         }
 
         /* ===== CARTES RICH PREVIEW ===== */
@@ -1058,7 +1153,7 @@
             border: 1px solid var(--card-border);
             border-radius: 14px;
             transition: all var(--transition);
-            cursor: pointer;
+            cursor: default;
             position: relative;
         }
         .rich-link-card:hover {
@@ -1198,6 +1293,7 @@
             text-transform: uppercase;
             opacity: 0.7;
             text-align: left;
+            pointer-events: none;
         }
 
         .maintenance-message {
@@ -1336,6 +1432,9 @@
             .glass-card {
                 padding: 1.5rem 1rem;
             }
+            .redirect-toggle .status-label {
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
@@ -1404,8 +1503,8 @@
                 <button class="btn btn-outline" id="logout-btn" style="padding:0.5rem 1rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
-            <!-- Bloc Statut Flash + Maintenance + Theme -->
-            <div class="mt-2" style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center;">
+            <!-- Bloc Statut Flash + Maintenance + Theme + Redirection Unique -->
+            <div class="mt-2" style="display:flex; flex-wrap:wrap; gap:0.8rem; justify-content:space-between; align-items:center;">
                 <div>
                     <label style="font-size:0.8rem; color:var(--text-secondary);">Statut Flash</label>
                     <div class="status-selector" id="status-selector">
@@ -1414,7 +1513,7 @@
                         <span class="status-option" data-value="enlive"><span class="dot"></span> En Live</span>
                     </div>
                 </div>
-                <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
+                <div style="display:flex; flex-wrap:wrap; gap:0.8rem; align-items:center;">
                     <div class="maintenance-toggle">
                         <span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span>
                         <div class="toggle-track" id="maintenance-toggle"></div>
@@ -1425,6 +1524,16 @@
                         <i class="fas fa-moon" id="theme-private-icon-moon"></i>
                     </div>
                 </div>
+            </div>
+
+            <!-- Ligne Redirection Unique -->
+            <div class="flex-between" style="margin-top:0.3rem; border-top:1px solid var(--border-glow); padding-top:0.4rem;">
+                <div class="redirect-toggle">
+                    <span style="font-size:0.8rem; color:var(--text-secondary);">Redirection Unique</span>
+                    <div class="toggle-track" id="redirect-toggle-track"></div>
+                    <span class="status-label" id="redirect-status-label">Désactivé</span>
+                </div>
+                <span style="font-size:0.6rem; color:var(--text-secondary);" id="redirect-hint">(nécessite 1 lien actif)</span>
             </div>
 
             <!-- Compteur vues global et réinitialisation -->
@@ -1516,31 +1625,36 @@
 
     <!-- ========== VUE PROFIL PUBLIC ========== -->
     <div id="view-profile-public" class="view">
-        <div class="glass-card" style="text-align:center; padding-top:0;">
-            <div class="public-header">
-                <div class="public-header-top">
-                    <div class="avatar-glow-ring">
-                        <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
+        <!-- Wrapper global pour la redirection unique (si activé) -->
+        <a id="public-wrapper-link" class="public-wrapper" href="#" target="_blank" rel="noopener noreferrer" style="display:block; text-decoration:none; color:inherit; width:100%;">
+            <div class="glass-card" style="text-align:center; padding-top:0; position:relative;">
+                <!-- En-tête -->
+                <div class="public-header">
+                    <div class="public-header-top">
+                        <div class="avatar-glow-ring">
+                            <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
+                        </div>
+                        <div class="public-header-actions">
+                            <button class="theme-toggle" id="theme-toggle-btn" title="Basculer le thème">
+                                <i class="fas fa-moon"></i>
+                            </button>
+                            <button class="btn btn-outline exclude-click" id="qr-code-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-qrcode"></i></button>
+                            <button class="btn btn-outline exclude-click" id="vcard-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-user-plus"></i></button>
+                        </div>
                     </div>
-                    <div class="public-header-actions">
-                        <button class="theme-toggle" id="theme-toggle-btn" title="Basculer le thème">
-                            <i class="fas fa-moon"></i>
-                        </button>
-                        <button class="btn btn-outline" id="qr-code-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-qrcode"></i></button>
-                        <button class="btn btn-outline" id="vcard-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-user-plus"></i></button>
+                    <h2 id="public-name" class="public-name">Utilisateur</h2>
+                    <p id="public-bio-text" class="public-bio-text">Bio du profil</p>
+                    <div class="public-status-wrap">
+                        <span id="public-status-badge" class="status-badge disponible"><span class="dot"></span> Disponible</span>
                     </div>
                 </div>
-                <h2 id="public-name" class="public-name">Utilisateur</h2>
-                <p id="public-bio-text" class="public-bio-text">Bio du profil</p>
-                <div class="public-status-wrap">
-                    <span id="public-status-badge" class="status-badge disponible"><span class="dot"></span> Disponible</span>
-                </div>
+
+                <div class="public-links-divider"></div>
+
+                <!-- Contenu des liens -->
+                <div id="public-links"></div>
             </div>
-
-            <div class="public-links-divider"></div>
-
-            <div id="public-links"></div>
-        </div>
+        </a>
         <p class="text-center" style="font-size:0.7rem; color:var(--text-secondary); padding:0.4rem 0;">Propulsé par LinkExt</p>
     </div>
 
@@ -1637,6 +1751,11 @@
             return url;
         }
 
+        function isValidUrl(url) {
+            const pattern = /^(https?:\/\/)([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}([\/\w\-\.]*)*$/i;
+            return pattern.test(url.trim());
+        }
+
         function generateAvatarUrl(name) {
             return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
         }
@@ -1665,6 +1784,7 @@
                         userProfile.links.sort((a, b) => (a.order || 0) - (b.order || 0));
                     }
                     if (typeof userProfile.views !== 'number') userProfile.views = 0;
+                    if (typeof userProfile.redirectUnique !== 'boolean') userProfile.redirectUnique = false;
                     return userProfile;
                 } else {
                     userProfile = null;
@@ -1692,7 +1812,7 @@
             }
         }
 
-        // --- Incrémentation des vues globales (page publique) ---
+        // --- Incrémentation des vues globales ---
         async function incrementViews(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1707,7 +1827,7 @@
             }
         }
 
-        // --- Incrémenter les clics d'un lien spécifique ---
+        // --- Incrémenter les clics d'un lien ---
         async function incrementLinkClick(uid, linkId) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1790,6 +1910,62 @@
             }
         }
 
+        // --- Gestion de la redirection unique ---
+        function updateRedirectToggleState() {
+            const track = document.getElementById('redirect-toggle-track');
+            const label = document.getElementById('redirect-status-label');
+            const hint = document.getElementById('redirect-hint');
+            if (!userProfile || !userProfile.links) {
+                track.classList.remove('enabled', 'active');
+                label.textContent = 'Désactivé';
+                label.classList.remove('active');
+                hint.textContent = '(aucun lien)';
+                return;
+            }
+            const activeLinks = userProfile.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '');
+            const count = activeLinks.length;
+            if (count === 1) {
+                track.classList.add('enabled');
+                hint.textContent = '(1 lien actif)';
+                if (userProfile.redirectUnique === true) {
+                    track.classList.add('active');
+                    label.textContent = 'Activé';
+                    label.classList.add('active');
+                } else {
+                    track.classList.remove('active');
+                    label.textContent = 'Désactivé';
+                    label.classList.remove('active');
+                }
+            } else {
+                track.classList.remove('enabled', 'active');
+                label.textContent = 'Désactivé';
+                label.classList.remove('active');
+                hint.textContent = `(${count} liens actifs - désactivé)`;
+                // Si plus d'un lien, on désactive l'option dans le profil
+                if (userProfile.redirectUnique === true) {
+                    userProfile.redirectUnique = false;
+                    saveUserProfile(currentUser.uid, { redirectUnique: false }).catch(() => {});
+                }
+            }
+        }
+
+        async function toggleRedirectUnique() {
+            if (!currentUser) {
+                showToast('Connectez-vous.', 'error');
+                return;
+            }
+            const track = document.getElementById('redirect-toggle-track');
+            if (!track.classList.contains('enabled')) {
+                showToast('La redirection unique nécessite exactement un lien actif.', 'info');
+                return;
+            }
+            const newState = !userProfile.redirectUnique;
+            userProfile.redirectUnique = newState;
+            await saveUserProfile(currentUser.uid, { redirectUnique: newState });
+            updateRedirectToggleState();
+            showToast(newState ? 'Redirection unique activée !' : 'Redirection unique désactivée.', 'info');
+        }
+
         // --- Routage ---
         async function handleAuthRedirection(user) {
             if (!user) {
@@ -1809,6 +1985,7 @@
                     maintenance: false,
                     featuredLink: null,
                     views: 0,
+                    redirectUnique: false,
                     onboardingCompleted: false
                 };
                 saveUserProfile(user.uid, defaultProfile).catch(() => {});
@@ -1902,6 +2079,7 @@
                     maintenance: false,
                     featuredLink: null,
                     views: 0,
+                    redirectUnique: false,
                     onboardingCompleted: false
                 };
             }
@@ -1917,7 +2095,8 @@
 
             updateStatusUI(userProfile.status || 'disponible');
             updateMaintenanceUI(userProfile.maintenance || false);
-            applyThemeToPrivateUI(); // Applique le thème sauvegardé dans le Dashboard
+            applyThemeToPrivateUI();
+            updateRedirectToggleState();
             renderDashboardLinks();
             renderTopNetworks();
         }
@@ -2009,7 +2188,6 @@
 
             // Gestion des événements
             container.onclick = (e) => {
-                // Actions pour les liens
                 const btn = e.target.closest('[data-action]');
                 if (btn) {
                     const id = btn.dataset.id;
@@ -2020,6 +2198,8 @@
                             link.active = !link.active;
                             renderDashboardLinks();
                             renderTopNetworks();
+                            updateRedirectToggleState(); // mise à jour de l'état du toggle
+                            saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                         }
                     } else if (btn.dataset.action === 'delete') {
                         if (confirm('Supprimer ce lien ?')) {
@@ -2027,12 +2207,12 @@
                             if (userProfile.featuredLink === id) userProfile.featuredLink = null;
                             renderDashboardLinks();
                             renderTopNetworks();
+                            updateRedirectToggleState();
                             saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                         }
                     }
                     return;
                 }
-                // Bouton "vedette"
                 const featureBtn = e.target.closest('.feature-btn');
                 if (featureBtn) {
                     const id = featureBtn.dataset.id;
@@ -2048,7 +2228,6 @@
                     saveUserProfile(currentUser.uid, { featuredLink: userProfile.featuredLink }).catch(() => {});
                     return;
                 }
-                // Ordre
                 const orderBtn = e.target.closest('[data-dir]');
                 if (orderBtn) {
                     const id = orderBtn.dataset.id;
@@ -2069,14 +2248,12 @@
                     renderTopNetworks();
                     saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                 }
-                // Réinitialisation individuelle des clics
                 const resetBtn = e.target.closest('.reset-clicks-btn');
                 if (resetBtn) {
                     const id = resetBtn.dataset.id;
                     if (id) resetLinkClicks(id);
                     return;
                 }
-                // Édition de section
                 const editSection = e.target.closest('[data-action="edit-section"]');
                 if (editSection) {
                     const id = editSection.dataset.id;
@@ -2090,7 +2267,6 @@
                         }
                     }
                 }
-                // Suppression de section
                 const deleteSection = e.target.closest('[data-action="delete-section"]');
                 if (deleteSection) {
                     const id = deleteSection.dataset.id;
@@ -2174,7 +2350,9 @@
                     multiple: false,
                     cropping: true,
                     resourceType: "image",
-                    signature: false
+                    signature: false,
+                    maxFileSize: 5242880, // 5 Mo
+                    allowedFormats: ['jpg', 'jpeg', 'png', 'webp']
                 },
                 (error, result) => {
                     if (error) {
@@ -2285,9 +2463,13 @@
                 return;
             }
             const input = document.getElementById('new-link-url');
-            const url = input.value.trim();
-            if (!url) {
+            const rawUrl = input.value.trim();
+            if (!rawUrl) {
                 showToast('Veuillez entrer un lien valide.', 'error');
+                return;
+            }
+            if (!isValidUrl(rawUrl)) {
+                showToast('URL invalide. Utilisez un lien commençant par http:// ou https://.', 'error');
                 return;
             }
             if (!currentUser) {
@@ -2301,7 +2483,7 @@
             const newLink = {
                 id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
                 platform: selectedNetworkType,
-                url: sanitizeUrl(url),
+                url: sanitizeUrl(rawUrl),
                 description: `Rejoindre ${PLATFORMS.find(p => p.id === selectedNetworkType).name}`,
                 imageUrl: linkImageUrl || '',
                 active: true,
@@ -2337,7 +2519,7 @@
             }
         }
 
-        // --- Gestion du thème (public et privé) ---
+        // --- Gestion du thème ---
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
@@ -2363,14 +2545,12 @@
             if (iconPublic) {
                 iconPublic.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
             }
-            // Icônes privées (soleil/lune)
             const sunIcon = document.getElementById('theme-private-icon');
             const moonIcon = document.getElementById('theme-private-icon-moon');
             if (sunIcon && moonIcon) {
                 sunIcon.style.color = isLight ? 'var(--cyan)' : 'var(--text-secondary)';
                 moonIcon.style.color = isLight ? 'var(--text-secondary)' : 'var(--cyan)';
             }
-            // Toggle track privé
             const track = document.getElementById('theme-toggle-private');
             if (track) {
                 track.classList.toggle('active', isLight);
@@ -2432,7 +2612,29 @@
 
                 applySavedTheme();
 
-                // Cartes
+                // --- Gestion de la redirection unique ---
+                const wrapperLink = document.getElementById('public-wrapper-link');
+                const activeLinks = data.links ? data.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '') : [];
+                const isRedirectActive = data.redirectUnique === true && activeLinks.length === 1;
+
+                if (isRedirectActive) {
+                    const targetUrl = sanitizeUrl(activeLinks[0].url);
+                    wrapperLink.href = targetUrl;
+                    wrapperLink.style.pointerEvents = 'auto';
+                    wrapperLink.style.cursor = 'pointer';
+                    // Empêcher les clics sur les boutons QR/Vcard de remonter au wrapper
+                    document.querySelectorAll('.exclude-click').forEach(el => {
+                        el.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                        });
+                    });
+                } else {
+                    wrapperLink.href = '#';
+                    wrapperLink.style.pointerEvents = 'none';
+                    wrapperLink.style.cursor = 'default';
+                }
+
+                // Contenu des liens (cartes)
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
@@ -2467,7 +2669,7 @@
 
                         const isFeatured = (data.featuredLink === item.id);
 
-                        const card = document.createElement('a');
+                        const card = document.createElement('div'); // plus de <a>, juste un div
                         card.className = 'rich-link-card';
                         if (isFeatured) {
                             card.classList.add('border-glow-pulse');
@@ -2477,9 +2679,16 @@
                             badge.innerHTML = '<i class="fas fa-bolt"></i> En évidence';
                             card.appendChild(badge);
                         }
-                        card.href = sanitizeUrl(item.url);
-                        card.target = '_blank';
-                        card.rel = 'noopener noreferrer';
+                        // Si redirection unique activée, on ne met pas de lien sur la carte
+                        if (!isRedirectActive) {
+                            card.style.cursor = 'pointer';
+                            card.addEventListener('click', (e) => {
+                                window.open(sanitizeUrl(item.url), '_blank');
+                                incrementLinkClick(uid, item.id).catch(() => {});
+                            });
+                        } else {
+                            card.style.cursor = 'default';
+                        }
 
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
@@ -2515,16 +2724,12 @@
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
                             <i class="${platform.icon}"></i>
-                            <span>Cliqué ici pour rejoindre</span>
+                            <span>${isRedirectActive ? 'Redirection active' : 'Cliqué ici pour rejoindre'}</span>
                         `;
 
                         card.appendChild(desc);
                         card.appendChild(media);
                         card.appendChild(actionBar);
-
-                        card.addEventListener('click', (e) => {
-                            incrementLinkClick(uid, item.id).catch(() => {});
-                        });
 
                         linksContainer.appendChild(card);
                     });
@@ -2552,7 +2757,8 @@
             const openBtn = document.getElementById('qr-code-btn');
             const closeBtn = document.getElementById('close-qr-modal');
 
-            openBtn.addEventListener('click', () => {
+            openBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 modal.classList.add('active');
             });
             closeBtn.addEventListener('click', () => {
@@ -2565,7 +2771,8 @@
 
         // --- Vcard ---
         function setupVcard() {
-            document.getElementById('vcard-btn').addEventListener('click', () => {
+            document.getElementById('vcard-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
                 const data = window._vcardData || {};
                 const name = data.displayName || 'Utilisateur';
                 let phone = '';
@@ -2735,6 +2942,7 @@ URL:${urlProfil}
                     maintenance: false,
                     featuredLink: null,
                     views: 0,
+                    redirectUnique: false,
                     onboardingCompleted: true
                 };
                 saveUserProfile(currentUser.uid, profileData).catch(() => {});
@@ -2777,6 +2985,7 @@ URL:${urlProfil}
                     maintenance: false,
                     featuredLink: null,
                     views: 0,
+                    redirectUnique: false,
                     onboardingCompleted: true
                 };
                 const saved = await saveUserProfile(currentUser.uid, profileData);
@@ -2843,6 +3052,7 @@ URL:${urlProfil}
                 if (saved) {
                     showToast('Profil enregistré !', 'info');
                     document.getElementById('views-count-display').textContent = userProfile.views || 0;
+                    updateRedirectToggleState();
                 }
             });
 
@@ -2892,13 +3102,16 @@ URL:${urlProfil}
                 }
             });
 
-            // Réinitialisation des vues globales (uniquement ce compteur)
+            // Réinitialisation des vues globales
             document.getElementById('reset-views-btn').addEventListener('click', resetViews);
 
             // Thème privé
             document.getElementById('theme-toggle-private').addEventListener('click', function() {
                 toggleTheme();
             });
+
+            // Redirection Unique
+            document.getElementById('redirect-toggle-track').addEventListener('click', toggleRedirectUnique);
 
             // QR Code et Vcard
             setupQRModal();
