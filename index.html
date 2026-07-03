@@ -1102,16 +1102,13 @@
             pointer-events: none;
         }
 
+        /* Les cartes sont désormais cliquables par défaut */
         #public-links {
             padding: 0 1rem 0 1rem;
             margin: 0;
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
-            pointer-events: none;
-        }
-        .public-wrapper .rich-link-card {
-            pointer-events: none;
         }
 
         /* ===== CARTES RICH PREVIEW ===== */
@@ -1125,7 +1122,7 @@
             border: 1px solid var(--card-border);
             border-radius: 14px;
             transition: all var(--transition);
-            cursor: default;
+            cursor: pointer;
             position: relative;
         }
         .rich-link-card:hover {
@@ -1793,8 +1790,16 @@
             }
         }
 
-        // --- Incrémentation des vues globales ---
+        // --- Incrémentation des vues globales (avec protection double comptage) ---
+        let viewCountedFlag = false; // flag local pour éviter double incrément
+
         async function incrementViews(uid) {
+            // Utiliser sessionStorage pour éviter double comptage par session
+            const key = 'viewCounted_' + uid;
+            if (sessionStorage.getItem(key) === 'true') {
+                // déjà compté pour cette session
+                return;
+            }
             try {
                 const docRef = db.collection('users').doc(uid);
                 await docRef.update({
@@ -1803,6 +1808,7 @@
                 if (userProfile && userProfile._id === uid) {
                     userProfile.views = (userProfile.views || 0) + 1;
                 }
+                sessionStorage.setItem(key, 'true');
             } catch (error) {
                 console.warn('Impossible d\'incrémenter les vues :', error);
             }
@@ -1825,6 +1831,10 @@
                 await docRef.update({ links: updatedLinks });
                 if (userProfile && userProfile._id === uid) {
                     userProfile.links = updatedLinks;
+                    // Mettre à jour les stats si on est dans le dashboard (affichage)
+                    if (document.getElementById('view-dashboard').classList.contains('active')) {
+                        updateStats();
+                    }
                 }
             } catch (error) {
                 console.warn('Impossible d\'incrémenter le clic :', error);
@@ -1956,14 +1966,16 @@
             document.getElementById('stat-total-clicks').textContent = totalClicks;
 
             const barsContainer = document.getElementById('stat-bars');
-            const linkItems = userProfile.links ? userProfile.links.filter(l => !l.isSection && l.active && (l.clicks || 0) > 0) : [];
-            if (linkItems.length === 0) {
+            const linkItems = userProfile.links ? userProfile.links.filter(l => !l.isSection && l.active) : [];
+            // Filtrer ceux qui ont des clics > 0 ou afficher tous les actifs
+            const displayItems = linkItems.filter(l => (l.clicks || 0) > 0);
+            if (displayItems.length === 0) {
                 barsContainer.innerHTML = '<span style="color:var(--text-secondary); font-size:0.7rem;">Aucun clic enregistré</span>';
                 return;
             }
-            const maxClicks = Math.max(...linkItems.map(l => l.clicks || 0));
+            const maxClicks = Math.max(...displayItems.map(l => l.clicks || 0));
             let html = '';
-            linkItems.slice(0, 5).forEach(link => {
+            displayItems.slice(0, 5).forEach(link => {
                 const platform = PLATFORMS.find(p => p.id === link.platform);
                 if (!platform) return;
                 const percent = maxClicks > 0 ? Math.round((link.clicks / maxClicks) * 100) : 0;
@@ -2682,7 +2694,7 @@
             draw();
         }
 
-        // --- Profil Public ---
+        // --- Profil Public (CORRIGÉ) ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -2693,8 +2705,8 @@
                 }
                 const data = doc.data();
 
-                // Incrémenter les vues globales
-                incrementViews(uid).catch(() => {});
+                // Incrémenter les vues globales (une seule fois par session)
+                await incrementViews(uid);
 
                 if (data.maintenance === true) {
                     const publicView = document.getElementById('view-profile-public');
@@ -2735,23 +2747,19 @@
                 const activeLinks = data.links ? data.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '') : [];
                 const isRedirectActive = data.redirectUnique === true && activeLinks.length === 1;
 
+                // Configurer le wrapper
                 if (isRedirectActive) {
                     const targetUrl = sanitizeUrl(activeLinks[0].url);
                     wrapperLink.href = targetUrl;
                     wrapperLink.style.pointerEvents = 'auto';
                     wrapperLink.style.cursor = 'pointer';
-                    document.querySelectorAll('.exclude-click').forEach(el => {
-                        el.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                        });
-                    });
                 } else {
                     wrapperLink.href = '#';
                     wrapperLink.style.pointerEvents = 'none';
                     wrapperLink.style.cursor = 'default';
                 }
 
-                // Contenu des liens
+                // Contenu des liens (cartes)
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
@@ -2786,6 +2794,7 @@
 
                         const isFeatured = (data.featuredLink === item.id);
 
+                        // Créer la carte
                         const card = document.createElement('div');
                         card.className = 'rich-link-card';
                         if (isFeatured) {
@@ -2796,20 +2805,32 @@
                             badge.innerHTML = '<i class="fas fa-bolt"></i> En évidence';
                             card.appendChild(badge);
                         }
-                        if (!isRedirectActive) {
-                            card.style.cursor = 'pointer';
-                            card.addEventListener('click', (e) => {
-                                window.open(sanitizeUrl(item.url), '_blank');
-                                incrementLinkClick(uid, item.id).catch(() => {});
-                            });
+
+                        // Gestion du clic sur la carte
+                        const handleCardClick = (e) => {
+                            // Si redirection unique active, on ne fait rien (le wrapper gère)
+                            if (isRedirectActive) return;
+                            // Sinon, ouvrir le lien et incrémenter le clic
+                            e.preventDefault();
+                            window.open(sanitizeUrl(item.url), '_blank');
+                            incrementLinkClick(uid, item.id).catch(() => {});
+                        };
+                        card.addEventListener('click', handleCardClick);
+
+                        // Désactiver les clics si redirection unique active
+                        if (isRedirectActive) {
+                            card.style.pointerEvents = 'none';
                         } else {
-                            card.style.cursor = 'default';
+                            card.style.pointerEvents = 'auto';
+                            card.style.cursor = 'pointer';
                         }
 
+                        // Description
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
                         desc.textContent = item.description || `Rejoindre ${platform.name}`;
 
+                        // Média
                         const media = document.createElement('div');
                         if (item.imageUrl && item.imageUrl !== '') {
                             const img = document.createElement('img');
@@ -2836,6 +2857,7 @@
                             media.appendChild(defaultContainer);
                         }
 
+                        // Barre d'action
                         const actionBar = document.createElement('div');
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
@@ -3233,7 +3255,6 @@ URL:${urlProfil}
             // Sélecteurs de thème visuel et fond
             document.getElementById('visual-theme-select').addEventListener('change', function() {
                 applyVisualTheme();
-                // Optionnel : rafraîchir l'affichage public si déjà chargé
             });
             document.getElementById('background-select').addEventListener('change', function() {
                 applyBackground();
@@ -3267,13 +3288,8 @@ URL:${urlProfil}
         // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
-
-            if (isPublicMode()) {
-                showView('view-profile-public');
-                loadPublicProfile(getPublicUid());
-            } else {
-                showView('view-auth');
-            }
+            // On ne charge pas le profil public ici, on laisse onAuthStateChanged le faire
+            // pour éviter les doublons.
         });
 
     })();
