@@ -875,7 +875,7 @@
         (function() {
             // ==================== CONFIGURATION ====================
             const firebaseConfig = {
-                apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw", // ← votre clé API
+                apiKey: "AIzaSyAs-VjX...", // ← votre clé API
                 authDomain: "linkext1.firebaseapp.com",
                 projectId: "linkext1",
                 storageBucket: "linkext1.appspot.com",
@@ -961,6 +961,7 @@
             let currentView = null;
             let publicProfileUid = null;
             let isSaving = false;
+            let _authRedirecting = false; // Flag pour éviter les doubles appels de redirectAfterAuth
 
             // ==================== HELPERS ====================
             function showLoader() { globalLoader.classList.remove('hidden'); }
@@ -1090,7 +1091,7 @@
                 clearAuthError();
             }
 
-            // Fonction de redirection après authentification réussie (appelée immédiatement)
+            // Fonction de redirection après authentification réussie
             async function redirectAfterAuth(user) {
                 showLoader();
                 try {
@@ -1113,7 +1114,6 @@
                     if(!userProfile.onboardingCompleted) {
                         navigateToOnboarding();
                     } else {
-                        // Charger liens et afficher dashboard
                         const links = await fetchUserLinks(user.uid);
                         localLinks = links.map(l=>({...l}));
                         originalLinks = JSON.parse(JSON.stringify(localLinks));
@@ -1121,11 +1121,13 @@
                         showView(viewDashboard);
                     }
                 } catch(err) {
-                    console.error(err);
+                    console.error("Détail erreur Firestore / profil:", err);
                     showToast('Erreur chargement profil', 'error');
                     showView(viewAuth);
+                } finally {
+                    hideLoader();
+                    _authRedirecting = false; // Réinitialiser le flag
                 }
-                hideLoader();
             }
 
             async function handleLogin(email, password) {
@@ -1135,7 +1137,7 @@
                 try {
                     const userCredential = await auth.signInWithEmailAndPassword(email, password);
                     showToast('Connexion réussie !', 'success');
-                    // Redirection immédiate sans attendre le listener global
+                    _authRedirecting = true;
                     await redirectAfterAuth(userCredential.user);
                 } catch(err) {
                     let msg = 'Erreur de connexion.';
@@ -1145,8 +1147,9 @@
                     else if(err.code === 'auth/invalid-credential') msg = 'Identifiants incorrects.';
                     else msg = err.message;
                     showAuthError(msg);
+                    setButtonLoading($('#btnLoginSubmit'), $('#btnLoginSpinner'), $('#btnLoginText'), false);
+                    _authRedirecting = false;
                 }
-                setButtonLoading($('#btnLoginSubmit'), $('#btnLoginSpinner'), $('#btnLoginText'), false);
             }
 
             async function handleRegister(email, password) {
@@ -1157,6 +1160,7 @@
                 try {
                     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                     showToast('Compte créé ! 🎉', 'success');
+                    _authRedirecting = true;
                     await redirectAfterAuth(userCredential.user);
                 } catch(err) {
                     let msg = 'Erreur inscription.';
@@ -1164,22 +1168,25 @@
                     else if(err.code === 'auth/weak-password') msg = 'Mot de passe trop faible.';
                     else msg = err.message;
                     showAuthError(msg);
+                    setButtonLoading($('#btnRegisterSubmit'), $('#btnRegisterSpinner'), $('#btnRegisterText'), false);
+                    _authRedirecting = false;
                 }
-                setButtonLoading($('#btnRegisterSubmit'), $('#btnRegisterSpinner'), $('#btnRegisterText'), false);
             }
 
             async function handleGoogleAuth(e) {
-                e.preventDefault(); // empêche le comportement par défaut
+                e.preventDefault(); // empêche tout rechargement
                 if(!firebaseReady) { showToast('Firebase indisponible','error'); return; }
                 const provider = new firebase.auth.GoogleAuthProvider();
                 try {
                     const result = await auth.signInWithPopup(provider);
                     showToast('Connexion Google réussie', 'success');
+                    _authRedirecting = true;
                     await redirectAfterAuth(result.user);
                 } catch(err) {
                     if(err.code !== 'auth/popup-closed-by-user') {
                         showToast('Erreur Google : ' + err.message, 'error');
                     }
+                    _authRedirecting = false;
                 }
             }
 
@@ -1358,7 +1365,6 @@
                     });
                     userProfile = await fetchUserProfile(currentUser.uid);
                     showToast('Profil configuré !', 'success');
-                    // Charger dashboard
                     const links = await fetchUserLinks(currentUser.uid);
                     localLinks = links.map(l=>({...l}));
                     originalLinks = JSON.parse(JSON.stringify(localLinks));
@@ -1380,7 +1386,7 @@
                     populateDashboard();
                     showView(viewDashboard);
                 } catch(err) {
-                    navigateToDashboard();
+                    navigateToAuth();
                 }
             }
 
@@ -1510,30 +1516,41 @@
 
             if(firebaseReady && auth) {
                 auth.onAuthStateChanged(async (user) => {
-                    // Si un ID public est présent, priorité absolue (même si connecté)
+                    // Priorité au profil public
                     if(checkPublicRoute()) {
                         currentUser = user;
                         hideLoader();
                         return;
                     }
+
+                    // Si une redirection est déjà en cours, on ignore
+                    if (_authRedirecting) {
+                        return;
+                    }
+
                     currentUser = user;
                     if(user) {
-                        // Si l'utilisateur est déjà redirigé par handleLogin, ce listener ne fait rien car la vue est déjà changée.
-                        // Mais pour les cas de rechargement de page ou de persistance de session, on exécute la redirection.
+                        // Si l'utilisateur est connecté mais pas encore redirigé (rechargement ou session persistante)
                         try {
-                            // Éviter double redirection si déjà sur dashboard/onboarding
+                            // On évite de refaire si déjà sur une vue appropriée
                             if(currentView !== viewDashboard && currentView !== viewOnboarding) {
+                                _authRedirecting = true;
                                 await redirectAfterAuth(user);
+                            } else {
+                                // Si déjà sur dashboard/onboarding, on s'assure juste que le loader est masqué
+                                hideLoader();
                             }
                         } catch(err) {
-                            console.error(err);
+                            console.error("Erreur lors de la récupération du profil:", err);
                             showToast('Erreur lors de la récupération du profil', 'error');
                             navigateToAuth();
+                            hideLoader();
                         }
                     } else {
+                        // Utilisateur déconnecté
                         if(currentView !== viewAuth) navigateToAuth();
+                        hideLoader();
                     }
-                    hideLoader();
                 });
             } else {
                 hideLoader();
@@ -1543,11 +1560,13 @@
                 }
             }
 
+            // Petit délai pour masquer le loader initial
             window.addEventListener('load', () => {
                 setTimeout(() => hideLoader(), 400);
             });
+
             console.log('🚀 LinkExt prêt — corrections auth appliquées.');
         })();
-    </script>
+    </script> 
 </body>
 </html>
