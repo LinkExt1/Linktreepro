@@ -12,7 +12,7 @@
     <!-- Cloudinary Widget -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
-        /* ===== VARIABLES ===== */
+        /* ===== VARIABLES (thème sombre par défaut) ===== */
         :root {
             --bg-deep: #0a0b10;
             --bg-card: rgba(10, 11, 16, 0.7);
@@ -26,7 +26,129 @@
             --font-heading: 'Orbitron', sans-serif;
             --font-body: 'Inter', sans-serif;
             --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --card-bg: rgba(255,255,255,0.04);
+            --card-border: rgba(255,255,255,0.08);
+            --input-bg: rgba(255,255,255,0.05);
+            --input-border: rgba(255,255,255,0.1);
+            --shadow-color: rgba(0,0,0,0.6);
         }
+
+        /* ===== THÈME CLAIR ===== */
+        body.light-mode {
+            --bg-deep: #f0f2f5;
+            --bg-card: rgba(255,255,255,0.8);
+            --border-glow: rgba(0, 150, 200, 0.3);
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a6a;
+            --card-bg: rgba(0,0,0,0.03);
+            --card-border: rgba(0,0,0,0.1);
+            --input-bg: rgba(0,0,0,0.04);
+            --input-border: rgba(0,0,0,0.15);
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+        body.light-mode .glass-card {
+            backdrop-filter: blur(4px);
+            background: var(--bg-card);
+        }
+        body.light-mode .brand {
+            background: linear-gradient(135deg, #0066cc, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        body.light-mode .btn {
+            color: #fff;
+            background: linear-gradient(135deg, #0066cc, #4facfe);
+        }
+        body.light-mode .btn-outline {
+            border-color: #0066cc;
+            color: #0066cc;
+            background: transparent;
+        }
+        body.light-mode .btn-outline:hover {
+            background: rgba(0,102,204,0.1);
+        }
+        body.light-mode .status-badge {
+            background: rgba(0,0,0,0.05);
+            border-color: rgba(0,0,0,0.1);
+            color: var(--text-secondary);
+        }
+        body.light-mode .input-field {
+            background: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-primary);
+        }
+        body.light-mode .input-field:focus {
+            border-color: #0066cc;
+        }
+        body.light-mode .link-item {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+        }
+        body.light-mode .rich-link-card {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+        }
+        body.light-mode .rich-link-card .link-description {
+            background: rgba(0,0,0,0.05);
+            color: var(--text-secondary);
+        }
+        body.light-mode .rich-link-card .link-action-bar {
+            background: rgba(0,0,0,0.08);
+        }
+        body.light-mode .rich-link-card .card-media-default {
+            background: var(--card-bg);
+        }
+        body.light-mode .modal-content {
+            background: #ffffff;
+            border-color: #0066cc;
+        }
+        body.light-mode .modal-content .close-modal {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+        }
+        body.light-mode .modal-content .close-modal:hover {
+            background: #0066cc;
+            color: #fff;
+        }
+        body.light-mode .toast {
+            background: #fff;
+            border-color: #0066cc;
+            color: var(--text-primary);
+        }
+        body.light-mode .public-name {
+            background: linear-gradient(135deg, #1a1a2e, #0066cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        body.light-mode .public-bio-text {
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+        body.light-mode .views-counter {
+            background: rgba(0,0,0,0.05);
+            border-color: #0066cc;
+            color: #0066cc;
+        }
+        body.light-mode .maintenance-toggle .toggle-track {
+            background: rgba(0,0,0,0.15);
+        }
+        body.light-mode .maintenance-toggle .toggle-track.active {
+            background: var(--danger);
+        }
+        body.light-mode .maintenance-toggle .toggle-track::after {
+            background: #fff;
+        }
+        body.light-mode .network-card {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+            color: var(--text-secondary);
+        }
+        body.light-mode .network-card.selected {
+            border-color: #0066cc;
+            background: rgba(0,102,204,0.1);
+            color: var(--text-primary);
+        }
+
+        /* ===== STYLES GÉNÉRAUX ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: var(--bg-deep);
@@ -41,6 +163,11 @@
             background-attachment: fixed;
             padding: 1.5rem;
             margin: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.light-mode {
+            background-image: radial-gradient(circle at 50% 0%, rgba(0, 150, 200, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 100% 30%, rgba(79, 172, 254, 0.05) 0%, transparent 50%);
         }
         #app {
             width: 100%;
@@ -66,8 +193,8 @@
             border: 1px solid var(--border-glow);
             border-radius: 20px;
             padding: 2rem 1.8rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,242,254,0.04);
-            transition: var(--transition);
+            box-shadow: 0 20px 40px var(--shadow-color), inset 0 0 30px rgba(0,242,254,0.04);
+            transition: all var(--transition);
             overflow: hidden;
             position: relative;
         }
@@ -98,12 +225,12 @@
             gap: 0.4rem;
         }
         .input-field {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
             border-radius: 12px;
             padding: 0.85rem 1rem;
             font-size: 0.95rem;
-            color: white;
+            color: var(--text-primary);
             font-family: var(--font-body);
             transition: var(--transition);
             outline: none;
@@ -113,7 +240,13 @@
             box-shadow: 0 0 12px rgba(0,242,254,0.3);
             background: rgba(255,255,255,0.08);
         }
+        body.light-mode .input-field:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 12px rgba(0,102,204,0.3);
+            background: rgba(0,0,0,0.05);
+        }
         .input-field::placeholder { color: rgba(255,255,255,0.35); }
+        body.light-mode .input-field::placeholder { color: rgba(0,0,0,0.35); }
         .btn {
             background: linear-gradient(135deg, var(--cyan), var(--violet));
             border: none;
@@ -133,6 +266,10 @@
             position: relative;
             overflow: hidden;
         }
+        body.light-mode .btn {
+            color: #fff;
+            background: linear-gradient(135deg, #0066cc, #4facfe);
+        }
         .btn:hover:not(:disabled) {
             transform: scale(1.02);
             box-shadow: 0 10px 25px rgba(0,242,254,0.35);
@@ -148,9 +285,18 @@
             color: var(--cyan);
             background: rgba(0,242,254,0.05);
         }
+        body.light-mode .btn-outline {
+            border-color: #0066cc;
+            color: #0066cc;
+            background: transparent;
+        }
         .btn-outline:hover:not(:disabled) {
             background: rgba(0,242,254,0.15);
             box-shadow: 0 0 20px rgba(0,242,254,0.3);
+        }
+        body.light-mode .btn-outline:hover:not(:disabled) {
+            background: rgba(0,102,204,0.1);
+            box-shadow: 0 0 20px rgba(0,102,204,0.3);
         }
         .btn-google {
             background: #ffffff;
@@ -171,6 +317,9 @@
             border-radius: 16px;
             padding: 0.3rem;
         }
+        body.light-mode .tabs {
+            background: rgba(0,0,0,0.04);
+        }
         .tab {
             flex: 1;
             text-align: center;
@@ -185,6 +334,11 @@
             background: rgba(0,242,254,0.15);
             color: var(--cyan);
             box-shadow: 0 0 15px rgba(0,242,254,0.2);
+        }
+        body.light-mode .tab.active {
+            background: rgba(0,102,204,0.1);
+            color: #0066cc;
+            box-shadow: 0 0 15px rgba(0,102,204,0.2);
         }
         .platform-grid {
             display: grid;
@@ -206,6 +360,10 @@
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
+        body.light-mode .platform-item {
+            background: var(--card-bg);
+            border-color: var(--card-border);
+        }
         .platform-item i { font-size: 1.8rem; transition: var(--transition); }
         .platform-item.selected {
             border-color: var(--cyan);
@@ -214,7 +372,14 @@
             color: white;
             transform: scale(1.02);
         }
+        body.light-mode .platform-item.selected {
+            border-color: #0066cc;
+            box-shadow: 0 0 20px rgba(0,102,204,0.3);
+            background: rgba(0,102,204,0.1);
+            color: var(--text-primary);
+        }
         .platform-item.selected i { color: var(--cyan); }
+        body.light-mode .platform-item.selected i { color: #0066cc; }
         .url-input-animated {
             animation: slideDown 0.3s ease-out;
             overflow: hidden;
@@ -237,18 +402,21 @@
             background: conic-gradient(var(--cyan), var(--violet), var(--cyan));
             padding: 2px;
         }
+        body.light-mode .avatar-wrapper {
+            background: conic-gradient(#0066cc, #4facfe, #0066cc);
+        }
         .avatar {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            background: #0a0b10;
+            background: var(--bg-deep);
             display: block;
             transition: opacity 0.2s;
         }
         .link-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 14px;
             padding: 1rem;
             display: flex;
@@ -259,6 +427,26 @@
         }
         .link-item .platform-icon { font-size: 1.6rem; width: 2rem; text-align: center; }
         .link-item input { flex: 1; min-width: 150px; }
+        .link-item .order-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .link-item .order-controls button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0 0.2rem;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        .link-item .order-controls button:hover {
+            color: var(--cyan);
+        }
+        body.light-mode .link-item .order-controls button:hover {
+            color: #0066cc;
+        }
         .toggle-switch {
             position: relative;
             width: 48px;
@@ -268,9 +456,16 @@
             cursor: pointer;
             transition: var(--transition);
         }
+        body.light-mode .toggle-switch {
+            background: rgba(0,0,0,0.15);
+        }
         .toggle-switch.active {
             background: var(--cyan);
             box-shadow: 0 0 12px var(--cyan);
+        }
+        body.light-mode .toggle-switch.active {
+            background: #0066cc;
+            box-shadow: 0 0 12px #0066cc;
         }
         .toggle-switch::after {
             content: '';
@@ -303,15 +498,19 @@
             gap: 0.6rem;
         }
         .toast {
-            background: #0a0b10;
+            background: var(--bg-deep);
             border: 1px solid var(--cyan);
             padding: 0.8rem 1.2rem;
             border-radius: 12px;
-            color: white;
+            color: var(--text-primary);
             backdrop-filter: blur(10px);
             animation: slideInRight 0.3s ease-out;
             font-size: 0.9rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 25px var(--shadow-color);
+        }
+        body.light-mode .toast {
+            background: #fff;
+            border-color: #0066cc;
         }
         .toast.error { border-color: var(--danger); }
         @keyframes slideInRight {
@@ -342,6 +541,7 @@
             align-items: center;
             gap: 0.5rem;
         }
+
         /* Statut Flash */
         .status-badge {
             display: inline-flex;
@@ -355,6 +555,11 @@
             letter-spacing: 0.5px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+        }
+        body.light-mode .status-badge {
+            background: rgba(0,0,0,0.05);
+            border-color: rgba(0,0,0,0.1);
         }
         .status-badge .dot {
             width: 8px;
@@ -379,11 +584,21 @@
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             transition: var(--transition);
+            color: var(--text-secondary);
+        }
+        body.light-mode .status-selector .status-option {
+            background: rgba(0,0,0,0.04);
+            border-color: rgba(0,0,0,0.1);
         }
         .status-selector .status-option.active {
             border-color: var(--cyan);
             background: rgba(0,242,254,0.15);
             color: white;
+        }
+        body.light-mode .status-selector .status-option.active {
+            border-color: #0066cc;
+            background: rgba(0,102,204,0.1);
+            color: var(--text-primary);
         }
         .status-selector .status-option .dot {
             width: 8px;
@@ -409,6 +624,9 @@
             cursor: pointer;
             transition: var(--transition);
             position: relative;
+        }
+        body.light-mode .maintenance-toggle .toggle-track {
+            background: rgba(0,0,0,0.15);
         }
         .maintenance-toggle .toggle-track.active {
             background: var(--danger);
@@ -439,6 +657,11 @@
             font-size: 0.9rem;
             color: var(--cyan);
         }
+        body.light-mode .views-counter {
+            background: rgba(0,102,204,0.08);
+            border-color: #0066cc;
+            color: #0066cc;
+        }
         .views-counter i { font-size: 1rem; }
         /* MODAL QR Code */
         .modal-overlay {
@@ -452,6 +675,9 @@
             z-index: 999;
             padding: 1.5rem;
         }
+        body.light-mode .modal-overlay {
+            background: rgba(0,0,0,0.3);
+        }
         .modal-overlay.active { display: flex; }
         .modal-content {
             background: var(--bg-deep);
@@ -462,6 +688,10 @@
             width: 100%;
             text-align: center;
             box-shadow: 0 0 60px rgba(0,242,254,0.3);
+        }
+        body.light-mode .modal-content {
+            background: #ffffff;
+            border-color: #0066cc;
         }
         .modal-content img {
             width: 100%;
@@ -485,6 +715,11 @@
             color: #0a0b10;
             border-color: var(--cyan);
         }
+        body.light-mode .modal-content .close-modal:hover {
+            background: #0066cc;
+            color: #fff;
+            border-color: #0066cc;
+        }
 
         /* ===== VUE AJOUT DE LIEN ===== */
         .back-btn {
@@ -500,6 +735,7 @@
             gap: 0.4rem;
         }
         .back-btn:hover { color: var(--cyan); }
+        body.light-mode .back-btn:hover { color: #0066cc; }
         .networks-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -507,8 +743,8 @@
             margin: 1rem 0;
         }
         .network-card {
-            background: rgba(255,255,255,0.04);
-            border: 2px solid rgba(255,255,255,0.06);
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
             border-radius: 16px;
             padding: 1.2rem 0.5rem;
             display: flex;
@@ -528,13 +764,22 @@
             background: rgba(255,255,255,0.08);
             transform: translateY(-2px);
         }
+        body.light-mode .network-card:hover {
+            background: rgba(0,0,0,0.05);
+        }
         .network-card.selected {
             border-color: var(--cyan);
             background: rgba(0,242,254,0.1);
             color: white;
             box-shadow: 0 0 25px rgba(0,242,254,0.3);
         }
+        body.light-mode .network-card.selected {
+            border-color: #0066cc;
+            background: rgba(0,102,204,0.08);
+            color: var(--text-primary);
+        }
         .network-card.selected i { color: var(--cyan); }
+        body.light-mode .network-card.selected i { color: #0066cc; }
         .link-input-container {
             margin-top: 1rem;
             display: none;
@@ -543,33 +788,42 @@
             animation: fadeSlideIn 0.3s ease-out;
         }
         .link-input-container.visible { display: flex; }
-        .link-input-container input {
+        .link-input-container input,
+        .link-input-container .datetime-group input {
             width: 100%;
             padding: 0.9rem 1rem;
-            background: rgba(255,255,255,0.05);
+            background: var(--input-bg);
             border: none;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            color: white;
+            border-bottom: 2px solid var(--input-border);
+            color: var(--text-primary);
             font-size: 1rem;
             outline: none;
             transition: var(--transition);
             font-family: var(--font-body);
         }
-        .link-input-container input:focus {
+        .link-input-container input:focus,
+        .link-input-container .datetime-group input:focus {
             border-bottom-color: var(--cyan);
             box-shadow: 0 2px 15px rgba(0,242,254,0.2);
+        }
+        body.light-mode .link-input-container input:focus,
+        body.light-mode .link-input-container .datetime-group input:focus {
+            border-bottom-color: #0066cc;
+            box-shadow: 0 2px 15px rgba(0,102,204,0.2);
         }
         .link-input-container input::placeholder {
             color: rgba(255,255,255,0.3);
         }
-        .link-input-container .btn {
-            width: 100%;
+        body.light-mode .link-input-container input::placeholder {
+            color: rgba(0,0,0,0.3);
         }
+        .link-input-container .btn { width: 100%; }
         .link-input-container .upload-row {
             display: flex;
             align-items: center;
             gap: 0.8rem;
             justify-content: flex-start;
+            flex-wrap: wrap;
         }
         .link-input-container .upload-row .btn-outline {
             padding: 0.4rem 1rem;
@@ -580,8 +834,24 @@
             height: 48px;
             border-radius: 8px;
             object-fit: cover;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--card-border);
             background: var(--bg-deep);
+        }
+        .link-input-container .datetime-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .link-input-container .datetime-group label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .link-input-container .datetime-group input {
+            width: auto;
+            flex: 1;
+            min-width: 120px;
+            padding: 0.5rem 0.7rem;
+            border-bottom-width: 1px;
         }
 
         /* ===== PROFIL PUBLIC ===== */
@@ -589,7 +859,6 @@
             padding: 0 1.8rem 2rem 1.8rem;
             overflow: visible;
         }
-        /* En-tête (avatar + boutons) */
         .public-header {
             margin-bottom: 1rem;
         }
@@ -610,6 +879,9 @@
             flex-shrink: 0;
             transition: box-shadow 0.3s ease;
         }
+        body.light-mode .public-header-top .avatar-glow-ring {
+            background: conic-gradient(#0066cc, #4facfe, #0066cc);
+        }
         .public-header-top .avatar-glow-ring .public-avatar {
             width: 100%;
             height: 100%;
@@ -621,6 +893,7 @@
         .public-header-actions {
             display: flex;
             gap: 0.6rem;
+            align-items: center;
         }
         .public-header-actions .btn {
             padding: 0.5rem 1rem;
@@ -638,6 +911,11 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+        body.light-mode .public-name {
+            background: linear-gradient(135deg, #1a1a2e, #0066cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .public-bio-text {
             color: var(--text-secondary);
@@ -658,7 +936,6 @@
             font-size: 0.7rem;
             padding: 0.2rem 1rem;
         }
-
         .public-links-divider {
             width: 60%;
             height: 1px;
@@ -673,18 +950,23 @@
             flex-direction: column;
             overflow: hidden;
             text-decoration: none;
-            color: #fff;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-primary);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 16px;
             transition: all var(--transition);
             margin-bottom: 1rem;
             cursor: pointer;
+            position: relative;
         }
         .rich-link-card:hover {
             border-color: var(--cyan);
             box-shadow: 0 0 30px rgba(0,242,254,0.2);
             transform: translateY(-2px);
+        }
+        body.light-mode .rich-link-card:hover {
+            border-color: #0066cc;
+            box-shadow: 0 0 30px rgba(0,102,204,0.2);
         }
         .rich-link-card .link-description {
             padding: 12px 14px 8px 14px;
@@ -695,6 +977,9 @@
             background: rgba(0,0,0,0.2);
             letter-spacing: 0.3px;
             text-align: left;
+        }
+        body.light-mode .rich-link-card .link-description {
+            background: rgba(0,0,0,0.05);
         }
         .rich-link-card .card-media {
             width: 100%;
@@ -715,6 +1000,9 @@
             color: rgba(255,255,255,0.1);
             transition: color 0.3s ease;
         }
+        body.light-mode .rich-link-card .card-media-default {
+            background: var(--card-bg);
+        }
         .rich-link-card:hover .card-media-default {
             color: rgba(255,255,255,0.25);
         }
@@ -731,12 +1019,54 @@
             font-size: 0.85rem;
             color: var(--text-primary);
         }
+        body.light-mode .rich-link-card .link-action-bar {
+            background: rgba(0,0,0,0.08);
+        }
         .rich-link-card .link-action-bar i {
             font-size: 1.3rem;
             color: var(--cyan);
         }
+        body.light-mode .rich-link-card .link-action-bar i {
+            color: #0066cc;
+        }
         .rich-link-card .link-action-bar span {
             opacity: 0.8;
+        }
+
+        /* Badge "En évidence" */
+        .card-highlight {
+            border-color: var(--cyan) !important;
+            box-shadow: 0 0 30px rgba(0,242,254,0.3);
+        }
+        body.light-mode .card-highlight {
+            border-color: #0066cc !important;
+            box-shadow: 0 0 30px rgba(0,102,204,0.3);
+        }
+        .card-highlight .highlight-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--cyan);
+            color: #0a0b10;
+            border-radius: 30px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            box-shadow: 0 0 15px rgba(0,242,254,0.5);
+            animation: pulseBadge 1.5s ease-in-out infinite;
+            z-index: 2;
+        }
+        body.light-mode .card-highlight .highlight-badge {
+            background: #0066cc;
+            color: #fff;
+        }
+        @keyframes pulseBadge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); opacity: 0.9; }
+            100% { transform: scale(1); }
         }
 
         .lien-vedette {
@@ -766,6 +1096,26 @@
         }
         .maintenance-message p {
             color: var(--text-secondary);
+        }
+
+        /* Interrupteur de thème public */
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.3rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .theme-toggle:hover {
+            color: var(--cyan);
+        }
+        body.light-mode .theme-toggle:hover {
+            color: #0066cc;
         }
 
         @media (max-width: 420px) {
@@ -803,6 +1153,12 @@
             }
             .rich-link-card .card-media-default {
                 font-size: 3rem;
+            }
+            .link-input-container .datetime-group {
+                flex-direction: column;
+            }
+            .link-input-container .datetime-group input {
+                width: 100%;
             }
         }
     </style>
@@ -920,7 +1276,6 @@
                 <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
             </div>
 
-            <!-- Lien personnalisé pour bannière (conservé, mais la bannière a été supprimée du public) -->
             <div class="input-group mt-2">
                 <label><i class="fas fa-link"></i> Lien de clic sur la bannière (personnalisé)</label>
                 <input type="url" class="input-field" id="dashboard-banner-link" placeholder="https://..." value="">
@@ -939,7 +1294,7 @@
         </div>
     </div>
 
-    <!-- ========== VUE AJOUTER UN LIEN ========== -->
+    <!-- ========== VUE AJOUTER UN LIEN (avec planification) ========== -->
     <div id="view-add-link" class="view">
         <div class="glass-card">
             <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
@@ -949,6 +1304,17 @@
             <div class="networks-grid" id="add-link-grid"></div>
             <div class="link-input-container" id="link-input-container">
                 <input type="url" id="new-link-url" placeholder="Entrez votre lien..." autocomplete="off">
+                <!-- Planification -->
+                <div class="datetime-group">
+                    <div style="flex:1; min-width:120px;">
+                        <label>Début (optionnel)</label>
+                        <input type="datetime-local" id="new-link-start">
+                    </div>
+                    <div style="flex:1; min-width:120px;">
+                        <label>Fin (optionnel)</label>
+                        <input type="datetime-local" id="new-link-end">
+                    </div>
+                </div>
                 <!-- Upload image optionnel -->
                 <div class="upload-row">
                     <button class="btn btn-outline" id="btn-upload-link-image" style="padding:0.4rem 1rem; font-size:0.85rem;">
@@ -964,13 +1330,16 @@
     <!-- ========== VUE PROFIL PUBLIC ========== -->
     <div id="view-profile-public" class="view">
         <div class="glass-card" style="text-align:center; padding-top:0;">
-            <!-- En-tête (avatar + boutons) - sans bannière -->
+            <!-- En-tête avec bouton de thème -->
             <div class="public-header">
                 <div class="public-header-top">
                     <div class="avatar-glow-ring">
                         <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
                     </div>
                     <div class="public-header-actions">
+                        <button class="theme-toggle" id="theme-toggle-btn" title="Basculer le thème">
+                            <i class="fas fa-moon"></i>
+                        </button>
                         <button class="btn btn-outline" id="qr-code-btn" style="padding:0.5rem 1rem;"><i class="fas fa-qrcode"></i> QR Code</button>
                         <button class="btn btn-outline" id="vcard-btn" style="padding:0.5rem 1rem;"><i class="fas fa-user-plus"></i> Vcard</button>
                     </div>
@@ -1048,7 +1417,7 @@
         let authRedirectInProgress = false;
         let isCloudinaryWidgetOpen = false;
         let selectedNetworkType = null;
-        let linkImageUrl = ''; // stocke l'URL de l'image uploadée pour le lien en cours
+        let linkImageUrl = '';
 
         // --- Vues ---
         const views = {
@@ -1101,8 +1470,13 @@
                             if (!l.id) l.id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
                             if (!l.description) l.description = '';
                             if (!l.imageUrl) l.imageUrl = '';
+                            if (typeof l.order !== 'number') l.order = 0;
+                            if (!l.startDate) l.startDate = null;
+                            if (!l.endDate) l.endDate = null;
                             return l;
                         });
+                        // Trier par order
+                        userProfile.links.sort((a, b) => (a.order || 0) - (b.order || 0));
                     }
                     return userProfile;
                 } else {
@@ -1300,61 +1674,99 @@
             container.innerHTML = '';
             if (!userProfile || !userProfile.links) return;
 
-            userProfile.links.forEach((link, index) => {
+            // Trier par order
+            const sorted = [...userProfile.links].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+            sorted.forEach((link, index) => {
                 const platform = PLATFORMS.find(p => p.id === link.platform);
                 if (!platform) return;
-                const isFeatured = (userProfile.featuredLink === index);
+                const isFeatured = (userProfile.featuredLink === link.id);
                 const clicks = link.clicks || 0;
+                const total = sorted.length;
 
                 const div = document.createElement('div');
                 div.className = 'link-item';
                 div.innerHTML = `
                         <i class="${platform.icon} platform-icon" style="color:var(--cyan);"></i>
-                        <input type="text" class="input-field link-url-input" value="${link.url || ''}" placeholder="URL" data-index="${index}">
-                        <div class="toggle-switch ${link.active ? 'active' : ''}" data-index="${index}" data-action="toggle"></div>
-                        <button class="delete-link-btn" data-index="${index}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
-                        <button class="btn btn-outline feature-btn" data-index="${index}" style="padding:0.2rem 0.5rem; font-size:0.8rem;">
+                        <input type="text" class="input-field link-url-input" value="${link.url || ''}" placeholder="URL" data-id="${link.id}">
+                        <div class="toggle-switch ${link.active ? 'active' : ''}" data-id="${link.id}" data-action="toggle"></div>
+                        <button class="delete-link-btn" data-id="${link.id}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn btn-outline feature-btn" data-id="${link.id}" style="padding:0.2rem 0.5rem; font-size:0.8rem;">
                             ${isFeatured ? '<i class="fas fa-thumbtack" style="color:var(--cyan);"></i>' : '<i class="fas fa-thumbtack"></i>'}
                         </button>
+                        <div class="order-controls">
+                            ${index > 0 ? `<button data-id="${link.id}" data-dir="up"><i class="fas fa-chevron-up"></i></button>` : ''}
+                            ${index < total - 1 ? `<button data-id="${link.id}" data-dir="down"><i class="fas fa-chevron-down"></i></button>` : ''}
+                        </div>
                         <span style="font-size:0.7rem; color:var(--text-secondary);">${clicks} clics</span>
+                        ${link.startDate ? `<span style="font-size:0.6rem; color:var(--text-secondary);">📅</span>` : ''}
                     `;
                 container.appendChild(div);
             });
 
+            // Gestion des événements
             container.onclick = (e) => {
                 const btn = e.target.closest('[data-action]');
                 if (btn) {
-                    const index = parseInt(btn.dataset.index);
-                    if (isNaN(index)) return;
+                    const id = btn.dataset.id;
+                    if (!id) return;
                     if (btn.dataset.action === 'toggle') {
-                        userProfile.links[index].active = !userProfile.links[index].active;
-                        renderDashboardLinks();
+                        const link = userProfile.links.find(l => l.id === id);
+                        if (link) {
+                            link.active = !link.active;
+                            renderDashboardLinks();
+                        }
                     } else if (btn.dataset.action === 'delete') {
-                        userProfile.links.splice(index, 1);
-                        if (userProfile.featuredLink === index) userProfile.featuredLink = null;
-                        else if (userProfile.featuredLink > index) userProfile.featuredLink--;
+                        userProfile.links = userProfile.links.filter(l => l.id !== id);
+                        if (userProfile.featuredLink === id) userProfile.featuredLink = null;
                         renderDashboardLinks();
                     }
                     return;
                 }
+                // Bouton "vedette"
                 const featureBtn = e.target.closest('.feature-btn');
                 if (featureBtn) {
-                    const index = parseInt(featureBtn.dataset.index);
-                    if (isNaN(index)) return;
-                    if (userProfile.featuredLink === index) {
+                    const id = featureBtn.dataset.id;
+                    if (!id) return;
+                    if (userProfile.featuredLink === id) {
                         userProfile.featuredLink = null;
                     } else {
-                        userProfile.featuredLink = index;
+                        userProfile.featuredLink = id;
                     }
                     renderDashboardLinks();
+                    return;
+                }
+                // Boutons d'ordre (haut/bas)
+                const orderBtn = e.target.closest('[data-dir]');
+                if (orderBtn) {
+                    const id = orderBtn.dataset.id;
+                    const dir = orderBtn.dataset.dir;
+                    if (!id) return;
+                    const sortedLinks = [...userProfile.links].sort((a, b) => (a.order || 0) - (b.order || 0));
+                    const idx = sortedLinks.findIndex(l => l.id === id);
+                    if (idx === -1) return;
+                    let swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+                    if (swapIdx < 0 || swapIdx >= sortedLinks.length) return;
+                    // Échanger les order
+                    const linkA = sortedLinks[idx];
+                    const linkB = sortedLinks[swapIdx];
+                    const tempOrder = linkA.order;
+                    linkA.order = linkB.order;
+                    linkB.order = tempOrder;
+                    // Réorganiser
+                    userProfile.links.sort((a, b) => (a.order || 0) - (b.order || 0));
+                    renderDashboardLinks();
+                    // Sauvegarder en arrière-plan
+                    saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                 }
             };
 
             container.oninput = (e) => {
                 if (e.target.classList.contains('link-url-input')) {
-                    const index = parseInt(e.target.dataset.index);
-                    if (!isNaN(index) && userProfile.links[index]) {
-                        userProfile.links[index].url = e.target.value;
+                    const id = e.target.dataset.id;
+                    const link = userProfile.links.find(l => l.id === id);
+                    if (link) {
+                        link.url = e.target.value;
                     }
                 }
             };
@@ -1371,7 +1783,7 @@
             track.classList.toggle('active', enabled);
         }
 
-        // --- Cloudinary Widget (générique) ---
+        // --- Cloudinary Widget ---
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
                 showToast('Connectez-vous pour continuer.', 'error');
@@ -1429,7 +1841,7 @@
             });
         }
 
-        // --- Upload pour la photo de profil (Dashboard) ---
+        // --- Upload photo de profil ---
         function setupAvatarUpload() {
             const btn = document.getElementById('btn-change-photo');
             btn.addEventListener('click', () => {
@@ -1444,7 +1856,7 @@
             });
         }
 
-        // --- Upload pour l'image d'un lien (vue add-link) ---
+        // --- Upload image de lien ---
         function setupLinkImageUpload() {
             const btn = document.getElementById('btn-upload-link-image');
             const preview = document.getElementById('link-image-preview');
@@ -1532,9 +1944,10 @@
             input.placeholder = `Entrez votre lien ${platform.name}...`;
             input.value = '';
             input.focus();
-            // Réinitialiser l'image précédente
             linkImageUrl = '';
             document.getElementById('link-image-preview').classList.add('hidden');
+            document.getElementById('new-link-start').value = '';
+            document.getElementById('new-link-end').value = '';
         }
 
         async function validateAndAddLink() {
@@ -1553,6 +1966,9 @@
                 return;
             }
 
+            const startDate = document.getElementById('new-link-start').value;
+            const endDate = document.getElementById('new-link-end').value;
+
             const newLink = {
                 id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
                 platform: selectedNetworkType,
@@ -1560,7 +1976,10 @@
                 description: `Rejoindre ${PLATFORMS.find(p => p.id === selectedNetworkType).name}`,
                 imageUrl: linkImageUrl || '',
                 active: true,
-                clicks: 0
+                clicks: 0,
+                order: userProfile.links ? userProfile.links.length : 0,
+                startDate: startDate || null,
+                endDate: endDate || null
             };
 
             try {
@@ -1575,6 +1994,8 @@
                 document.getElementById('new-link-url').value = '';
                 linkImageUrl = '';
                 document.getElementById('link-image-preview').classList.add('hidden');
+                document.getElementById('new-link-start').value = '';
+                document.getElementById('new-link-end').value = '';
 
                 showToast('Lien ajouté avec succès !', 'info');
                 showView('view-dashboard');
@@ -1585,7 +2006,31 @@
             }
         }
 
-        // --- Profil Public (Rich Cards avec image ou logo par défaut) ---
+        // --- Gestion du thème ---
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            const icon = document.querySelector('#theme-toggle-btn i');
+            if (icon) {
+                icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+
+        function applySavedTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light') {
+                document.body.classList.add('light-mode');
+                const icon = document.querySelector('#theme-toggle-btn i');
+                if (icon) icon.className = 'fas fa-sun';
+            } else {
+                document.body.classList.remove('light-mode');
+                const icon = document.querySelector('#theme-toggle-btn i');
+                if (icon) icon.className = 'fas fa-moon';
+            }
+        }
+
+        // --- Profil Public ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1610,7 +2055,7 @@
                     return;
                 }
 
-                // --- En-tête ---
+                // En-tête
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
@@ -1628,23 +2073,50 @@
                 statusBadge.className = `status-badge ${st.class}`;
                 statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
 
-                // --- Cartes Rich Link ---
+                // Appliquer le thème sauvegardé
+                applySavedTheme();
+
+                // Cartes Rich Link
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
                 if (data.links && Array.isArray(data.links)) {
-                    data.links.forEach((link) => {
-                        if (!link.active) return;
+                    // Filtrer les liens actifs et dans la période de planification
+                    const now = new Date();
+                    const activeLinks = data.links.filter(link => {
+                        if (!link.active) return false;
+                        // Vérifier la planification
+                        if (link.startDate) {
+                            const start = new Date(link.startDate);
+                            if (start > now) return false;
+                        }
+                        if (link.endDate) {
+                            const end = new Date(link.endDate);
+                            if (end < now) return false;
+                        }
+                        return true;
+                    });
+
+                    // Trier par order
+                    activeLinks.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+                    activeLinks.forEach((link) => {
                         const platform = PLATFORMS.find(p => p.id === link.platform);
                         if (!platform || !link.url) return;
 
+                        const isFeatured = (data.featuredLink === link.id);
+
                         const card = document.createElement('a');
                         card.className = 'rich-link-card';
-                        if (data.featuredLink !== null && data.featuredLink !== undefined) {
-                            const featuredIndex = data.links.findIndex(l => l.id === link.id);
-                            if (featuredIndex === data.featuredLink) {
-                                card.classList.add('lien-vedette');
-                            }
+                        if (isFeatured) {
+                            card.classList.add('card-highlight');
+                            // Ajouter le badge "En évidence"
+                            const badge = document.createElement('span');
+                            badge.className = 'highlight-badge';
+                            badge.innerHTML = '<i class="fas fa-bolt"></i> En évidence';
+                            card.appendChild(badge);
+                        } else {
+                            card.classList.remove('card-highlight');
                         }
                         card.href = sanitizeUrl(link.url);
                         card.target = '_blank';
@@ -1655,7 +2127,7 @@
                         desc.className = 'link-description';
                         desc.textContent = link.description || `Rejoindre ${platform.name}`;
 
-                        // Média (image ou logo par défaut)
+                        // Média
                         const media = document.createElement('div');
                         if (link.imageUrl && link.imageUrl !== '') {
                             const img = document.createElement('img');
@@ -1668,7 +2140,6 @@
                             defaultContainer.className = 'card-media-default';
                             const icon = document.createElement('i');
                             icon.className = platform.icon;
-                            // Appliquer la couleur du réseau si possible
                             const colorMap = {
                                 whatsapp: '#25D366',
                                 telegram: '#0088cc',
@@ -1683,7 +2154,7 @@
                             media.appendChild(defaultContainer);
                         }
 
-                        // Barre d'action
+                        // Action bar
                         const actionBar = document.createElement('div');
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
@@ -1695,7 +2166,6 @@
                         card.appendChild(media);
                         card.appendChild(actionBar);
 
-                        // Écouteur de clic
                         card.addEventListener('click', (e) => {
                             incrementLinkClick(uid, link.id).catch(() => {});
                         });
@@ -1891,7 +2361,10 @@ URL:${urlProfil}
                             description: `Rejoindre ${PLATFORMS.find(p => p.id === platformId).name}`,
                             imageUrl: '',
                             active: true,
-                            clicks: 0
+                            clicks: 0,
+                            order: links.length,
+                            startDate: null,
+                            endDate: null
                         });
                     }
                 });
@@ -1928,7 +2401,10 @@ URL:${urlProfil}
                             description: `Rejoindre ${PLATFORMS.find(p => p.id === platformId).name}`,
                             imageUrl: '',
                             active: true,
-                            clicks: 0
+                            clicks: 0,
+                            order: links.length,
+                            startDate: null,
+                            endDate: null
                         });
                     }
                 });
@@ -1962,6 +2438,8 @@ URL:${urlProfil}
                 document.getElementById('new-link-url').value = '';
                 linkImageUrl = '';
                 document.getElementById('link-image-preview').classList.add('hidden');
+                document.getElementById('new-link-start').value = '';
+                document.getElementById('new-link-end').value = '';
                 showView('view-add-link');
             });
 
@@ -1986,7 +2464,10 @@ URL:${urlProfil}
                     description: l.description || '',
                     imageUrl: l.imageUrl || '',
                     active: l.active,
-                    clicks: l.clicks || 0
+                    clicks: l.clicks || 0,
+                    order: l.order || 0,
+                    startDate: l.startDate || null,
+                    endDate: l.endDate || null
                 })) : [];
                 const saved = await saveUserProfile(currentUser.uid, {
                     displayName: name,
@@ -2056,6 +2537,9 @@ URL:${urlProfil}
 
             // Grille d'ajout
             renderAddLinkGrid();
+
+            // Theme toggle public
+            document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
         }
 
         // --- Auth state ---
