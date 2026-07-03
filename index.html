@@ -251,6 +251,37 @@
             text-align: center;
             margin-bottom: 0.5rem;
         }
+        /* ===== STYLES DE LA PAGE LÉGALE ===== */
+        .legal-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .legal-text h3 {
+            color: var(--text-primary);
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            margin: 1rem 0 0.3rem 0;
+            letter-spacing: 0.5px;
+        }
+        .legal-text p {
+            margin-bottom: 0.5rem;
+        }
+        .legal-text::-webkit-scrollbar {
+            width: 4px;
+        }
+        .legal-text::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        .legal-text::-webkit-scrollbar-thumb {
+            background: var(--cyan);
+            border-radius: 4px;
+        }
+
+        /* Autres styles inchangés (pour rester concis, on garde les classes existantes) */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -1102,7 +1133,6 @@
             pointer-events: none;
         }
 
-        /* Les cartes sont désormais cliquables par défaut */
         #public-links {
             padding: 0 1rem 0 1rem;
             margin: 0;
@@ -1389,6 +1419,32 @@
 <body>
 <div id="app">
 
+    <!-- ========== VUE LÉGALE (POLITIQUE DE CONFIDENTIALITÉ) ========== -->
+    <div id="view-legal" class="view">
+        <div class="glass-card">
+            <div class="brand">LINKEXT</div>
+            <h2 style="font-family:var(--font-heading); font-size:1.2rem; text-align:center; margin:0.5rem 0 1rem 0;">Politique de confidentialité</h2>
+            <div class="legal-text">
+                <p>Bienvenue sur LinkExt. Avant de pouvoir accéder à notre plateforme d'inscription ou de connexion, vous devez lire attentivement et accepter les présentes conditions.</p>
+
+                <h3>1. Parcours utilisateur et Premier Chargement</h3>
+                <p>Conformément aux réglementations sur la protection des données, lors de la toute première ouverture de l'application ou du site LinkExt sur un nouveau téléphone ou navigateur mobile, l'utilisateur est accueilli par cette documentation légale. L'accès à l'espace de création de compte ou de connexion est strictement conditionné par l'action explicite d'appuyer sur le bouton « Accepter et continuer ». Un cookie essentiel ou une clé locale (LocalStorage) sera enregistré sur votre téléphone uniquement pour mémoriser cette acceptation et vous éviter de relire ce texte à chaque visite.</p>
+
+                <h3>2. Utilisation des données et Espace Privé (Dashboard)</h3>
+                <p>LinkExt collecte uniquement les données nécessaires à la personnalisation de votre profil public : votre nom affiché, votre biographie, votre image de profil, ainsi que les liens de vos réseaux sociaux (WhatsApp, Telegram, X, etc.). Depuis votre espace privé, vous disposez d'un contrôle total : vous pouvez modifier, ajouter ou supprimer définitivement vos liens, vos images et vos textes à tout moment.</p>
+
+                <h3>3. Statistiques et Compteurs de Clics</h3>
+                <p>Pour permettre aux utilisateurs de suivre la performance de leur profil, LinkExt intègre un système de compteurs anonymes dans l'espace privé : un compteur de vues globales du profil, et un compteur de clics individuels sur chaque lien actif pour afficher le pourcentage de répartition des visites. Ces données sont strictement anonymes, restent confidentielles, et ne sont visibles que par le propriétaire du profil depuis son Dashboard. Aucune information d'identification personnelle ou de géolocalisation n'est partagée avec des entreprises tierces.</p>
+
+                <h3>4. Fonctionnalités et Interactions Matérielles</h3>
+                <p>Le site intègre des options de confort visuel et matériel (bascule de thèmes clair/sombre, animations fluides). L'activation de l'option « Redirection Unique » permet de transformer l'intégralité de l'espace public en un lien cliquable global menant vers votre unique réseau social actif, tout en excluant et en préservant le bon fonctionnement autonome des boutons QR code et Vcard (enregistrement de contact).</p>
+
+                <p style="margin-top:1rem; font-weight:500;">En cliquant sur « Accepter et continuer », vous certifiez avoir pris connaissance de ces règles, vous acceptez l'utilisation du stockage local pour vos préférences de navigation, et vous êtes redirigé vers l'espace d'inscription/connexion.</p>
+            </div>
+            <button class="btn mt-2" id="accept-legal-btn" style="width:100%;">Accepter et continuer</button>
+        </div>
+    </div>
+
     <!-- ========== VUE AUTH ========== -->
     <div id="view-auth" class="view">
         <div class="glass-card">
@@ -1617,8 +1673,8 @@
                             <button class="theme-toggle" id="theme-toggle-btn" title="Basculer le thème">
                                 <i class="fas fa-moon"></i>
                             </button>
-                            <button class="btn btn-outline exclude-click" id="qr-code-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-qrcode"></i></button>
-                            <button class="btn btn-outline exclude-click" id="vcard-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-user-plus"></i></button>
+                            <button class="btn btn-outline exclude-click" id="qr-code-btn"><i class="fas fa-qrcode"></i></button>
+                            <button class="btn btn-outline exclude-click" id="vcard-btn"><i class="fas fa-user-plus"></i></button>
                         </div>
                     </div>
                     <h2 id="public-name" class="public-name">Utilisateur</h2>
@@ -1656,6 +1712,32 @@
 
 <script>
     (function() {
+        // ============================================================
+        //  GESTION DE LA PAGE LÉGALE (POLITIQUE DE CONFIDENTIALITÉ)
+        // ============================================================
+        const LEGAL_KEY = 'linkext_legal_accepted';
+
+        function checkLegal() {
+            if (localStorage.getItem(LEGAL_KEY) === 'true') {
+                // Déjà accepté, on passe directement à l'auth
+                showView('view-auth');
+                return true;
+            } else {
+                // Afficher la vue légale
+                showView('view-legal');
+                return false;
+            }
+        }
+
+        function acceptLegal() {
+            localStorage.setItem(LEGAL_KEY, 'true');
+            showView('view-auth');
+        }
+
+        // ============================================================
+        //  SUITE DE L'APPLICATION (Firebase, Cloudinary, etc.)
+        // ============================================================
+
         // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
@@ -1698,6 +1780,7 @@
 
         // --- Vues ---
         const views = {
+            legal: document.getElementById('view-legal'),
             auth: document.getElementById('view-auth'),
             onboarding: document.getElementById('view-onboarding'),
             dashboard: document.getElementById('view-dashboard'),
@@ -1791,13 +1874,11 @@
         }
 
         // --- Incrémentation des vues globales (avec protection double comptage) ---
-        let viewCountedFlag = false; // flag local pour éviter double incrément
+        let viewCountedFlag = false;
 
         async function incrementViews(uid) {
-            // Utiliser sessionStorage pour éviter double comptage par session
             const key = 'viewCounted_' + uid;
             if (sessionStorage.getItem(key) === 'true') {
-                // déjà compté pour cette session
                 return;
             }
             try {
@@ -1831,7 +1912,6 @@
                 await docRef.update({ links: updatedLinks });
                 if (userProfile && userProfile._id === uid) {
                     userProfile.links = updatedLinks;
-                    // Mettre à jour les stats si on est dans le dashboard (affichage)
                     if (document.getElementById('view-dashboard').classList.contains('active')) {
                         updateStats();
                     }
@@ -1967,7 +2047,6 @@
 
             const barsContainer = document.getElementById('stat-bars');
             const linkItems = userProfile.links ? userProfile.links.filter(l => !l.isSection && l.active) : [];
-            // Filtrer ceux qui ont des clics > 0 ou afficher tous les actifs
             const displayItems = linkItems.filter(l => (l.clicks || 0) > 0);
             if (displayItems.length === 0) {
                 barsContainer.innerHTML = '<span style="color:var(--text-secondary); font-size:0.7rem;">Aucun clic enregistré</span>';
@@ -2122,7 +2201,7 @@
 
             updateStatusUI(userProfile.status || 'disponible');
             updateMaintenanceUI(userProfile.maintenance || false);
-            applyThemeToPrivateUI();
+            applyThemeToPrivateUI(); // Applique le thème clair/sombre
             updateRedirectToggleState();
             updateStats();
             renderDashboardLinks();
@@ -2554,7 +2633,9 @@
             }
         }
 
-        // --- Gestion du thème (clair/sombre) ---
+        // ============================================================
+        //  GESTION DES THÈMES (clair/sombre) CORRIGÉE
+        // ============================================================
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
@@ -2618,7 +2699,6 @@
             const select = document.getElementById('background-select');
             const bg = select.value;
             document.body.classList.remove('fond-aurora', 'fond-particules', 'fond-unique');
-            // Supprimer l'ancien canvas si présent
             const oldCanvas = document.getElementById('particles-canvas');
             if (oldCanvas) oldCanvas.remove();
             if (bg === 'aurora') {
@@ -2629,7 +2709,6 @@
             } else if (bg === 'uni') {
                 document.body.classList.add('fond-unique');
             }
-            // sinon cyberpunk (défaut) : rien de spécifique
             localStorage.setItem('background', bg);
         }
 
@@ -2673,7 +2752,6 @@
                     ctx.fillStyle = p.color;
                     ctx.fill();
                 });
-                // Lignes entre particules proches
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
                         const dx = particles[i].x - particles[j].x;
@@ -2747,7 +2825,6 @@
                 const activeLinks = data.links ? data.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '') : [];
                 const isRedirectActive = data.redirectUnique === true && activeLinks.length === 1;
 
-                // Configurer le wrapper
                 if (isRedirectActive) {
                     const targetUrl = sanitizeUrl(activeLinks[0].url);
                     wrapperLink.href = targetUrl;
@@ -2794,7 +2871,6 @@
 
                         const isFeatured = (data.featuredLink === item.id);
 
-                        // Créer la carte
                         const card = document.createElement('div');
                         card.className = 'rich-link-card';
                         if (isFeatured) {
@@ -2806,18 +2882,14 @@
                             card.appendChild(badge);
                         }
 
-                        // Gestion du clic sur la carte
                         const handleCardClick = (e) => {
-                            // Si redirection unique active, on ne fait rien (le wrapper gère)
                             if (isRedirectActive) return;
-                            // Sinon, ouvrir le lien et incrémenter le clic
                             e.preventDefault();
                             window.open(sanitizeUrl(item.url), '_blank');
                             incrementLinkClick(uid, item.id).catch(() => {});
                         };
                         card.addEventListener('click', handleCardClick);
 
-                        // Désactiver les clics si redirection unique active
                         if (isRedirectActive) {
                             card.style.pointerEvents = 'none';
                         } else {
@@ -2825,12 +2897,10 @@
                             card.style.cursor = 'pointer';
                         }
 
-                        // Description
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
                         desc.textContent = item.description || `Rejoindre ${platform.name}`;
 
-                        // Média
                         const media = document.createElement('div');
                         if (item.imageUrl && item.imageUrl !== '') {
                             const img = document.createElement('img');
@@ -2857,7 +2927,6 @@
                             media.appendChild(defaultContainer);
                         }
 
-                        // Barre d'action
                         const actionBar = document.createElement('div');
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
@@ -2897,6 +2966,7 @@
 
             openBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
+                e.preventDefault(); // évite tout rechargement
                 modal.classList.add('active');
             });
             closeBtn.addEventListener('click', () => {
@@ -2911,6 +2981,7 @@
         function setupVcard() {
             document.getElementById('vcard-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 const data = window._vcardData || {};
                 const name = data.displayName || 'Utilisateur';
                 let phone = '';
@@ -2945,6 +3016,14 @@ URL:${urlProfil}
             });
         }
 
+        // --- Theme toggle public (CORRIGÉ) ---
+        function setupPublicThemeToggle() {
+            document.getElementById('theme-toggle-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleTheme();
+            });
+        }
+
         // --- isPublicMode ---
         function isPublicMode() {
             return new URLSearchParams(window.location.search).has('id');
@@ -2955,14 +3034,17 @@ URL:${urlProfil}
 
         // ==================== ATTACHEMENT GLOBAL DES ÉVÉNEMENTS ====================
         function attachAllEventListeners() {
-            // Auth tabs
+            // --- Acceptation de la politique légale ---
+            document.getElementById('accept-legal-btn').addEventListener('click', acceptLegal);
+
+            // --- Auth tabs ---
             document.getElementById('auth-tabs').addEventListener('click', (e) => {
                 if (e.target.classList.contains('tab')) {
                     updateAuthUIForMode(e.target.dataset.tab);
                 }
             });
 
-            // Auth form
+            // --- Auth form ---
             document.getElementById('auth-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('auth-email').value.trim();
@@ -3001,7 +3083,7 @@ URL:${urlProfil}
                 }
             });
 
-            // Google Sign-In
+            // --- Google Sign-In ---
             document.getElementById('google-signin-btn').addEventListener('click', async () => {
                 const googleBtn = document.getElementById('google-signin-btn');
                 const googleText = document.getElementById('google-btn-text');
@@ -3033,7 +3115,7 @@ URL:${urlProfil}
                 }
             });
 
-            // Mot de passe oublié
+            // --- Mot de passe oublié ---
             document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
                 e.preventDefault();
                 const email = prompt('Entrez votre adresse email pour réinitialiser le mot de passe :');
@@ -3046,7 +3128,7 @@ URL:${urlProfil}
                 }
             });
 
-            // Onboarding : Passer
+            // --- Onboarding : Passer ---
             document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const bio = document.getElementById('onboarding-bio').value.trim();
@@ -3089,7 +3171,7 @@ URL:${urlProfil}
                 showToast('Profil créé avec succès (sauvegarde en cours).', 'info');
             });
 
-            // Onboarding : Finaliser
+            // --- Onboarding : Finaliser ---
             document.getElementById('finish-onboarding-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const bio = document.getElementById('onboarding-bio').value.trim();
@@ -3136,7 +3218,7 @@ URL:${urlProfil}
                 await populateDashboard();
             });
 
-            // Dashboard : Ajouter un lien
+            // --- Dashboard : Ajouter un lien ---
             document.getElementById('add-link-btn').addEventListener('click', () => {
                 selectedNetworkType = null;
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
@@ -3149,18 +3231,18 @@ URL:${urlProfil}
                 showView('view-add-link');
             });
 
-            // Dashboard : Ajouter une section
+            // --- Dashboard : Ajouter une section ---
             document.getElementById('add-section-btn').addEventListener('click', addSection);
 
-            // Vue add-link : Retour
+            // --- Vue add-link : Retour ---
             document.getElementById('back-from-add-link').addEventListener('click', () => {
                 showView('view-dashboard');
             });
 
-            // Vue add-link : Valider
+            // --- Vue add-link : Valider ---
             document.getElementById('validate-link-btn').addEventListener('click', validateAndAddLink);
 
-            // Dashboard : Enregistrer
+            // --- Dashboard : Enregistrer ---
             document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const name = document.getElementById('dashboard-name').value.trim();
@@ -3195,7 +3277,7 @@ URL:${urlProfil}
                 }
             });
 
-            // Dashboard : Copier le lien de partage
+            // --- Dashboard : Copier le lien de partage ---
             document.getElementById('copy-share-link-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const shareUrl = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
@@ -3213,16 +3295,16 @@ URL:${urlProfil}
                 }
             });
 
-            // Déconnexion
+            // --- Déconnexion ---
             document.getElementById('logout-btn').addEventListener('click', () => {
                 auth.signOut();
             });
 
-            // Uploads
+            // --- Uploads ---
             setupAvatarUpload();
             setupLinkImageUpload();
 
-            // Événements dashboard (statut, maintenance)
+            // --- Événements dashboard (statut, maintenance) ---
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
                 el.addEventListener('click', () => {
                     const value = el.dataset.value;
@@ -3241,34 +3323,31 @@ URL:${urlProfil}
                 }
             });
 
-            // Réinitialisation des vues globales
+            // --- Réinitialisation des vues globales ---
             document.getElementById('reset-views-btn').addEventListener('click', resetViews);
 
-            // Thème privé (clair/sombre)
-            document.getElementById('theme-toggle-private').addEventListener('click', function() {
+            // --- Thème privé (clair/sombre) ---
+            document.getElementById('theme-toggle-private').addEventListener('click', function(e) {
+                e.preventDefault();
                 toggleTheme();
             });
 
-            // Redirection Unique
+            // --- Redirection Unique ---
             document.getElementById('redirect-toggle-track').addEventListener('click', toggleRedirectUnique);
 
-            // Sélecteurs de thème visuel et fond
-            document.getElementById('visual-theme-select').addEventListener('change', function() {
-                applyVisualTheme();
-            });
-            document.getElementById('background-select').addEventListener('change', function() {
-                applyBackground();
-            });
+            // --- Sélecteurs de thème visuel et fond ---
+            document.getElementById('visual-theme-select').addEventListener('change', applyVisualTheme);
+            document.getElementById('background-select').addEventListener('change', applyBackground);
 
-            // QR Code et Vcard
+            // --- QR Code et Vcard (public) ---
             setupQRModal();
             setupVcard();
 
-            // Grille d'ajout
-            renderAddLinkGrid();
+            // --- Theme toggle public ---
+            setupPublicThemeToggle();
 
-            // Theme toggle public
-            document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+            // --- Grille d'ajout ---
+            renderAddLinkGrid();
         }
 
         // --- Auth state ---
@@ -3281,6 +3360,13 @@ URL:${urlProfil}
                 return;
             }
 
+            // Vérifier d'abord si l'utilisateur a accepté les conditions légales
+            const legalAccepted = localStorage.getItem(LEGAL_KEY) === 'true';
+            if (!legalAccepted) {
+                showView('view-legal');
+                return;
+            }
+
             currentUser = user;
             await handleAuthRedirection(user);
         });
@@ -3288,8 +3374,21 @@ URL:${urlProfil}
         // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
-            // On ne charge pas le profil public ici, on laisse onAuthStateChanged le faire
-            // pour éviter les doublons.
+
+            // Si mode public, on ne vérifie pas la politique (le profil public est accessible sans acceptation)
+            if (isPublicMode()) {
+                showView('view-profile-public');
+                loadPublicProfile(getPublicUid());
+                return;
+            }
+
+            // Sinon, on vérifie la politique
+            const legalAccepted = localStorage.getItem(LEGAL_KEY) === 'true';
+            if (!legalAccepted) {
+                showView('view-legal');
+            } else {
+                showView('view-auth');
+            }
         });
 
     })();
