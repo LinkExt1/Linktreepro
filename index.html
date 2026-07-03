@@ -2,1141 +2,1711 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>LinkExt | Cyber Linktree</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>LinkExt — Votre hub de liens nouvelle génération</title>
 
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="LinkExt - Votre hub de liens nouvelle génération">
-    <meta property="og:description" content="Partagez tous vos réseaux sociaux en un seul lien. Design cyberpunk et gestion simplifiée.">
-    <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
-    <meta property="og:url" content="https://linkext1.github.io/">
-    <meta property="og:type" content="website">
-
+    <!-- Font Awesome 6 (icônes) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts : Inter (moderne & lisible) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Widget Cloudinary -->
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDK (compat mode, aucun build nécessaire) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
-            --bg-deep: #0a0b10;
-            --bg-card: rgba(10, 11, 16, 0.7);
-            --border-glow: rgba(0, 242, 254, 0.2);
-            --cyan: #00f2fe;
-            --violet: #4facfe;
-            --text-primary: #e0e0ff;
-            --text-secondary: #a0a0c0;
-            --danger: #ff4d6d;
-            --success: #2ecc71;
-            --font-heading: 'Orbitron', sans-serif;
-            --font-body: 'Inter', sans-serif;
-            --transition: 0.3s ease-in-out;
+            --bg-deep: #0d0d11;
+            --glass-bg: rgba(22, 22, 30, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg-hover: rgba(28, 28, 40, 0.78);
+            --accent-1: #4facfe;
+            --accent-2: #00f2fe;
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --accent-glow: rgba(79, 172, 254, 0.35);
+            --text-primary: #f0f0f5;
+            --text-secondary: #b0b0c0;
+            --text-muted: #6b6b7a;
+            --danger: #ff4757;
+            --success: #2ed573;
+            --warning: #ffa502;
+            --whatsapp: #25D366;
+            --telegram: #0088cc;
+            --facebook: #1877F2;
+            --instagram: #E4405F;
+            --youtube: #FF0000;
+            --x-twitter: #1DA1F2;
+            --tiktok: #fe2c55;
+            --radius-lg: 22px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --radius-full: 50%;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --shadow-glass: 0 10px 40px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 50px var(--accent-glow), 0 0 100px rgba(79, 172, 254, 0.15);
+            --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            height: 100%;
+        }
+
         body {
+            font-family: var(--font-stack);
             background: var(--bg-deep);
-            font-family: var(--font-body);
             color: var(--text-primary);
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
-                radial-gradient(circle at 100% 30%, rgba(79, 172, 254, 0.05) 0%, transparent 50%);
-            background-attachment: fixed;
-            padding: 1.5rem;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+            padding: 0;
             margin: 0;
         }
-        #app {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            position: relative;
-        }
-        .view {
-            display: none;
-            flex-direction: column;
-            gap: 1.8rem;
-            animation: fadeSlideIn 0.4s ease-out;
-        }
-        .view.active {
-            display: flex;
-        }
-        @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid var(--border-glow);
-            border-radius: 20px;
-            padding: 2rem 1.8rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,242,254,0.04);
-            transition: var(--transition);
+
+        /* Fond animé avec orbes */
+        .bg-aurora {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
             overflow: hidden;
         }
-        .brand {
-            font-family: var(--font-heading);
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--cyan), var(--violet));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-align: center;
-            margin-bottom: 0.5rem;
+        .bg-aurora .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.45;
+            will-change: transform;
         }
-        .input-group {
+        .bg-aurora .orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.4) 0%, transparent 70%);
+            top: -20%;
+            left: -15%;
+            animation: floatOrb 16s ease-in-out infinite;
+        }
+        .bg-aurora .orb:nth-child(2) {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, transparent 70%);
+            bottom: -15%;
+            right: -10%;
+            animation: floatOrb 18s ease-in-out infinite;
+            animation-delay: -5s;
+        }
+        .bg-aurora .orb:nth-child(3) {
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(120, 80, 255, 0.3) 0%, transparent 70%);
+            top: 60%;
+            left: 70%;
+            animation: floatOrb 20s ease-in-out infinite;
+            animation-delay: -9s;
+        }
+
+        @keyframes floatOrb {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(70px, -60px) scale(1.12);
+            }
+            50% {
+                transform: translate(-40px, 50px) scale(0.88);
+            }
+            75% {
+                transform: translate(-60px, -35px) scale(1.08);
+            }
+        }
+
+        /* Conteneur principal */
+        .app-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 540px;
+            margin: 0 auto;
+            padding: 20px 16px;
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
-        }
-        .input-group label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-            display: flex;
             align-items: center;
-            gap: 0.4rem;
+            min-height: 100vh;
+            min-height: 100dvh;
+            justify-content: center;
+            gap: 18px;
         }
-        .input-field {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 0.85rem 1rem;
+
+        /* Glassmorphisme */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-glass);
+            transition: var(--transition-smooth);
+        }
+        .glass:hover {
+            background: var(--glass-bg-hover);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: var(--shadow-glass), 0 0 35px rgba(79, 172, 254, 0.08);
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-glass);
+            padding: 22px 20px;
+            transition: var(--transition-smooth);
+            width: 100%;
+        }
+        .glass-input {
+            background: rgba(18, 18, 28, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            padding: 14px 16px;
             font-size: 0.95rem;
-            color: white;
-            font-family: var(--font-body);
-            transition: var(--transition);
+            font-family: var(--font-stack);
+            width: 100%;
+            transition: var(--transition-fast);
             outline: none;
         }
-        .input-field:focus {
-            border-color: var(--cyan);
-            box-shadow: 0 0 12px rgba(0,242,254,0.3);
-            background: rgba(255,255,255,0.08);
+        .glass-input:focus {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.15);
+            background: rgba(24, 24, 38, 0.85);
         }
-        .input-field::placeholder {
-            color: rgba(255,255,255,0.35);
+        .glass-input::placeholder {
+            color: var(--text-muted);
         }
+
+        /* Boutons */
         .btn {
-            background: linear-gradient(135deg, var(--cyan), var(--violet));
-            border: none;
-            border-radius: 14px;
-            padding: 0.9rem 1.5rem;
-            font-weight: 600;
-            font-size: 1rem;
-            color: #0a0b10;
-            cursor: pointer;
-            transition: all var(--transition);
-            font-family: var(--font-body);
-            letter-spacing: 0.3px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 8px;
+            padding: 13px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: var(--font-stack);
+            cursor: pointer;
+            border: none;
+            transition: var(--transition-smooth);
             position: relative;
             overflow: hidden;
+            text-decoration: none;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        .btn:hover:not(:disabled) {
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(0,242,254,0.35);
+        .btn:active {
+            transform: scale(0.96);
+            transition: var(--transition-fast);
         }
-        .btn:disabled {
-            opacity: 0.6;
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: 0 4px 22px rgba(79, 172, 254, 0.45);
+            font-weight: 700;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 28px rgba(79, 172, 254, 0.6);
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.55;
             cursor: not-allowed;
-            filter: grayscale(30%);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--cyan);
-            color: var(--cyan);
-            background: rgba(0,242,254,0.05);
-        }
-        .btn-outline:hover:not(:disabled) {
-            background: rgba(0,242,254,0.15);
-            box-shadow: 0 0 20px rgba(0,242,254,0.3);
+            pointer-events: none;
+            filter: grayscale(20%);
         }
         .btn-google {
             background: #ffffff;
-            color: #1a1a1a;
-            border: 1px solid rgba(255,255,255,0.2);
+            color: #1a1a2e;
             font-weight: 600;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
         }
-        .btn-google:hover:not(:disabled) {
-            background: #f0f0f0;
-            box-shadow: 0 8px 20px rgba(255,255,255,0.2);
+        .btn-google:hover {
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+            transform: translateY(-2px);
         }
         .btn-google img {
             width: 20px;
             height: 20px;
         }
-        .tabs {
-            display: flex;
-            gap: 0;
-            margin-bottom: 1.5rem;
-            background: rgba(255,255,255,0.04);
-            border-radius: 16px;
-            padding: 0.3rem;
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            color: var(--text-primary);
         }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 0.7rem;
-            border-radius: 14px;
+        .btn-outline:hover {
+            border-color: var(--accent-1);
+            background: rgba(79, 172, 254, 0.08);
+        }
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border-radius: 30px;
+        }
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-full);
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
             cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-            color: var(--text-secondary);
+            transition: var(--transition-fast);
         }
-        .tab.active {
-            background: rgba(0,242,254,0.15);
-            color: var(--cyan);
-            box-shadow: 0 0 15px rgba(0,242,254,0.2);
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.13);
+            border-color: rgba(255, 255, 255, 0.25);
         }
-        .platform-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.8rem;
-            margin: 1rem 0;
+        .btn-icon.danger {
+            color: var(--danger);
+            border-color: rgba(255, 71, 87, 0.35);
         }
-        .platform-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 0.8rem 0.3rem;
+        .btn-icon.danger:hover {
+            background: rgba(255, 71, 87, 0.15);
+            border-color: rgba(255, 71, 87, 0.6);
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .spinner-sm {
+            width: 16px;
+            height: 16px;
+            border-width: 2px;
+        }
+
+        /* Loader global */
+        .global-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(6, 6, 14, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: opacity 0.4s ease;
+            pointer-events: all;
+        }
+        .global-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .global-loader .loader-ring {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-1);
+            animation: spin 0.9s linear infinite;
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        /* Toasts */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
             display: flex;
             flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 450px;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            text-align: center;
+            pointer-events: auto;
+            animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), toastOut 0.35s ease 3s forwards;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            letter-spacing: 0.02em;
+        }
+        .toast.success {
+            background: rgba(46, 213, 115, 0.25);
+            border: 1px solid rgba(46, 213, 115, 0.5);
+            color: #2ed573;
+        }
+        .toast.error {
+            background: rgba(255, 71, 87, 0.25);
+            border: 1px solid rgba(255, 71, 87, 0.5);
+            color: #ff6b7a;
+        }
+        .toast.info {
+            background: rgba(79, 172, 254, 0.25);
+            border: 1px solid rgba(79, 172, 254, 0.5);
+            color: #7ec8ff;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.85);
+            }
+        }
+
+        /* Vues */
+        .view {
+            display: none;
+            width: 100%;
+            flex-direction: column;
             align-items: center;
-            gap: 0.3rem;
-            cursor: pointer;
-            transition: var(--transition);
+            gap: 18px;
+            animation: fadeSlideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .view.active {
+            display: flex;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .view-title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            text-align: center;
+            letter-spacing: -0.02em;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .view-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+            font-weight: 400;
+            margin-bottom: 6px;
+        }
+        .separator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
             font-size: 0.8rem;
+            font-weight: 500;
+            width: 100%;
+            margin: 8px 0;
+        }
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Auth */
+        .auth-tabs {
+            display: flex;
+            background: rgba(18, 18, 28, 0.7);
+            border-radius: 50px;
+            padding: 5px;
+            width: 100%;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            margin-bottom: 16px;
+        }
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition-smooth);
+            color: var(--text-muted);
+            user-select: none;
+        }
+        .auth-tab.active {
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(79, 172, 254, 0.4);
+        }
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+        }
+        .auth-form.hidden {
+            display: none;
+        }
+        .error-banner {
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid rgba(255, 71, 87, 0.45);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            color: #ff6b7a;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: none;
+            width: 100%;
+            text-align: center;
+            animation: fadeSlideIn 0.3s ease;
+        }
+        .error-banner.visible {
+            display: block;
+        }
+
+        /* Onboarding */
+        .platform-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+            margin: 8px 0;
+        }
+        .platform-chip {
+            padding: 10px 16px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.5px solid rgba(255, 255, 255, 0.14);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: var(--transition-smooth);
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 7px;
             color: var(--text-secondary);
         }
-        .platform-item i {
-            font-size: 1.8rem;
-            transition: var(--transition);
+        .platform-chip i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
         }
-        .platform-item.selected {
-            border-color: var(--cyan);
-            box-shadow: 0 0 20px rgba(0,242,254,0.5);
-            background: rgba(0,242,254,0.1);
-            color: white;
-            transform: scale(1.02);
+        .platform-chip.selected {
+            background: rgba(79, 172, 254, 0.2);
+            border-color: var(--accent-1);
+            color: #fff;
+            box-shadow: 0 0 18px rgba(79, 172, 254, 0.35);
         }
-        .platform-item.selected i {
-            color: var(--cyan);
-        }
-        .url-input-animated {
-            animation: slideDown 0.3s ease-out;
-            overflow: hidden;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; max-height: 0; margin-top: 0; }
-            to { opacity: 1; max-height: 80px; margin-top: 0.6rem; }
-        }
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            flex-wrap: wrap;
-        }
+
+        /* Dashboard */
         .avatar-wrapper {
             position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: conic-gradient(var(--cyan), var(--violet), var(--cyan));
-            padding: 2px;
+            width: 100px;
+            height: 100px;
+            border-radius: var(--radius-full);
+            flex-shrink: 0;
+            margin: 0 auto;
         }
-        .avatar {
+        .avatar-img {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
+            border-radius: var(--radius-full);
             object-fit: cover;
-            background: #0a0b10;
-            display: block;
-            transition: opacity 0.2s;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 30px var(--accent-glow);
+            transition: var(--transition-smooth);
         }
-        .link-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 1rem;
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-full);
+            background: var(--accent-gradient);
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            justify-content: center;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #fff;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 30px var(--accent-glow);
+            letter-spacing: -0.03em;
+        }
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-full);
+            background: var(--accent-gradient);
+            border: 2px solid var(--bg-deep);
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+        }
+        .avatar-upload-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Lien dashboard */
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(18, 18, 28, 0.6);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: var(--transition-smooth);
+            width: 100%;
             flex-wrap: wrap;
-            transition: var(--transition);
+        }
+        .link-item:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(24, 24, 38, 0.75);
         }
         .link-item .platform-icon {
-            font-size: 1.6rem;
-            width: 2rem;
+            font-size: 1.4rem;
+            width: 32px;
             text-align: center;
+            flex-shrink: 0;
         }
         .link-item input {
             flex: 1;
-            min-width: 150px;
+            min-width: 120px;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-stack);
+            font-size: 0.9rem;
+            outline: none;
+            padding: 6px 0;
         }
+        .link-item input::placeholder {
+            color: var(--text-muted);
+        }
+        .click-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        .click-badge i {
+            color: var(--accent-1);
+        }
+
+        /* Toggle switch */
         .toggle-switch {
             position: relative;
             width: 48px;
             height: 26px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 30px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
             cursor: pointer;
-            transition: var(--transition);
+            inset: 0;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 26px;
+            transition: var(--transition-smooth);
         }
-        .toggle-switch.active {
-            background: var(--cyan);
-            box-shadow: 0 0 12px var(--cyan);
-        }
-        .toggle-switch::after {
+        .toggle-slider::before {
             content: '';
             position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
             height: 20px;
-            background: white;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
             border-radius: 50%;
-            transition: var(--transition);
+            transition: var(--transition-smooth);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
         }
-        .toggle-switch.active::after {
-            left: 25px;
+        .toggle-switch input:checked+.toggle-slider {
+            background: var(--accent-gradient);
+            box-shadow: 0 0 14px rgba(79, 172, 254, 0.5);
         }
-        .delete-link-btn {
-            background: transparent;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: var(--transition);
+        .toggle-switch input:checked+.toggle-slider::before {
+            transform: translateX(22px);
         }
-        .delete-link-btn:hover {
-            color: #ff2040;
-            transform: scale(1.1);
-        }
+
+        /* Page publique */
         .public-avatar {
             width: 110px;
             height: 110px;
-            border-radius: 50%;
+            border-radius: var(--radius-full);
             object-fit: cover;
-            border: 3px solid var(--cyan);
-            box-shadow: 0 0 30px rgba(0,242,254,0.5);
-            animation: pulseGlow 2s infinite;
+            border: 4px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 50px var(--accent-glow), 0 0 100px rgba(79, 172, 254, 0.2);
+            transition: var(--transition-smooth);
         }
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 15px rgba(0,242,254,0.4); }
-            50% { box-shadow: 0 0 35px rgba(0,242,254,0.8); }
-            100% { box-shadow: 0 0 15px rgba(0,242,254,0.4); }
-        }
-        .social-btn {
+        .public-avatar-placeholder {
+            width: 110px;
+            height: 110px;
+            border-radius: var(--radius-full);
+            background: var(--accent-gradient);
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            padding: 0.9rem 1.4rem;
-            border-radius: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            color: white;
-            transition: var(--transition);
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            font-family: var(--font-body);
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fff;
+            border: 4px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 50px var(--accent-glow), 0 0 100px rgba(79, 172, 254, 0.2);
+            letter-spacing: -0.03em;
         }
-        .social-btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.2);
-        }
-        .social-btn.whatsapp { background: #25D366; color: #fff; }
-        .social-btn.telegram { background: #0088cc; color: #fff; }
-        .social-btn.facebook { background: #1877F2; color: #fff; }
-        .social-btn.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
-        .social-btn.youtube { background: #FF0000; color: #fff; }
-        .social-btn.x { background: #1DA1F2; color: #fff; }
-        .social-btn.tiktok { background: #000000; color: #fff; border: 1px solid #ffffff40; }
-        #toast-container {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            z-index: 9999;
+        .public-link-btn {
             display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            color: #fff;
+            transition: var(--transition-bounce);
+            letter-spacing: 0.02em;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-stack);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+            position: relative;
+            overflow: hidden;
         }
-        .toast {
-            background: #0a0b10;
-            border: 1px solid var(--cyan);
-            padding: 0.8rem 1.2rem;
-            border-radius: 12px;
-            color: white;
-            backdrop-filter: blur(10px);
-            animation: slideInRight 0.3s ease-out;
-            font-size: 0.9rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        .public-link-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
         }
-        .toast.error { border-color: var(--danger); }
-        @keyframes slideInRight {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .public-link-btn:active {
+            transform: scale(0.97);
+            transition: var(--transition-fast);
         }
-        .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            display: inline-block;
+        .public-link-btn i {
+            font-size: 1.3rem;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .text-center { text-align: center; }
-        .mt-1 { margin-top: 1rem; }
-        .mt-2 { margin-top: 1.5rem; }
-        .hidden { display: none !important; }
+        .footer-brand {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 500;
+            margin-top: 16px;
+            letter-spacing: 0.03em;
+        }
+        .footer-brand span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 10;
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid rgba(255, 71, 87, 0.45);
+            color: #ff6b7a;
+            padding: 8px 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition-fast);
+            font-family: var(--font-stack);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 71, 87, 0.35);
+            border-color: rgba(255, 71, 87, 0.7);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 12px;
+                gap: 12px;
+            }
+            .glass-card {
+                padding: 18px 14px;
+                border-radius: var(--radius-sm);
+            }
+            .view-title {
+                font-size: 1.4rem;
+            }
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            .public-link-btn {
+                padding: 14px 18px;
+                font-size: 0.9rem;
+            }
+            .avatar-wrapper,
+            .public-avatar,
+            .public-avatar-placeholder {
+                width: 85px;
+                height: 85px;
+            }
+            .avatar-placeholder {
+                font-size: 2.2rem;
+            }
+            .public-avatar-placeholder {
+                font-size: 2.4rem;
+            }
+            .link-item {
+                padding: 12px;
+                gap: 8px;
+            }
+            .link-item input {
+                font-size: 0.85rem;
+            }
+            .logout-btn {
+                top: 8px;
+                right: 8px;
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="app">
-        <!-- VUE AUTH -->
-        <div id="view-auth" class="view">
-            <div class="glass-card">
-                <div class="brand">LINKEXT</div>
-                <div class="tabs" id="auth-tabs">
-                    <div class="tab active" data-tab="login">Connexion</div>
-                    <div class="tab" data-tab="register">Inscription</div>
+    <!-- Fond animé -->
+    <div class="bg-aurora">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <!-- Loader global -->
+    <div class="global-loader" id="globalLoader">
+        <div class="loader-ring"></div>
+    </div>
+
+    <!-- Conteneur toasts -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Application -->
+    <div class="app-container" id="appContainer">
+
+        <!-- ========== VUE AUTH ========== -->
+        <div class="view" id="viewAuth">
+            <div class="glass-card" style="width:100%;max-width:420px;">
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-tab="login" id="tabLogin">Connexion</div>
+                    <div class="auth-tab" data-tab="register" id="tabRegister">Inscription</div>
                 </div>
-                <form id="auth-form" autocomplete="off">
-                    <div class="input-group mt-1">
-                        <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" class="input-field" id="auth-email" placeholder="vous@exemple.com" required>
-                    </div>
-                    <div class="input-group mt-1">
-                        <label><i class="fas fa-lock"></i> Mot de passe</label>
-                        <input type="password" class="input-field" id="auth-password" placeholder="••••••••" required minlength="6">
-                    </div>
-                    <button type="submit" class="btn mt-2" id="auth-submit-btn" style="width:100%">
-                        <span id="auth-btn-text">Se connecter</span>
-                        <span id="auth-spinner" class="spinner hidden"></span>
+                <div class="error-banner" id="authError"></div>
+                <form class="auth-form" id="formLogin">
+                    <input type="email" class="glass-input" placeholder="vous@exemple.com" id="loginEmail" required autocomplete="email">
+                    <input type="password" class="glass-input" placeholder="Mot de passe" id="loginPassword" required autocomplete="current-password">
+                    <button type="submit" class="btn btn-primary" style="width:100%;" id="btnLoginSubmit">
+                        <span id="btnLoginText">Se connecter</span>
+                        <span class="spinner spinner-sm" id="btnLoginSpinner" style="display:none;"></span>
                     </button>
                 </form>
-                <div class="text-center mt-1">
-                    <a href="#" id="forgot-password-link" style="color:var(--cyan); font-size:0.85rem;">Mot de passe oublié ?</a>
-                </div>
-                <div class="mt-2" style="display:flex; align-items:center; gap:0.8rem;">
-                    <div style="flex:1; height:1px; background:rgba(255,255,255,0.15);"></div>
-                    <span style="font-size:0.8rem; color:var(--text-secondary);">ou</span>
-                    <div style="flex:1; height:1px; background:rgba(255,255,255,0.15);"></div>
-                </div>
-                <button class="btn btn-google mt-2" id="google-signin-btn" style="width:100%">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" height="20">
-                    <span id="google-btn-text">Continuer avec Google</span>
-                    <span id="google-spinner" class="spinner hidden"></span>
+                <form class="auth-form hidden" id="formRegister">
+                    <input type="email" class="glass-input" placeholder="vous@exemple.com" id="registerEmail" required autocomplete="email">
+                    <input type="password" class="glass-input" placeholder="Mot de passe (6+ caractères)" id="registerPassword" required autocomplete="new-password" minlength="6">
+                    <button type="submit" class="btn btn-primary" style="width:100%;" id="btnRegisterSubmit">
+                        <span id="btnRegisterText">Créer un compte</span>
+                        <span class="spinner spinner-sm" id="btnRegisterSpinner" style="display:none;"></span>
+                    </button>
+                </form>
+                <div class="separator">ou</div>
+                <button class="btn btn-google" style="width:100%;" id="btnGoogleAuth">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.95 16.46 0 20.12 0 24c0 3.88.95 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E" alt="Google">
+                    Continuer avec Google
                 </button>
             </div>
         </div>
 
-        <!-- VUE ONBOARDING -->
-        <div id="view-onboarding" class="view">
-            <div class="glass-card">
-                <div class="brand" style="font-size:1.8rem;">CONFIGURATION</div>
-                <p style="color:var(--text-secondary); text-align:center;">Sélectionnez vos réseaux et ajoutez vos liens</p>
-                <div class="platform-grid" id="onboarding-grid"></div>
-                <div id="onboarding-urls" class="mt-1"></div>
-                <div class="input-group mt-2">
-                    <label><i class="fas fa-pen"></i> Bio courte</label>
-                    <textarea class="input-field" id="onboarding-bio" rows="2" maxlength="150" placeholder="Décrivez-vous en quelques mots..."></textarea>
+        <!-- ========== VUE ONBOARDING ========== -->
+        <div class="view" id="viewOnboarding">
+            <div class="glass-card" style="width:100%;max-width:480px;">
+                <h2 class="view-title" style="margin-bottom:8px;">Configurons votre profil</h2>
+                <p class="view-subtitle">Choisissez vos réseaux et ajoutez une bio</p>
+                <p style="font-weight:600;font-size:0.9rem;margin:8px 0;color:var(--text-secondary);">📱 Vos plateformes</p>
+                <div class="platform-grid" id="onboardingPlatforms">
+                    <div class="platform-chip" data-platform="whatsapp"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</div>
+                    <div class="platform-chip" data-platform="telegram"><i class="fab fa-telegram-plane" style="color:#0088cc;"></i> Telegram</div>
+                    <div class="platform-chip" data-platform="facebook"><i class="fab fa-facebook" style="color:#1877F2;"></i> Facebook</div>
+                    <div class="platform-chip" data-platform="instagram"><i class="fab fa-instagram" style="color:#E4405F;"></i> Instagram</div>
+                    <div class="platform-chip" data-platform="youtube"><i class="fab fa-youtube" style="color:#FF0000;"></i> YouTube</div>
+                    <div class="platform-chip" data-platform="x"><i class="fab fa-x-twitter"></i> X (Twitter)</div>
+                    <div class="platform-chip" data-platform="tiktok"><i class="fab fa-tiktok"></i> TikTok</div>
                 </div>
-                <button class="btn mt-2" id="finish-onboarding-btn" style="width:100%">Finaliser et créer mon profil</button>
-                <button class="btn btn-outline mt-1" id="skip-onboarding-btn" style="width:100%">Passer l'étape</button>
-            </div>
-        </div>
-
-        <!-- VUE DASHBOARD -->
-        <div id="view-dashboard" class="view">
-            <div class="glass-card">
-                <div style="display:flex; justify-content: space-between; align-items:center;">
-                    <div class="brand" style="font-size:1.5rem; margin:0;">DASHBOARD</div>
-                    <button class="btn btn-outline" id="logout-btn" style="padding:0.5rem 1rem;"><i class="fas fa-sign-out-alt"></i></button>
-                </div>
-                <div class="profile-header mt-2">
-                    <div class="avatar-wrapper">
-                        <img id="dashboard-avatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=128" alt="avatar">
-                    </div>
-                    <div style="flex:1;">
-                        <div class="input-group">
-                            <label>Nom affiché</label>
-                            <input type="text" class="input-field" id="dashboard-name" placeholder="Votre nom">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bouton Cloudinary pour changer la photo de profil -->
-                <div class="input-group mt-2">
-                    <label>Photo de profil</label>
-                    <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center;">
-                        <i class="fas fa-camera"></i> 📷 Changer la photo de profil
+                <textarea class="glass-input" id="onboardingBio" placeholder="Décrivez-vous en quelques mots..." rows="3" style="margin-top:14px;resize:vertical;min-height:70px;"></textarea>
+                <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" id="btnFinishOnboarding" style="flex:1;min-width:160px;">
+                        <span id="btnFinishOnboardingText">Finaliser et créer mon profil</span>
+                        <span class="spinner spinner-sm" id="btnFinishOnboardingSpinner" style="display:none;"></span>
                     </button>
+                    <button class="btn btn-outline" id="btnSkipOnboarding" style="flex:1;min-width:130px;">Passer l'étape</button>
                 </div>
-
-                <div class="input-group mt-2">
-                    <label>Biographie</label>
-                    <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
-                </div>
-
-                <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
-                    <h3 style="font-family:var(--font-heading); font-size:1rem;">🔗 Mes liens</h3>
-                    <button class="btn btn-outline" id="add-link-btn" style="padding:0.4rem 1rem;"><i class="fas fa-plus"></i> Ajouter</button>
-                </div>
-                <div id="dashboard-links-container" class="mt-1" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
-                <button class="btn mt-2" id="save-dashboard-btn" style="width:100%">Enregistrer les modifications</button>
-                <button class="btn btn-outline mt-1" id="copy-share-link-btn" style="width:100%"><i class="fas fa-copy"></i> Copier mon lien de partage</button>
             </div>
         </div>
 
-        <!-- VUE PROFIL PUBLIC -->
-        <div id="view-profile-public" class="view">
-            <div class="glass-card" style="text-align:center; padding-top: 0;">
-                <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
-                <h2 id="public-name" style="font-family:var(--font-heading); margin-top:1rem;"></h2>
-                <p id="public-bio" style="color:var(--text-secondary); margin-top:0.5rem;"></p>
-                <div id="public-links" class="mt-2" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
+        <!-- ========== VUE DASHBOARD ========== -->
+        <div class="view" id="viewDashboard">
+            <button class="logout-btn" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+            <div class="glass-card" style="width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+                <div class="avatar-wrapper" id="dashboardAvatarWrapper">
+                    <div class="avatar-placeholder" id="dashboardAvatarPlaceholder">?</div>
+                    <img class="avatar-img" id="dashboardAvatarImg" src="" alt="Photo de profil" style="display:none;">
+                    <button class="avatar-upload-btn" id="btnUploadAvatar" title="Changer la photo de profil"><i class="fas fa-camera"></i></button>
+                    <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+                </div>
+                <input type="text" class="glass-input" id="dashboardDisplayName" placeholder="Votre nom affiché" style="text-align:center;font-weight:600;font-size:1.1rem;">
+                <textarea class="glass-input" id="dashboardBio" placeholder="Votre biographie..." rows="2" style="resize:vertical;min-height:50px;text-align:center;"></textarea>
+                <div style="width:100%;text-align:center;">
+                    <button class="btn btn-outline btn-sm" id="btnUploadPreview"><i class="fas fa-image"></i> Téléverser l'image d'aperçu</button>
+                    <input type="file" id="previewFileInput" accept="image/*" style="display:none;">
+                    <div id="previewThumbnailContainer" style="margin-top:8px;display:none;">
+                        <img id="previewThumbnail" src="" alt="Aperçu" style="max-width:100%;max-height:120px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);">
+                    </div>
+                </div>
             </div>
-            <p class="text-center" style="font-size:0.8rem; color:var(--text-secondary);">Propulsé par LinkExt</p>
+
+            <div class="glass-card" style="width:100%;max-width:500px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <h3 style="font-size:1.1rem;font-weight:700;">🔗 Vos liens</h3>
+                    <button class="btn btn-outline btn-sm" id="btnAddLink"><i class="fas fa-plus"></i> Ajouter</button>
+                </div>
+                <div id="linksContainer" style="display:flex;flex-direction:column;gap:10px;"></div>
+                <p id="noLinksMsg" style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:20px 0;">Aucun lien pour le moment.</p>
+            </div>
+
+            <button class="btn btn-primary" id="btnSaveDashboard" style="width:100%;max-width:500px;">
+                <span id="btnSaveDashboardText">Enregistrer les modifications</span>
+                <span class="spinner spinner-sm" id="btnSaveDashboardSpinner" style="display:none;"></span>
+            </button>
+        </div>
+
+        <!-- ========== VUE PROFIL PUBLIC ========== -->
+        <div class="view" id="viewPublicProfile">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:460px;">
+                <div id="publicAvatarPlaceholder" class="public-avatar-placeholder">?</div>
+                <img id="publicAvatarImg" class="public-avatar" src="" alt="Photo de profil" style="display:none;">
+                <h2 id="publicDisplayName" style="font-size:1.5rem;font-weight:700;text-align:center;color:var(--text-primary);"></h2>
+                <p id="publicBio" style="color:var(--text-secondary);text-align:center;font-size:0.95rem;line-height:1.5;"></p>
+                <div id="publicLinksContainer" style="display:flex;flex-direction:column;gap:12px;width:100%;"></div>
+                <div class="footer-brand">Propulsé par <span>LinkExt</span></div>
+            </div>
         </div>
     </div>
 
-    <div id="toast-container"></div>
-
-    <!-- Firebase Compat SDKs (Auth + Firestore, PAS de Storage) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
     <script>
         (function() {
-            // ----- CONFIGURATION FIREBASE -----
+            // ==================== CONFIGURATION ====================
+            // Remplacez ces valeurs par vos vraies clés Firebase et Cloudinary
             const firebaseConfig = {
-                apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
-                authDomain: "linkext-83984.firebaseapp.com",
-                projectId: "linkext-83984",
-                storageBucket: "linkext-83984.firebasestorage.app",
-                messagingSenderId: "252759128333",
-                appId: "1:252759128333:web:faa50e87e8e86699b6d844",
-                measurementId: "G-FT8V3C652D"
-            };
-            firebase.initializeApp(firebaseConfig);
-            const auth = firebase.auth();
-            const db = firebase.firestore();
-
-            // ----- CONFIGURATION CLOUDINARY (UNSIGNED, sans clé API) -----
-            const CLOUDINARY_CLOUD_NAME = "bwexb1sj";          // Cloud name correct
-            const CLOUDINARY_UPLOAD_PRESET = "LinkExt";    // Preset non signé
-
-            // ----- PLATEFORMES DISPONIBLES -----
-            const PLATFORMS = [
-                { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp', colorClass: 'whatsapp' },
-                { id: 'telegram', name: 'Telegram', icon: 'fab fa-telegram-plane', colorClass: 'telegram' },
-                { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook', colorClass: 'facebook' },
-                { id: 'instagram', name: 'Instagram', icon: 'fab fa-instagram', colorClass: 'instagram' },
-                { id: 'youtube', name: 'YouTube', icon: 'fab fa-youtube', colorClass: 'youtube' },
-                { id: 'x', name: 'X (Twitter)', icon: 'fab fa-x-twitter', colorClass: 'x' },
-                { id: 'tiktok', name: 'TikTok', icon: 'fab fa-tiktok', colorClass: 'tiktok' }
-            ];
-
-            // ----- ÉTAT GLOBAL -----
-            let currentUser = null;
-            let userProfile = null;            // Contiendra le profil chargé, ou un objet par défaut
-            let authMode = 'login';
-            let selectedOnboardingPlatforms = new Set();
-            let onboardingUrls = {};
-            let authRedirectInProgress = false;
-            let isCloudinaryWidgetOpen = false;
-
-            // ----- VUES -----
-            const views = {
-                auth: document.getElementById('view-auth'),
-                onboarding: document.getElementById('view-onboarding'),
-                dashboard: document.getElementById('view-dashboard'),
-                publicProfile: document.getElementById('view-profile-public')
+                apiKey: "AIzaSyAs-VjX...", // ← complétez avec votre clé API
+                authDomain: "linkext1.firebaseapp.com",
+                projectId: "linkext1",
+                storageBucket: "linkext1.appspot.com",
+                messagingSenderId: "1234567890",
+                appId: "1:1234567890:web:abcdef"
             };
 
-            // ----- UTILITAIRES UI -----
-            function showView(viewId) {
-                const target = document.getElementById(viewId);
-                if (!target) return;
-                Object.values(views).forEach(v => v.classList.remove('active'));
-                target.classList.add('active');
+            const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
+            const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
+
+            // ==================== INITIALISATION FIREBASE ====================
+            let firebaseReady = false;
+            let auth, db;
+
+            try {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                firebaseReady = true;
+                console.log('✅ Firebase initialisé');
+            } catch (err) {
+                console.warn('⚠️ Firebase non configuré — mode démo limité.', err);
+                showToast('Firebase non configuré. Certaines fonctionnalités seront désactivées.', 'info');
             }
 
+            // ==================== RÉFÉRENCES DOM ====================
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
+
+            const globalLoader = $('#globalLoader');
+            const toastContainer = $('#toastContainer');
+            const viewAuth = $('#viewAuth');
+            const viewOnboarding = $('#viewOnboarding');
+            const viewDashboard = $('#viewDashboard');
+            const viewPublicProfile = $('#viewPublicProfile');
+            const allViews = [viewAuth, viewOnboarding, viewDashboard, viewPublicProfile];
+
+            // Auth
+            const tabLogin = $('#tabLogin');
+            const tabRegister = $('#tabRegister');
+            const formLogin = $('#formLogin');
+            const formRegister = $('#formRegister');
+            const authError = $('#authError');
+            const btnGoogleAuth = $('#btnGoogleAuth');
+            const loginEmail = $('#loginEmail');
+            const loginPassword = $('#loginPassword');
+            const registerEmail = $('#registerEmail');
+            const registerPassword = $('#registerPassword');
+
+            // Onboarding
+            const onboardingPlatformsContainer = $('#onboardingPlatforms');
+            const onboardingBio = $('#onboardingBio');
+            const btnFinishOnboarding = $('#btnFinishOnboarding');
+            const btnSkipOnboarding = $('#btnSkipOnboarding');
+
+            // Dashboard
+            const dashboardAvatarPlaceholder = $('#dashboardAvatarPlaceholder');
+            const dashboardAvatarImg = $('#dashboardAvatarImg');
+            const btnUploadAvatar = $('#btnUploadAvatar');
+            const avatarFileInput = $('#avatarFileInput');
+            const dashboardDisplayName = $('#dashboardDisplayName');
+            const dashboardBio = $('#dashboardBio');
+            const btnUploadPreview = $('#btnUploadPreview');
+            const previewFileInput = $('#previewFileInput');
+            const previewThumbnailContainer = $('#previewThumbnailContainer');
+            const previewThumbnail = $('#previewThumbnail');
+            const linksContainer = $('#linksContainer');
+            const noLinksMsg = $('#noLinksMsg');
+            const btnAddLink = $('#btnAddLink');
+            const btnSaveDashboard = $('#btnSaveDashboard');
+            const btnLogout = $('#btnLogout');
+
+            // Public
+            const publicAvatarPlaceholder = $('#publicAvatarPlaceholder');
+            const publicAvatarImg = $('#publicAvatarImg');
+            const publicDisplayName = $('#publicDisplayName');
+            const publicBio = $('#publicBio');
+            const publicLinksContainer = $('#publicLinksContainer');
+
+            // ==================== ÉTAT ====================
+            let currentUser = null;
+            let userProfile = null; // doc Firestore userProfiles/{uid}
+            let selectedOnboardingPlatforms = new Set();
+            let localLinks = []; // liens en édition (tableau d'objets avec id, platform, url, active, clicks)
+            let originalLinks = []; // sauvegarde pour diff
+            let currentView = null;
+            let publicProfileUid = null;
+            let isSaving = false;
+
+            // ==================== HELPERS ====================
+            function showLoader() { globalLoader.classList.remove('hidden'); }
+
+            function hideLoader() { globalLoader.classList.add('hidden'); }
+
             function showToast(message, type = 'info') {
-                const container = document.getElementById('toast-container');
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
                 toast.textContent = message;
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
+                toastContainer.appendChild(toast);
+                setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3300);
             }
 
-            function sanitizeUrl(url) {
-                if (!url) return '';
-                url = url.trim();
-                if (!/^https?:\/\//i.test(url)) return 'https://' + url;
-                return url;
+            function showView(viewElement) {
+                if (currentView === viewElement) return;
+                allViews.forEach(v => v.classList.remove('active'));
+                viewElement.classList.add('active');
+                currentView = viewElement;
+                viewElement.style.animation = 'none';
+                viewElement.offsetHeight;
+                viewElement.style.animation = '';
             }
 
-            function generateAvatarUrl(name) {
-                return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
+            function showAuthError(msg) {
+                authError.textContent = msg;
+                authError.classList.add('visible');
+                setTimeout(() => authError.classList.remove('visible'), 5000);
             }
 
-            // ----- FIRESTORE ROBUSTE (ne gèle jamais l'interface) -----
-            async function loadUserProfile(uid) {
-                try {
-                    const docRef = db.collection('users').doc(uid);
-                    const doc = await docRef.get();
-                    if (doc.exists) {
-                        userProfile = doc.data();
-                        userProfile._id = uid;
-                        return userProfile;
-                    } else {
-                        // Document inexistant → on fabrique un profil par défaut (local)
-                        userProfile = createDefaultProfile();
-                        userProfile._id = uid;
-                        return userProfile;
-                    }
-                } catch (error) {
-                    console.warn('Erreur Firestore (lecture) :', error);
-                    showToast('Connexion à la base de données impossible. Mode dégradé.', 'error');
-                    // On continue avec un profil local pour ne pas bloquer l'UI
-                    userProfile = createDefaultProfile();
-                    userProfile._id = uid;
-                    return userProfile;
+            function clearAuthError() { authError.classList.remove('visible'); }
+
+            function setButtonLoading(btn, spinner, text, isLoading) {
+                btn.disabled = isLoading;
+                if (spinner) spinner.style.display = isLoading ? 'inline-block' : 'none';
+                if (text) text.style.opacity = isLoading ? '0.5' : '1';
+            }
+
+            function getInitial(name) {
+                if (!name || !name.trim()) return '?';
+                return name.trim().charAt(0).toUpperCase();
+            }
+
+            function generateId() {
+                return Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            // Plateformes
+            const PLATFORMS = {
+                whatsapp: { name: 'WhatsApp', icon: 'fab fa-whatsapp', color: '#25D366', bgColor: '#25D366' },
+                telegram: { name: 'Telegram', icon: 'fab fa-telegram-plane', color: '#0088cc', bgColor: '#0088cc' },
+                facebook: { name: 'Facebook', icon: 'fab fa-facebook', color: '#1877F2', bgColor: '#1877F2' },
+                instagram: { name: 'Instagram', icon: 'fab fa-instagram', color: '#E4405F',
+                    bgColor: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' },
+                youtube: { name: 'YouTube', icon: 'fab fa-youtube', color: '#FF0000', bgColor: '#FF0000' },
+                x: { name: 'X (Twitter)', icon: 'fab fa-x-twitter', color: '#1DA1F2', bgColor: '#1DA1F2' },
+                tiktok: { name: 'TikTok', icon: 'fab fa-tiktok', color: '#fe2c55', bgColor: '#111' },
+                site: { name: 'Site web', icon: 'fas fa-globe', color: '#aaa', bgColor: '#444' },
+                autre: { name: 'Autre', icon: 'fas fa-link', color: '#ccc', bgColor: '#555' }
+            };
+
+            // ==================== CLOUDINARY ====================
+            async function uploadToCloudinary(file) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+                formData.append('folder', 'linkext');
+                const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+                const response = await fetch(url, { method: 'POST', body: formData });
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error?.message || 'Échec upload Cloudinary');
                 }
+                const data = await response.json();
+                return data.secure_url;
             }
 
-            function createDefaultProfile(overrides = {}) {
-                return {
-                    displayName: currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Utilisateur',
-                    photoURL: currentUser?.photoURL || '',
-                    bio: '',
-                    links: [],
-                    onboardingCompleted: false,
-                    ...overrides
-                };
+            // ==================== FIRESTORE ====================
+            async function fetchUserProfile(uid) {
+                if (!firebaseReady) return null;
+                const docRef = db.collection('userProfiles').doc(uid);
+                const snap = await docRef.get();
+                return snap.exists ? { id: snap.id, ...snap.data() } : null;
             }
 
             async function saveUserProfile(uid, data) {
-                try {
-                    const docRef = db.collection('users').doc(uid);
-                    await docRef.set(data, { merge: true });
-                    // Mise à jour locale seulement si pas d'erreur (sinon on garde l'ancien état)
-                    userProfile = { ...userProfile, ...data, _id: uid };
-                    return true;
-                } catch (error) {
-                    console.warn('Erreur Firestore (écriture) :', error);
-                    showToast('Sauvegarde cloud échouée. Modifications conservées en local.', 'error');
-                    // Mise à jour locale quand même pour que l'utilisateur voie ses changements
-                    userProfile = { ...userProfile, ...data, _id: uid };
-                    return false;
-                }
+                if (!firebaseReady) throw new Error('Firebase non disponible');
+                const docRef = db.collection('userProfiles').doc(uid);
+                await docRef.set({ ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             }
 
-            // ----- ROUTAGE CENTRAL (avec fallback sécurisé) -----
-            async function handleAuthRedirection(user) {
-                if (!user) {
-                    userProfile = null;
-                    showView('view-auth');
-                    updateAuthUIForMode('login');
-                    return;
+            async function fetchUserLinks(uid) {
+                if (!firebaseReady) return [];
+                const snapshot = await db.collection('userProfiles').doc(uid).collection('links').orderBy('createdAt',
+                    'asc').get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+
+            async function saveLinksBatch(uid, linksToSave, linksToDelete) {
+                if (!firebaseReady) throw new Error('Firebase indisponible');
+                const batch = db.batch();
+                const linksCol = db.collection('userProfiles').doc(uid).collection('links');
+
+                for (const link of linksToSave) {
+                    const docRef = link.id ? linksCol.doc(link.id) : linksCol.doc(); // nouvel id si absent
+                    const data = {
+                        platform: link.platform,
+                        url: link.url || '',
+                        active: link.active !== false,
+                        clicks: link.clicks || 0,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    if (!link.id) data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    batch.set(docRef, data, { merge: true });
                 }
 
-                // Chargement du profil (ou création d'un profil local si échec)
-                const profile = await loadUserProfile(user.uid);
-                userProfile = profile;   // Quoi qu'il arrive, userProfile est défini (objet par défaut)
+                for (const linkId of linksToDelete) {
+                    batch.delete(linksCol.doc(linkId));
+                }
 
-                if (!profile.onboardingCompleted) {
-                    // Onboarding pas encore fait
-                    selectedOnboardingPlatforms.clear();
-                    onboardingUrls = {};
-                    renderOnboardingGrid();
-                    document.getElementById('onboarding-bio').value = profile.bio || '';
-                    showView('view-onboarding');
+                await batch.commit();
+            }
+
+            async function incrementLinkClick(uid, linkId) {
+                if (!firebaseReady) return;
+                const docRef = db.collection('userProfiles').doc(uid).collection('links').doc(linkId);
+                await docRef.update({ clicks: firebase.firestore.FieldValue.increment(1) });
+            }
+
+            // ==================== ROUTEUR & AUTH ====================
+            function switchAuthTab(tab) {
+                if (tab === 'login') {
+                    tabLogin.classList.add('active');
+                    tabRegister.classList.remove('active');
+                    formLogin.classList.remove('hidden');
+                    formRegister.classList.add('hidden');
                 } else {
-                    // Profil complet → dashboard
-                    showView('view-dashboard');
-                    await populateDashboard();
+                    tabRegister.classList.add('active');
+                    tabLogin.classList.remove('active');
+                    formRegister.classList.remove('hidden');
+                    formLogin.classList.add('hidden');
                 }
+                clearAuthError();
             }
 
-            // ----- UI AUTH -----
-            function updateAuthUIForMode(mode) {
-                authMode = mode;
-                document.querySelectorAll('#auth-tabs .tab').forEach(tab => {
-                    tab.classList.toggle('active', tab.dataset.tab === mode);
-                });
-                document.getElementById('auth-btn-text').textContent = mode === 'login' ? 'Se connecter' : 'Créer un compte';
-            }
-
-            // ----- ONBOARDING -----
-            function renderOnboardingGrid() {
-                const grid = document.getElementById('onboarding-grid');
-                grid.innerHTML = '';
-                PLATFORMS.forEach(p => {
-                    const div = document.createElement('div');
-                    div.className = `platform-item ${selectedOnboardingPlatforms.has(p.id) ? 'selected' : ''}`;
-                    div.dataset.platform = p.id;
-                    div.innerHTML = `<i class="${p.icon}"></i><span>${p.name}</span>`;
-                    div.addEventListener('click', () => toggleOnboardingPlatform(p.id));
-                    grid.appendChild(div);
-                });
-                renderOnboardingUrlInputs();
-            }
-
-            function toggleOnboardingPlatform(platformId) {
-                if (selectedOnboardingPlatforms.has(platformId)) {
-                    selectedOnboardingPlatforms.delete(platformId);
-                    delete onboardingUrls[platformId];
-                } else {
-                    selectedOnboardingPlatforms.add(platformId);
-                    onboardingUrls[platformId] = '';
-                }
-                document.querySelectorAll('#onboarding-grid .platform-item').forEach(el => {
-                    el.classList.toggle('selected', selectedOnboardingPlatforms.has(el.dataset.platform));
-                });
-                renderOnboardingUrlInputs();
-            }
-
-            function renderOnboardingUrlInputs() {
-                const container = document.getElementById('onboarding-urls');
-                container.innerHTML = '';
-                selectedOnboardingPlatforms.forEach(platformId => {
-                    const platform = PLATFORMS.find(p => p.id === platformId);
-                    if (!platform) return;
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'input-group url-input-animated mt-1';
-                    wrapper.innerHTML = `
-                        <label><i class="${platform.icon}"></i> Lien ${platform.name}</label>
-                        <input type="text" class="input-field onboarding-url-input" data-platform="${platformId}" 
-                               placeholder="https://..." value="${onboardingUrls[platformId] || ''}">
-                    `;
-                    container.appendChild(wrapper);
-                });
-                document.querySelectorAll('.onboarding-url-input').forEach(input => {
-                    input.addEventListener('input', (e) => {
-                        onboardingUrls[e.target.dataset.platform] = e.target.value;
-                    });
-                });
-            }
-
-            // ----- DASHBOARD -----
-            async function populateDashboard() {
-                // userProfile est garanti défini (même en local)
-                if (!userProfile) userProfile = createDefaultProfile();
-
-                document.getElementById('dashboard-name').value = userProfile.displayName || '';
-                document.getElementById('dashboard-bio').value = userProfile.bio || '';
-                const avatarImg = document.getElementById('dashboard-avatar');
-                avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
-                avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
-
-                renderDashboardLinks();
-            }
-
-            function renderDashboardLinks() {
-                const container = document.getElementById('dashboard-links-container');
-                container.innerHTML = '';
-                if (!userProfile || !userProfile.links) {
-                    userProfile.links = [];
-                }
-                userProfile.links.forEach((link, index) => {
-                    const platform = PLATFORMS.find(p => p.id === link.platform);
-                    if (!platform) return;
-                    const div = document.createElement('div');
-                    div.className = 'link-item';
-                    div.innerHTML = `
-                        <i class="${platform.icon} platform-icon" style="color:var(--cyan);"></i>
-                        <input type="text" class="input-field link-url-input" value="${link.url || ''}" placeholder="URL" data-index="${index}">
-                        <div class="toggle-switch ${link.active ? 'active' : ''}" data-index="${index}" data-action="toggle"></div>
-                        <button class="delete-link-btn" data-index="${index}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
-                    `;
-                    container.appendChild(div);
-                });
-
-                // Gestion des événements par délégation
-                container.onclick = (e) => {
-                    const btn = e.target.closest('[data-action]');
-                    if (!btn) return;
-                    const index = parseInt(btn.dataset.index);
-                    if (isNaN(index)) return;
-                    if (btn.dataset.action === 'toggle') {
-                        userProfile.links[index].active = !userProfile.links[index].active;
-                        renderDashboardLinks();
-                    } else if (btn.dataset.action === 'delete') {
-                        userProfile.links.splice(index, 1);
-                        renderDashboardLinks();
-                    }
-                };
-
-                container.oninput = (e) => {
-                    if (e.target.classList.contains('link-url-input')) {
-                        const index = parseInt(e.target.dataset.index);
-                        if (!isNaN(index) && userProfile.links[index]) {
-                            userProfile.links[index].url = e.target.value;
-                        }
-                    }
-                };
-            }
-
-            // ----- WIDGET CLOUDINARY (UNSIGNED) -----
-            function openCloudinaryWidget({ button, onSuccess }) {
-                if (!currentUser) {
-                    showToast('Connectez-vous pour continuer.', 'error');
-                    return;
-                }
-                if (isCloudinaryWidgetOpen) return;
-                isCloudinaryWidgetOpen = true;
-                const originalHTML = button.innerHTML;
-                button.disabled = true;
-                button.innerHTML = '<span class="spinner"></span> Ouverture...';
-
-                // Appel EXACT avec cloudName et uploadPreset, AUCUNE clé API
-                const widget = cloudinary.openUploadWidget(
-                    {
-                        cloudName: CLOUDINARY_CLOUD_NAME,
-                        uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-                        sources: ["local", "url", "camera"],
-                        multiple: false,
-                        cropping: true,
-                        resourceType: "image"
-                    },
-                    (error, result) => {
-                        if (error) {
-                            console.error("Détail erreur Cloudinary:", error);
-                            showToast('Erreur Cloudinary : ' + (error.message || 'inconnue'), 'error');
-                            button.disabled = false;
-                            button.innerHTML = originalHTML;
-                            isCloudinaryWidgetOpen = false;
-                            return;
-                        }
-                        if (result && result.event === "success") {
-                            const imageUrl = result.info.secure_url;
-                            if (imageUrl && onSuccess) {
-                                onSuccess(imageUrl);
-                            }
-                        }
-                        if (result && (result.event === "success" || result.event === "close" || result.event === "abort")) {
-                            button.disabled = false;
-                            button.innerHTML = originalHTML;
-                            isCloudinaryWidgetOpen = false;
-                        }
-                    }
-                );
-
-                // Sécurité fermeture imprévue
-                widget.on('close', () => {
-                    button.disabled = false;
-                    button.innerHTML = originalHTML;
-                    isCloudinaryWidgetOpen = false;
-                });
-            }
-
-            function setupAvatarUpload() {
-                const btn = document.getElementById('btn-change-photo');
-                btn.addEventListener('click', () => {
-                    openCloudinaryWidget({
-                        button: btn,
-                        onSuccess: (url) => {
-                            document.getElementById('dashboard-avatar').src = url;
-                            if (currentUser) {
-                                saveUserProfile(currentUser.uid, { photoURL: url });
-                            }
-                            showToast('Photo de profil mise à jour !', 'info');
-                        }
-                    });
-                });
-            }
-
-            // ----- PROFIL PUBLIC -----
-            async function loadPublicProfile(uid) {
+            async function handleLogin(email, password) {
+                if (!firebaseReady) { showToast('Firebase non configuré', 'error'); return; }
+                setButtonLoading($('#btnLoginSubmit'), $('#btnLoginSpinner'), $('#btnLoginText'), true);
+                clearAuthError();
                 try {
-                    const docRef = db.collection('users').doc(uid);
-                    const doc = await docRef.get();
-                    if (!doc.exists) {
-                        showToast('Profil introuvable.', 'error');
+                    await auth.signInWithEmailAndPassword(email, password);
+                    showToast('Connexion réussie !', 'success');
+                } catch (err) {
+                    let msg = 'Erreur de connexion.';
+                    if (err.code === 'auth/user-not-found') msg = 'Aucun compte trouvé.';
+                    else if (err.code === 'auth/wrong-password') msg = 'Mot de passe incorrect.';
+                    else if (err.code === 'auth/invalid-email') msg = 'Email invalide.';
+                    else if (err.code === 'auth/invalid-credential') msg = 'Identifiants incorrects.';
+                    else msg = err.message;
+                    showAuthError(msg);
+                }
+                setButtonLoading($('#btnLoginSubmit'), $('#btnLoginSpinner'), $('#btnLoginText'), false);
+            }
+
+            async function handleRegister(email, password) {
+                if (!firebaseReady) { showToast('Firebase non configuré', 'error'); return; }
+                if (password.length < 6) { showAuthError('6 caractères minimum.'); return; }
+                setButtonLoading($('#btnRegisterSubmit'), $('#btnRegisterSpinner'), $('#btnRegisterText'), true);
+                clearAuthError();
+                try {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                    showToast('Compte créé ! 🎉', 'success');
+                } catch (err) {
+                    let msg = 'Erreur inscription.';
+                    if (err.code === 'auth/email-already-in-use') msg = 'Email déjà utilisé.';
+                    else if (err.code === 'auth/weak-password') msg = 'Mot de passe trop faible.';
+                    else msg = err.message;
+                    showAuthError(msg);
+                }
+                setButtonLoading($('#btnRegisterSubmit'), $('#btnRegisterSpinner'), $('#btnRegisterText'), false);
+            }
+
+            async function handleGoogleAuth() {
+                if (!firebaseReady) { showToast('Firebase indisponible', 'error'); return; }
+                const provider = new firebase.auth.GoogleAuthProvider();
+                try {
+                    await auth.signInWithPopup(provider);
+                } catch (err) {
+                    if (err.code !== 'auth/popup-closed-by-user') {
+                        showToast('Erreur Google : ' + err.message, 'error');
+                    }
+                }
+            }
+
+            async function handleLogout() {
+                if (!firebaseReady) return;
+                await auth.signOut();
+                currentUser = null;
+                userProfile = null;
+                localLinks = [];
+                showToast('Déconnexion', 'info');
+                navigateToAuth();
+            }
+
+            // ==================== NAVIGATION ====================
+            async function navigateToAuth() {
+                showView(viewAuth);
+                loginEmail.value = '';
+                loginPassword.value = '';
+                registerEmail.value = '';
+                registerPassword.value = '';
+                switchAuthTab('login');
+            }
+
+            async function navigateToOnboarding() {
+                showView(viewOnboarding);
+                selectedOnboardingPlatforms.clear();
+                onboardingBio.value = userProfile?.bio || '';
+                $$('#onboardingPlatforms .platform-chip').forEach(chip => chip.classList.remove('selected'));
+                if (userProfile?.onboardingPlatforms) {
+                    userProfile.onboardingPlatforms.forEach(p => {
+                        selectedOnboardingPlatforms.add(p);
+                        const chip = $(`#onboardingPlatforms .platform-chip[data-platform="${p}"]`);
+                        if (chip) chip.classList.add('selected');
+                    });
+                }
+            }
+
+            async function navigateToDashboard() {
+                if (!currentUser || !firebaseReady) { navigateToAuth(); return; }
+                showLoader();
+                try {
+                    userProfile = await fetchUserProfile(currentUser.uid);
+                    if (!userProfile) {
+                        // Créer profil par défaut
+                        const defaultProfile = {
+                            displayName: currentUser.email ? currentUser.email.split('@')[0] : 'Utilisateur',
+                            bio: '',
+                            photoURL: '',
+                            previewImageURL: '',
+                            onboardingCompleted: false,
+                            onboardingPlatforms: [],
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+                        await saveUserProfile(currentUser.uid, defaultProfile);
+                        userProfile = await fetchUserProfile(currentUser.uid);
+                    }
+                    if (!userProfile.onboardingCompleted) {
+                        hideLoader();
+                        navigateToOnboarding();
                         return;
                     }
-                    const data = doc.data();
-                    document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
-                    document.getElementById('public-bio').textContent = data.bio || '';
-                    const avatar = document.getElementById('public-avatar');
-                    avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
-                    avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
-
-                    const linksContainer = document.getElementById('public-links');
-                    linksContainer.innerHTML = '';
-                    if (data.links && Array.isArray(data.links)) {
-                        data.links.filter(l => l.active).forEach(link => {
-                            const platform = PLATFORMS.find(p => p.id === link.platform);
-                            if (!platform || !link.url) return;
-                            const a = document.createElement('a');
-                            a.href = sanitizeUrl(link.url);
-                            a.target = '_blank';
-                            a.rel = 'noopener noreferrer';
-                            a.className = `social-btn ${platform.colorClass}`;
-                            a.innerHTML = `<i class="${platform.icon}"></i> ${platform.name}`;
-                            linksContainer.appendChild(a);
-                        });
-                    }
+                    // Charger liens
+                    const links = await fetchUserLinks(currentUser.uid);
+                    localLinks = links.map(l => ({ ...l }));
+                    originalLinks = JSON.parse(JSON.stringify(localLinks));
+                    populateDashboard();
+                    showView(viewDashboard);
                 } catch (err) {
-                    showToast('Erreur chargement profil public.', 'error');
+                    console.error(err);
+                    showToast('Erreur chargement dashboard', 'error');
+                    navigateToAuth();
+                }
+                hideLoader();
+            }
+
+            function populateDashboard() {
+                if (!userProfile) return;
+                dashboardDisplayName.value = userProfile.displayName || '';
+                dashboardBio.value = userProfile.bio || '';
+                updateDashboardAvatar(userProfile.photoURL, userProfile.displayName);
+                if (userProfile.previewImageURL) {
+                    previewThumbnail.src = userProfile.previewImageURL;
+                    previewThumbnailContainer.style.display = 'block';
+                } else {
+                    previewThumbnailContainer.style.display = 'none';
+                }
+                renderLinks();
+            }
+
+            function updateDashboardAvatar(photoURL, displayName) {
+                if (photoURL) {
+                    dashboardAvatarImg.src = photoURL;
+                    dashboardAvatarImg.style.display = 'block';
+                    dashboardAvatarPlaceholder.style.display = 'none';
+                } else {
+                    dashboardAvatarImg.style.display = 'none';
+                    dashboardAvatarPlaceholder.style.display = 'flex';
+                    dashboardAvatarPlaceholder.textContent = getInitial(displayName);
                 }
             }
 
-            // ----- DÉTECTION MODE PUBLIC -----
-            function checkPublicNode() {
+            function renderLinks() {
+                linksContainer.innerHTML = '';
+                if (localLinks.length === 0) {
+                    noLinksMsg.style.display = 'block';
+                } else {
+                    noLinksMsg.style.display = 'none';
+                    localLinks.forEach((link, index) => {
+                        const platform = PLATFORMS[link.platform] || PLATFORMS['autre'];
+                        const div = document.createElement('div');
+                        div.className = 'link-item';
+                        div.innerHTML = `
+                            <span class="platform-icon" style="color:${platform.color};"><i class="${platform.icon}"></i></span>
+                            <select class="link-platform-select glass-input" style="width:auto;flex-shrink:0;padding:8px 10px;font-size:0.8rem;" data-index="${index}">
+                                ${Object.entries(PLATFORMS).map(([key, p]) => `<option value="${key}" ${link.platform === key ? 'selected' : ''}>${p.name}</option>`).join('')}
+                            </select>
+                            <input type="url" class="link-url-input" placeholder="https://..." value="${link.url || ''}" data-index="${index}">
+                            <div class="click-badge"><i class="fas fa-eye"></i> ${link.clicks || 0} clic(s)</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="link-toggle" data-index="${index}" ${link.active !== false ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <button class="btn-icon danger link-delete-btn" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
+                        `;
+                        linksContainer.appendChild(div);
+                    });
+                    // Events
+                    $$('.link-platform-select').forEach(sel => sel.addEventListener('change', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        localLinks[idx].platform = e.target.value;
+                    }));
+                    $$('.link-url-input').forEach(inp => inp.addEventListener('input', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        localLinks[idx].url = e.target.value;
+                    }));
+                    $$('.link-toggle').forEach(tog => tog.addEventListener('change', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        localLinks[idx].active = e.target.checked;
+                    }));
+                    $$('.link-delete-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                        const idx = parseInt(e.target.closest('.link-delete-btn').dataset.index);
+                        localLinks.splice(idx, 1);
+                        renderLinks();
+                        showToast('Lien supprimé (enregistrez pour appliquer)', 'info');
+                    }));
+                }
+            }
+
+            async function navigateToPublicProfile(uid) {
+                publicProfileUid = uid;
+                showLoader();
+                try {
+                    const profile = await fetchUserProfile(uid);
+                    if (!profile) {
+                        showView(viewPublicProfile);
+                        publicDisplayName.textContent = 'Profil introuvable';
+                        publicBio.textContent = '';
+                        publicAvatarPlaceholder.style.display = 'flex';
+                        publicAvatarPlaceholder.textContent = '?';
+                        publicAvatarImg.style.display = 'none';
+                        publicLinksContainer.innerHTML = '';
+                        hideLoader();
+                        return;
+                    }
+                    // Avatar
+                    if (profile.photoURL) {
+                        publicAvatarImg.src = profile.photoURL;
+                        publicAvatarImg.style.display = 'block';
+                        publicAvatarPlaceholder.style.display = 'none';
+                    } else {
+                        publicAvatarImg.style.display = 'none';
+                        publicAvatarPlaceholder.style.display = 'flex';
+                        publicAvatarPlaceholder.textContent = getInitial(profile.displayName);
+                    }
+                    publicDisplayName.textContent = profile.displayName || 'Sans nom';
+                    publicBio.textContent = profile.bio || '';
+
+                    // Liens actifs
+                    const links = await fetchUserLinks(uid);
+                    const activeLinks = links.filter(l => l.active !== false);
+                    publicLinksContainer.innerHTML = '';
+                    if (activeLinks.length === 0) {
+                        publicLinksContainer.innerHTML =
+                            '<p style="text-align:center;color:var(--text-muted);">Aucun lien public.</p>';
+                    } else {
+                        activeLinks.forEach(link => {
+                            const platform = PLATFORMS[link.platform] || PLATFORMS['autre'];
+                            const a = document.createElement('a');
+                            a.className = 'public-link-btn';
+                            a.href = link.url || '#';
+                            a.target = '_blank';
+                            a.rel = 'noopener noreferrer';
+                            a.style.background = platform.bgColor;
+                            if (platform.bgColor.startsWith('linear-gradient')) a.style.background = platform
+                                .bgColor;
+                            a.innerHTML = `<i class="${platform.icon}"></i> ${platform.name}`;
+                            a.addEventListener('click', async (e) => {
+                                e.preventDefault();
+                                // Incrémenter le compteur de clics
+                                try {
+                                    await incrementLinkClick(uid, link.id);
+                                } catch (err) {
+                                    console.warn('Erreur incrément clic:', err);
+                                }
+                                window.open(link.url || '#', '_blank', 'noopener,noreferrer');
+                            });
+                            publicLinksContainer.appendChild(a);
+                        });
+                    }
+                    showView(viewPublicProfile);
+                } catch (err) {
+                    console.error(err);
+                    showToast('Erreur chargement profil public', 'error');
+                    publicDisplayName.textContent = 'Erreur';
+                    publicBio.textContent = '';
+                }
+                hideLoader();
+            }
+
+            // ==================== HANDLERS ====================
+            async function finishOnboarding() {
+                if (!currentUser || !firebaseReady) return;
+                setButtonLoading(btnFinishOnboarding, $('#btnFinishOnboardingSpinner'), $('#btnFinishOnboardingText'), true);
+                try {
+                    const platforms = Array.from(selectedOnboardingPlatforms);
+                    const bio = onboardingBio.value.trim();
+                    await saveUserProfile(currentUser.uid, {
+                        onboardingCompleted: true,
+                        onboardingPlatforms: platforms,
+                        bio: bio
+                    });
+                    userProfile = await fetchUserProfile(currentUser.uid);
+                    showToast('Profil configuré !', 'success');
+                    navigateToDashboard();
+                } catch (err) {
+                    showToast('Erreur : ' + err.message, 'error');
+                }
+                setButtonLoading(btnFinishOnboarding, $('#btnFinishOnboardingSpinner'), $('#btnFinishOnboardingText'), false);
+            }
+
+            async function skipOnboarding() {
+                if (!currentUser || !firebaseReady) return;
+                try {
+                    await saveUserProfile(currentUser.uid, { onboardingCompleted: true });
+                    userProfile = await fetchUserProfile(currentUser.uid);
+                    navigateToDashboard();
+                } catch (err) {
+                    navigateToDashboard();
+                }
+            }
+
+            async function saveDashboard() {
+                if (!currentUser || !firebaseReady || isSaving) return;
+                isSaving = true;
+                setButtonLoading(btnSaveDashboard, $('#btnSaveDashboardSpinner'), $('#btnSaveDashboardText'), true);
+                try {
+                    // Sauvegarder infos profil
+                    await saveUserProfile(currentUser.uid, {
+                        displayName: dashboardDisplayName.value.trim() || 'Utilisateur',
+                        bio: dashboardBio.value.trim()
+                    });
+
+                    // Diff liens
+                    const currentIds = localLinks.map(l => l.id).filter(id => id);
+                    const originalIds = originalLinks.map(l => l.id);
+                    const toDelete = originalIds.filter(id => !currentIds.includes(id));
+                    await saveLinksBatch(currentUser.uid, localLinks, toDelete);
+
+                    // Mettre à jour originaux et recharger pour avoir les clics à jour
+                    originalLinks = JSON.parse(JSON.stringify(localLinks));
+                    const updatedLinks = await fetchUserLinks(currentUser.uid);
+                    localLinks = updatedLinks.map(l => ({ ...l }));
+                    renderLinks();
+                    showToast('Tout est sauvegardé ! ✅', 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Erreur de sauvegarde : ' + err.message, 'error');
+                }
+                setButtonLoading(btnSaveDashboard, $('#btnSaveDashboardSpinner'), $('#btnSaveDashboardText'), false);
+                isSaving = false;
+            }
+
+            async function handleAvatarUpload(file) {
+                if (!file || !file.type.startsWith('image/')) { showToast('Image invalide', 'error'); return; }
+                if (file.size > 5 * 1024 * 1024) { showToast('Max 5 Mo', 'error'); return; }
+                showLoader();
+                try {
+                    const url = await uploadToCloudinary(file);
+                    await saveUserProfile(currentUser.uid, { photoURL: url });
+                    userProfile.photoURL = url;
+                    updateDashboardAvatar(url, userProfile.displayName);
+                    showToast('Photo de profil mise à jour 📸', 'success');
+                } catch (err) {
+                    showToast('Erreur upload : ' + err.message, 'error');
+                }
+                hideLoader();
+                avatarFileInput.value = '';
+            }
+
+            async function handlePreviewUpload(file) {
+                if (!file || !file.type.startsWith('image/')) { showToast('Image invalide', 'error'); return; }
+                if (file.size > 5 * 1024 * 1024) { showToast('Max 5 Mo', 'error'); return; }
+                showLoader();
+                try {
+                    const url = await uploadToCloudinary(file);
+                    await saveUserProfile(currentUser.uid, { previewImageURL: url });
+                    userProfile.previewImageURL = url;
+                    previewThumbnail.src = url;
+                    previewThumbnailContainer.style.display = 'block';
+                    showToast('Image d\'aperçu enregistrée 🖼️', 'success');
+                } catch (err) {
+                    showToast('Erreur upload : ' + err.message, 'error');
+                }
+                hideLoader();
+                previewFileInput.value = '';
+            }
+
+            function addLink() {
+                localLinks.push({
+                    id: null, // sera généré par Firestore
+                    platform: 'site',
+                    url: '',
+                    active: true,
+                    clicks: 0
+                });
+                renderLinks();
+                setTimeout(() => {
+                    const last = linksContainer.lastElementChild;
+                    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+                showToast('Nouveau lien ajouté (à enregistrer)', 'info');
+            }
+
+            // ==================== EVENT LISTENERS ====================
+            tabLogin.addEventListener('click', () => switchAuthTab('login'));
+            tabRegister.addEventListener('click', () => switchAuthTab('register'));
+            formLogin.addEventListener('submit', e => { e.preventDefault();
+                handleLogin(loginEmail.value.trim(), loginPassword.value); });
+            formRegister.addEventListener('submit', e => { e.preventDefault();
+                handleRegister(registerEmail.value.trim(), registerPassword.value); });
+            btnGoogleAuth.addEventListener('click', handleGoogleAuth);
+
+            btnFinishOnboarding.addEventListener('click', finishOnboarding);
+            btnSkipOnboarding.addEventListener('click', skipOnboarding);
+            $$('#onboardingPlatforms .platform-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const p = chip.dataset.platform;
+                    if (selectedOnboardingPlatforms.has(p)) {
+                        selectedOnboardingPlatforms.delete(p);
+                        chip.classList.remove('selected');
+                    } else {
+                        selectedOnboardingPlatforms.add(p);
+                        chip.classList.add('selected');
+                    }
+                });
+            });
+
+            btnUploadAvatar.addEventListener('click', () => avatarFileInput.click());
+            avatarFileInput.addEventListener('change', e => {
+                if (e.target.files[0]) handleAvatarUpload(e.target.files[0]);
+            });
+            btnUploadPreview.addEventListener('click', () => previewFileInput.click());
+            previewFileInput.addEventListener('change', e => {
+                if (e.target.files[0]) handlePreviewUpload(e.target.files[0]);
+            });
+            btnAddLink.addEventListener('click', addLink);
+            btnSaveDashboard.addEventListener('click', saveDashboard);
+            btnLogout.addEventListener('click', handleLogout);
+
+            document.addEventListener('keydown', e => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 's' && currentView === viewDashboard) {
+                    e.preventDefault();
+                    saveDashboard();
+                }
+            });
+
+            // ==================== ROUTEUR INITIAL ====================
+            function checkPublicRoute() {
                 const params = new URLSearchParams(window.location.search);
-                const uid = params.get('id');
-                if (uid) {
-                    showView('view-profile-public');
-                    loadPublicProfile(uid);
+                const id = params.get('id');
+                if (id) {
+                    navigateToPublicProfile(id);
                     return true;
                 }
                 return false;
             }
 
-            // ----- ÉCOUTEUR D'ÉTAT D'AUTHENTIFICATION (ultra-robuste) -----
-            auth.onAuthStateChanged(async (user) => {
-                if (authRedirectInProgress) return;  // éviter boucles
-
-                // Priorité absolue à la vue publique
-                if (checkPublicNode()) return;
-
-                currentUser = user;
-                if (user) {
-                    // Appel à handleAuthRedirection qui gère tous les cas sans planter
-                    await handleAuthRedirection(user);
-                } else {
-                    // Déconnecté
-                    userProfile = null;
-                    showView('view-auth');
-                    updateAuthUIForMode('login');
-                }
-            });
-
-            // ----- INITIALISATION AU CHARGEMENT DE LA PAGE -----
-            window.addEventListener('DOMContentLoaded', () => {
-                // Attache les écouteurs de tous les boutons (y compris "+ Ajouter")
-                attachAllEventListeners();
-
-                // Si on est déjà en mode public, pas besoin d'attendre l'auth
-                if (!checkPublicNode()) {
-                    // On affiche la vue auth par défaut (sera modifiée par onAuthStateChanged si déjà connecté)
-                    showView('view-auth');
-                }
-            });
-
-            // ----- ATTACHE DE TOUS LES ÉCOUTEURS (pour que "+ Ajouter" fonctionne) -----
-            function attachAllEventListeners() {
-                // Tabs auth
-                document.getElementById('auth-tabs').addEventListener('click', (e) => {
-                    if (e.target.classList.contains('tab')) updateAuthUIForMode(e.target.dataset.tab);
-                });
-
-                // Formulaire email/password
-                document.getElementById('auth-form').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const email = document.getElementById('auth-email').value.trim();
-                    const password = document.getElementById('auth-password').value;
-                    const submitBtn = document.getElementById('auth-submit-btn');
-                    const spinner = document.getElementById('auth-spinner');
-                    const btnText = document.getElementById('auth-btn-text');
-
-                    submitBtn.disabled = true;
-                    spinner.classList.remove('hidden');
-                    btnText.textContent = '';
-                    authRedirectInProgress = true;
-                    try {
-                        if (authMode === 'login') {
-                            await auth.signInWithEmailAndPassword(email, password);
-                        } else {
-                            await auth.createUserWithEmailAndPassword(email, password);
-                        }
-                        const user = auth.currentUser;
+            if (firebaseReady && auth) {
+                auth.onAuthStateChanged(async (user) => {
+                    if (checkPublicRoute()) {
                         currentUser = user;
-                        await handleAuthRedirection(user);
-                    } catch (error) {
-                        let message = "Échec de l'authentification.";
-                        if (error.code === 'auth/wrong-password') message = 'Mot de passe incorrect.';
-                        else if (error.code === 'auth/user-not-found') message = 'Aucun compte associé.';
-                        else if (error.code === 'auth/email-already-in-use') message = 'Email déjà utilisé.';
-                        else if (error.code === 'auth/weak-password') message = 'Mot de passe trop faible.';
-                        else if (error.code === 'auth/invalid-credential') message = 'Identifiants invalides.';
-                        showToast(message, 'error');
-                    } finally {
-                        authRedirectInProgress = false;
-                        submitBtn.disabled = false;
-                        spinner.classList.add('hidden');
-                        btnText.textContent = authMode === 'login' ? 'Se connecter' : 'Créer un compte';
-                    }
-                });
-
-                // Google Sign-In
-                document.getElementById('google-signin-btn').addEventListener('click', async () => {
-                    const googleBtn = document.getElementById('google-signin-btn');
-                    const googleText = document.getElementById('google-btn-text');
-                    const googleSpinner = document.getElementById('google-spinner');
-
-                    googleBtn.disabled = true;
-                    googleText.textContent = 'Connexion...';
-                    googleSpinner.classList.remove('hidden');
-                    authRedirectInProgress = true;
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    try {
-                        const result = await auth.signInWithPopup(provider);
-                        currentUser = result.user;
-                        await handleAuthRedirection(result.user);
-                    } catch (error) {
-                        let message = 'Connexion Google échouée.';
-                        if (error.code === 'auth/unauthorized-domain') {
-                            message = 'Domaine non autorisé. Ajoutez linkext1.github.io dans la console Firebase.';
-                        } else if (error.message) {
-                            message = error.message;
-                        }
-                        showToast(message, 'error');
-                    } finally {
-                        authRedirectInProgress = false;
-                        googleBtn.disabled = false;
-                        googleText.textContent = 'Continuer avec Google';
-                        googleSpinner.classList.add('hidden');
-                    }
-                });
-
-                // Mot de passe oublié
-                document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    const email = prompt('Entrez votre email :');
-                    if (!email) return;
-                    try {
-                        await auth.sendPasswordResetEmail(email);
-                        showToast('Email de réinitialisation envoyé.', 'info');
-                    } catch (error) {
-                        showToast('Erreur : ' + error.message, 'error');
-                    }
-                });
-
-                // Onboarding : Passer l'étape
-                document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
-                    if (!currentUser) return;
-                    const bio = document.getElementById('onboarding-bio').value.trim();
-                    const links = [];
-                    selectedOnboardingPlatforms.forEach(platformId => {
-                        const url = sanitizeUrl(onboardingUrls[platformId] || '');
-                        if (url) links.push({ platform: platformId, url, active: true });
-                    });
-                    await saveUserProfile(currentUser.uid, {
-                        displayName: currentUser.displayName || (currentUser.email?.split('@')[0] || 'Utilisateur'),
-                        photoURL: currentUser.photoURL || '',
-                        bio,
-                        links,
-                        onboardingCompleted: true
-                    });
-                    showView('view-dashboard');
-                    await populateDashboard();
-                });
-
-                // Onboarding : Finaliser
-                document.getElementById('finish-onboarding-btn').addEventListener('click', async () => {
-                    if (!currentUser) return;
-                    const bio = document.getElementById('onboarding-bio').value.trim();
-                    const links = [];
-                    selectedOnboardingPlatforms.forEach(platformId => {
-                        const url = sanitizeUrl(onboardingUrls[platformId] || '');
-                        if (url) links.push({ platform: platformId, url, active: true });
-                    });
-                    await saveUserProfile(currentUser.uid, {
-                        displayName: currentUser.displayName || (currentUser.email?.split('@')[0] || 'Utilisateur'),
-                        photoURL: currentUser.photoURL || '',
-                        bio,
-                        links,
-                        onboardingCompleted: true
-                    });
-                    showView('view-dashboard');
-                    await populateDashboard();
-                });
-
-                // Dashboard : "+ Ajouter" (fonctionnel même hors ligne)
-                document.getElementById('add-link-btn').addEventListener('click', () => {
-                    if (!userProfile) userProfile = createDefaultProfile();
-                    if (!userProfile.links) userProfile.links = [];
-                    const available = PLATFORMS.filter(p => !userProfile.links.some(l => l.platform === p.id));
-                    if (available.length === 0) {
-                        showToast('Tous les réseaux sont déjà ajoutés.', 'info');
                         return;
                     }
-                    const names = available.map((p, i) => `${i+1}. ${p.name}`).join('\n');
-                    const choice = prompt(`Choisissez un réseau :\n${names}\nNuméro :`);
-                    if (!choice) return;
-                    const idx = parseInt(choice) - 1;
-                    if (idx >= 0 && idx < available.length) {
-                        userProfile.links.push({ platform: available[idx].id, url: '', active: true });
-                        renderDashboardLinks();
+                    currentUser = user;
+                    if (user) {
+                        try {
+                            userProfile = await fetchUserProfile(user.uid);
+                            if (!userProfile) {
+                                const defaultProfile = {
+                                    displayName: user.email ? user.email.split('@')[0] : 'Utilisateur',
+                                    bio: '',
+                                    photoURL: '',
+                                    previewImageURL: '',
+                                    onboardingCompleted: false,
+                                    onboardingPlatforms: [],
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                };
+                                await saveUserProfile(user.uid, defaultProfile);
+                                userProfile = await fetchUserProfile(user.uid);
+                            }
+                            if (!userProfile.onboardingCompleted) {
+                                navigateToOnboarding();
+                            } else {
+                                navigateToDashboard();
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            showToast('Erreur chargement profil', 'error');
+                            navigateToAuth();
+                        }
                     } else {
-                        showToast('Choix invalide.', 'error');
+                        navigateToAuth();
                     }
+                    hideLoader();
                 });
-
-                // Dashboard : Enregistrer
-                document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
-                    if (!currentUser) return;
-                    const name = document.getElementById('dashboard-name').value.trim();
-                    const bio = document.getElementById('dashboard-bio').value.trim();
-                    const links = userProfile.links ? userProfile.links.map(l => ({
-                        platform: l.platform,
-                        url: sanitizeUrl(l.url),
-                        active: l.active
-                    })) : [];
-                    await saveUserProfile(currentUser.uid, {
-                        displayName: name,
-                        bio,
-                        links,
-                        onboardingCompleted: true
-                    });
-                    showToast('Profil enregistré.', 'info');
-                });
-
-                // Dashboard : Copier lien
-                document.getElementById('copy-share-link-btn').addEventListener('click', () => {
-                    if (!currentUser) return;
-                    const shareUrl = `${window.location.origin}${window.location.pathname}?id=${currentUser.uid}`;
-                    navigator.clipboard.writeText(shareUrl).then(() => {
-                        showToast('Lien copié ! 🚀', 'info');
-                    }).catch(() => {
-                        const input = document.createElement('input');
-                        input.value = shareUrl;
-                        document.body.appendChild(input);
-                        input.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(input);
-                        showToast('Lien copié !', 'info');
-                    });
-                });
-
-                // Déconnexion
-                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-
-                // Initialisation de l'upload Cloudinary (avatar)
-                setupAvatarUpload();
+            } else {
+                hideLoader();
+                if (!checkPublicRoute()) {
+                    navigateToAuth();
+                    showToast('Firebase non configuré — mode démo.', 'info');
+                }
             }
+
+            // Démasquer le loader après court délai
+            window.addEventListener('load', () => {
+                setTimeout(() => hideLoader(), 400);
+            });
+            console.log('🚀 LinkExt prêt — Compteur de clics, Cloudinary & Firestore.');
         })();
     </script>
 </body>
