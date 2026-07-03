@@ -19,7 +19,7 @@
     <!-- Widget Cloudinary -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
-        /* ===== STYLES (identiques à avant, avec quelques ajouts) ===== */
+        /* ===== STYLES ===== */
         :root {
             --bg-deep: #0a0b10;
             --bg-card: rgba(10, 11, 16, 0.7);
@@ -34,11 +34,7 @@
             --font-body: 'Inter', sans-serif;
             --transition: 0.3s ease-in-out;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: var(--bg-deep);
             font-family: var(--font-body);
@@ -65,9 +61,7 @@
             gap: 1.8rem;
             animation: fadeSlideIn 0.4s ease-out;
         }
-        .view.active {
-            display: flex;
-        }
+        .view.active { display: flex; }
         @keyframes fadeSlideIn {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
@@ -125,9 +119,7 @@
             box-shadow: 0 0 12px rgba(0,242,254,0.3);
             background: rgba(255,255,255,0.08);
         }
-        .input-field::placeholder {
-            color: rgba(255,255,255,0.35);
-        }
+        .input-field::placeholder { color: rgba(255,255,255,0.35); }
         .btn {
             background: linear-gradient(135deg, var(--cyan), var(--violet));
             border: none;
@@ -176,10 +168,7 @@
             background: #f0f0f0;
             box-shadow: 0 8px 20px rgba(255,255,255,0.2);
         }
-        .btn-google img {
-            width: 20px;
-            height: 20px;
-        }
+        .btn-google img { width: 20px; height: 20px; }
         .tabs {
             display: flex;
             gap: 0;
@@ -223,10 +212,7 @@
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
-        .platform-item i {
-            font-size: 1.8rem;
-            transition: var(--transition);
-        }
+        .platform-item i { font-size: 1.8rem; transition: var(--transition); }
         .platform-item.selected {
             border-color: var(--cyan);
             box-shadow: 0 0 20px rgba(0,242,254,0.5);
@@ -234,9 +220,7 @@
             color: white;
             transform: scale(1.02);
         }
-        .platform-item.selected i {
-            color: var(--cyan);
-        }
+        .platform-item.selected i { color: var(--cyan); }
         .url-input-animated {
             animation: slideDown 0.3s ease-out;
             overflow: hidden;
@@ -279,15 +263,8 @@
             flex-wrap: wrap;
             transition: var(--transition);
         }
-        .link-item .platform-icon {
-            font-size: 1.6rem;
-            width: 2rem;
-            text-align: center;
-        }
-        .link-item input {
-            flex: 1;
-            min-width: 150px;
-        }
+        .link-item .platform-icon { font-size: 1.6rem; width: 2rem; text-align: center; }
+        .link-item input { flex: 1; min-width: 150px; }
         .toggle-switch {
             position: relative;
             width: 48px;
@@ -312,9 +289,7 @@
             border-radius: 50%;
             transition: var(--transition);
         }
-        .toggle-switch.active::after {
-            left: 25px;
-        }
+        .toggle-switch.active::after { left: 25px; }
         .delete-link-btn {
             background: transparent;
             border: none;
@@ -323,10 +298,7 @@
             font-size: 1.2rem;
             transition: var(--transition);
         }
-        .delete-link-btn:hover {
-            color: #ff2040;
-            transform: scale(1.1);
-        }
+        .delete-link-btn:hover { color: #ff2040; transform: scale(1.1); }
         .public-avatar {
             width: 110px;
             height: 110px;
@@ -422,9 +394,7 @@
             display: block;
             transition: transform 0.3s ease;
         }
-        .share-banner-link:hover img {
-            transform: scale(1.02);
-        }
+        .share-banner-link:hover img { transform: scale(1.02); }
         .share-banner-placeholder {
             background: linear-gradient(135deg, rgba(0,242,254,0.15), rgba(79,172,254,0.15));
             height: 120px;
@@ -439,7 +409,6 @@
             border-radius: 16px 16px 0 0;
         }
 
-        /* Description sous la bannière */
         .public-bio-under-banner {
             color: var(--text-secondary);
             font-size: 0.95rem;
@@ -449,7 +418,6 @@
             font-style: italic;
         }
 
-        /* Compteur de vues dans le dashboard */
         .views-counter {
             display: inline-flex;
             align-items: center;
@@ -461,9 +429,7 @@
             font-size: 0.9rem;
             color: var(--cyan);
         }
-        .views-counter i {
-            font-size: 1rem;
-        }
+        .views-counter i { font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -530,7 +496,6 @@
                 <button class="btn btn-outline" id="logout-btn" style="padding:0.5rem 1rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
-            <!-- Affichage du compteur de vues -->
             <div style="display:flex; justify-content: flex-end; margin-top: 0.5rem;">
                 <span class="views-counter"><i class="fas fa-eye"></i> <span id="views-count-display">0</span> vues</span>
             </div>
@@ -547,7 +512,6 @@
                 </div>
             </div>
 
-            <!-- Bouton pour changer la photo de profil (Cloudinary) -->
             <div class="input-group mt-2">
                 <label>Photo de profil</label>
                 <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center;">
@@ -575,11 +539,11 @@
                 </div>
             </div>
 
-            <!-- Nouveau champ : Lien de clic sur la bannière -->
+            <!-- Champ Lien de clic sur la bannière (personnalisé) -->
             <div class="input-group mt-2">
-                <label><i class="fas fa-link"></i> Lien de clic sur la bannière</label>
+                <label><i class="fas fa-link"></i> Lien de clic sur la bannière (personnalisé)</label>
                 <input type="url" class="input-field" id="dashboard-banner-link" placeholder="https://..." value="">
-                <p style="color:var(--text-secondary); font-size:0.7rem;">Laissez vide pour utiliser votre lien de partage.</p>
+                <p style="color:var(--text-secondary); font-size:0.7rem;">Laissez vide pour utiliser automatiquement le premier lien social actif.</p>
             </div>
 
             <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
@@ -602,7 +566,7 @@
             <!-- Avatar et nom -->
             <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
             <h2 id="public-name" style="font-family:var(--font-heading); margin-top:1rem;"></h2>
-            <!-- Les liens sociaux -->
+            <!-- Liens sociaux -->
             <div id="public-links" class="mt-2" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
         </div>
         <p class="text-center" style="font-size:0.8rem; color:var(--text-secondary);">Propulsé par LinkExt</p>
@@ -633,7 +597,7 @@
         const db = firebase.firestore();
 
         // --- Configuration Cloudinary (UNSIGNED) ---
-        const CLOUDINARY_CLOUD_NAME = "bwexb1sj";  // ✅ corrigé
+        const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
         const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
 
         // --- Plateformes ---
@@ -727,7 +691,6 @@
             }
         }
 
-        // --- Incrémenter le compteur de vues ---
         async function incrementViews(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -736,7 +699,6 @@
                 });
             } catch (error) {
                 console.warn('Impossible d\'incrémenter les vues :', error);
-                // Non bloquant
             }
         }
 
@@ -785,7 +747,7 @@
             document.getElementById('auth-btn-text').textContent = mode === 'login' ? 'Se connecter' : 'Créer un compte';
         }
 
-        // --- Onboarding --- (inchangé)
+        // --- Onboarding ---
         function renderOnboardingGrid() {
             const grid = document.getElementById('onboarding-grid');
             grid.innerHTML = '';
@@ -854,8 +816,6 @@
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
             document.getElementById('dashboard-banner-link').value = userProfile.bannerLink || '';
-
-            // Compteur de vues
             document.getElementById('views-count-display').textContent = userProfile.views || 0;
 
             const avatarImg = document.getElementById('dashboard-avatar');
@@ -915,7 +875,7 @@
             };
         }
 
-        // --- Cloudinary Widget (identique, avec signature: false) ---
+        // --- Cloudinary Widget ---
         function openCloudinaryWidget({ button, onSuccess }) {
             if (!currentUser) {
                 showToast('Connectez-vous pour continuer.', 'error');
@@ -1012,7 +972,7 @@
             });
         }
 
-        // --- Profil public (avec bannière cliquable, bio sous la bannière, compteur) ---
+        // --- Profil public (avec bannière redirigeant vers le premier lien social actif) ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1023,25 +983,49 @@
                 }
                 const data = doc.data();
 
-                // Incrémenter le compteur de vues (non bloquant)
+                // Incrémenter les vues
                 incrementViews(uid).catch(() => {});
 
                 // Bannière cliquable
                 const bannerContainer = document.getElementById('public-banner-container');
                 bannerContainer.innerHTML = '';
+
+                // Déterminer l'URL de destination pour la bannière
+                let bannerTargetUrl = null;
+                if (data.bannerLink && data.bannerLink.trim() !== '') {
+                    bannerTargetUrl = sanitizeUrl(data.bannerLink);
+                } else {
+                    // Chercher le premier lien actif
+                    if (data.links && Array.isArray(data.links)) {
+                        const activeLink = data.links.find(l => l.active && l.url && l.url.trim() !== '');
+                        if (activeLink) {
+                            bannerTargetUrl = sanitizeUrl(activeLink.url);
+                        }
+                    }
+                }
+
                 if (data.sharePreviewURL) {
-                    const link = document.createElement('a');
-                    link.className = 'share-banner-link';
-                    // Utiliser le lien personnalisé ou le lien de partage par défaut
-                    const targetUrl = data.bannerLink ? sanitizeUrl(data.bannerLink) : (window.location.origin + window.location.pathname + '?id=' + uid);
-                    link.href = targetUrl;
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    const img = document.createElement('img');
-                    img.src = data.sharePreviewURL;
-                    img.alt = 'Bannière de profil';
-                    link.appendChild(img);
-                    bannerContainer.appendChild(link);
+                    if (bannerTargetUrl) {
+                        const link = document.createElement('a');
+                        link.className = 'share-banner-link';
+                        link.href = bannerTargetUrl;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        const img = document.createElement('img');
+                        img.src = data.sharePreviewURL;
+                        img.alt = 'Bannière de profil';
+                        link.appendChild(img);
+                        bannerContainer.appendChild(link);
+                    } else {
+                        // Image seule (non cliquable)
+                        const div = document.createElement('div');
+                        div.className = 'share-banner-link';
+                        const img = document.createElement('img');
+                        img.src = data.sharePreviewURL;
+                        img.alt = 'Bannière de profil';
+                        div.appendChild(img);
+                        bannerContainer.appendChild(div);
+                    }
                 } else {
                     const placeholder = document.createElement('div');
                     placeholder.className = 'share-banner-placeholder';
@@ -1050,8 +1034,7 @@
                 }
 
                 // Bio sous la bannière
-                const bioUnderBanner = document.getElementById('public-bio-under-banner');
-                bioUnderBanner.textContent = data.bio || '';
+                document.getElementById('public-bio-under-banner').textContent = data.bio || '';
 
                 // Avatar et nom
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
@@ -1275,7 +1258,6 @@
                 });
                 if (saved) {
                     showToast('Profil enregistré !', 'info');
-                    // Rafraîchir l'affichage du compteur
                     document.getElementById('views-count-display').textContent = userProfile.views || 0;
                 }
             });
@@ -1336,4 +1318,4 @@
     })();
 </script>
 </body>
-</html>
+</html>bwexb1sj
