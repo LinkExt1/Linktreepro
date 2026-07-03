@@ -147,6 +147,9 @@
             background: rgba(0,102,204,0.1);
             color: var(--text-primary);
         }
+        body.light-mode .section-item {
+            border-color: var(--border-glow);
+        }
 
         /* ===== STYLES GÉNÉRAUX ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -418,27 +421,27 @@
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 14px;
-            padding: 1rem;
+            padding: 0.8rem 1rem;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
             transition: var(--transition);
         }
-        .link-item .platform-icon { font-size: 1.6rem; width: 2rem; text-align: center; }
-        .link-item input { flex: 1; min-width: 150px; }
+        .link-item .platform-icon { font-size: 1.4rem; width: 1.8rem; text-align: center; }
+        .link-item input { flex: 1; min-width: 120px; font-size: 0.85rem; padding: 0.5rem 0.7rem; }
         .link-item .order-controls {
             display: flex;
             flex-direction: column;
-            gap: 0.2rem;
+            gap: 0.1rem;
         }
         .link-item .order-controls button {
             background: transparent;
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            padding: 0 0.2rem;
-            font-size: 0.8rem;
+            padding: 0 0.1rem;
+            font-size: 0.7rem;
             transition: var(--transition);
         }
         .link-item .order-controls button:hover {
@@ -447,10 +450,25 @@
         body.light-mode .link-item .order-controls button:hover {
             color: #0066cc;
         }
+        .link-item .reset-clicks-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            padding: 0 0.2rem;
+        }
+        .link-item .reset-clicks-btn:hover {
+            color: var(--cyan);
+        }
+        body.light-mode .link-item .reset-clicks-btn:hover {
+            color: #0066cc;
+        }
         .toggle-switch {
             position: relative;
-            width: 48px;
-            height: 26px;
+            width: 40px;
+            height: 22px;
             background: rgba(255,255,255,0.15);
             border-radius: 30px;
             cursor: pointer;
@@ -470,37 +488,37 @@
         .toggle-switch::after {
             content: '';
             position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
             background: white;
             border-radius: 50%;
             transition: var(--transition);
         }
-        .toggle-switch.active::after { left: 25px; }
+        .toggle-switch.active::after { left: 20px; }
         .delete-link-btn {
             background: transparent;
             border: none;
             color: var(--danger);
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1rem;
             transition: var(--transition);
         }
         .delete-link-btn:hover { color: #ff2040; transform: scale(1.1); }
         .section-item {
             background: transparent;
             border: none;
-            padding: 0.8rem 0.5rem;
+            border-bottom: 1px solid var(--border-glow);
+            padding: 0.6rem 0.5rem;
             display: flex;
             align-items: center;
             gap: 0.8rem;
             color: var(--text-secondary);
             font-family: var(--font-heading);
-            font-size: 1rem;
+            font-size: 0.9rem;
             letter-spacing: 1px;
-            border-bottom: 1px solid var(--border-glow);
-            margin: 0.5rem 0 0.5rem 0;
+            margin: 0.3rem 0;
         }
         .section-item .section-actions {
             margin-left: auto;
@@ -512,7 +530,7 @@
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             transition: var(--transition);
         }
         .section-item .section-actions button:hover {
@@ -647,8 +665,8 @@
             gap: 1rem;
         }
         .maintenance-toggle .toggle-track {
-            width: 50px;
-            height: 28px;
+            width: 44px;
+            height: 24px;
             background: rgba(255,255,255,0.15);
             border-radius: 30px;
             cursor: pointer;
@@ -664,18 +682,61 @@
         .maintenance-toggle .toggle-track::after {
             content: '';
             position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 22px;
-            height: 22px;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
             background: white;
             border-radius: 50%;
             transition: var(--transition);
         }
         .maintenance-toggle .toggle-track.active::after {
-            left: 25px;
+            left: 22px;
         }
-        /* Compteur de vues */
+        /* Theme toggle privé */
+        .theme-toggle-private {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .theme-toggle-private .toggle-track {
+            width: 44px;
+            height: 24px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        body.light-mode .theme-toggle-private .toggle-track {
+            background: rgba(0,0,0,0.15);
+        }
+        .theme-toggle-private .toggle-track.active {
+            background: var(--cyan);
+        }
+        body.light-mode .theme-toggle-private .toggle-track.active {
+            background: #0066cc;
+        }
+        .theme-toggle-private .toggle-track::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .theme-toggle-private .toggle-track.active::after {
+            left: 22px;
+        }
+        .theme-toggle-private i {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Compteur de vues global */
         .views-counter {
             display: inline-flex;
             align-items: center;
@@ -885,7 +946,6 @@
         }
 
         /* ===== PROFIL PUBLIC ===== */
-        /* Suppression totale des marges/paddings superflus */
         #view-profile-public .glass-card {
             padding: 0 0 1.2rem 0;
             overflow: visible;
@@ -971,7 +1031,6 @@
             padding: 0.1rem 0.8rem;
         }
 
-        /* Séparateur public - plus compact */
         .public-links-divider {
             width: 60%;
             height: 1px;
@@ -980,7 +1039,6 @@
             opacity: 0.3;
         }
 
-        /* Conteneur principal des liens - sans marges */
         #public-links {
             padding: 0 1rem 0 1rem;
             margin: 0;
@@ -1079,7 +1137,7 @@
             opacity: 0.8;
         }
 
-        /* ===== ANIMATION BORDER-GLOW-PULSE (pour les liens vedettes) ===== */
+        /* Animation border-glow-pulse pour les liens vedettes */
         .border-glow-pulse {
             border: 2px solid var(--cyan) !important;
             animation: glowPulse 2.5s ease-in-out infinite;
@@ -1101,7 +1159,7 @@
             100% { box-shadow: 0 0 5px rgba(0,102,204,0.3), inset 0 0 5px rgba(0,102,204,0.1); }
         }
 
-        /* Badge "En évidence" pour les cartes vedettes (optionnel) */
+        /* Badge En évidence */
         .card-highlight .highlight-badge {
             position: absolute;
             top: 6px;
@@ -1129,7 +1187,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Sections publiques (titres séparateurs) */
         .public-section-title {
             font-family: var(--font-heading);
             font-size: 0.9rem;
@@ -1161,7 +1218,6 @@
             color: var(--text-secondary);
         }
 
-        /* Interrupteur de thème public */
         .theme-toggle {
             background: transparent;
             border: none;
@@ -1181,7 +1237,7 @@
             color: #0066cc;
         }
 
-        /* Top réseaux (classement) dans le Dashboard */
+        /* Top réseaux */
         .top-networks {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -1267,11 +1323,18 @@
                 font-size: 1.8rem;
             }
             .link-item input {
-                min-width: 100px;
-                font-size: 0.85rem;
+                min-width: 80px;
+                font-size: 0.8rem;
+                padding: 0.4rem 0.5rem;
             }
             .link-item .order-controls button {
+                font-size: 0.6rem;
+            }
+            .link-item .reset-clicks-btn {
                 font-size: 0.7rem;
+            }
+            .glass-card {
+                padding: 1.5rem 1rem;
             }
         }
     </style>
@@ -1341,8 +1404,8 @@
                 <button class="btn btn-outline" id="logout-btn" style="padding:0.5rem 1rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
-            <!-- Statut Flash & Maintenance -->
-            <div class="mt-2 flex-between">
+            <!-- Bloc Statut Flash + Maintenance + Theme -->
+            <div class="mt-2" style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center;">
                 <div>
                     <label style="font-size:0.8rem; color:var(--text-secondary);">Statut Flash</label>
                     <div class="status-selector" id="status-selector">
@@ -1351,17 +1414,24 @@
                         <span class="status-option" data-value="enlive"><span class="dot"></span> En Live</span>
                     </div>
                 </div>
-                <div class="maintenance-toggle">
-                    <span style="font-size:0.8rem; color:var(--text-secondary);">Mode Maintenance</span>
-                    <div class="toggle-track" id="maintenance-toggle"></div>
+                <div style="display:flex; gap:0.8rem; flex-wrap:wrap;">
+                    <div class="maintenance-toggle">
+                        <span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span>
+                        <div class="toggle-track" id="maintenance-toggle"></div>
+                    </div>
+                    <div class="theme-toggle-private">
+                        <i class="fas fa-sun" id="theme-private-icon"></i>
+                        <div class="toggle-track" id="theme-toggle-private"></div>
+                        <i class="fas fa-moon" id="theme-private-icon-moon"></i>
+                    </div>
                 </div>
             </div>
 
-            <!-- Compteur vues et réinitialisation -->
+            <!-- Compteur vues global et réinitialisation -->
             <div class="flex-between" style="margin-top:0.5rem;">
                 <span class="views-counter"><i class="fas fa-eye"></i> <span id="views-count-display">0</span> vues</span>
-                <button class="btn btn-outline" id="reset-clicks-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
-                    <i class="fas fa-redo"></i> Réinitialiser les stats
+                <button class="btn btn-outline" id="reset-views-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                    <i class="fas fa-redo"></i> Réinitialiser les vues
                 </button>
             </div>
 
@@ -1413,7 +1483,7 @@
         </div>
     </div>
 
-    <!-- ========== VUE AJOUTER UN LIEN (avec planification) ========== -->
+    <!-- ========== VUE AJOUTER UN LIEN ========== -->
     <div id="view-add-link" class="view">
         <div class="glass-card">
             <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
@@ -1423,7 +1493,6 @@
             <div class="networks-grid" id="add-link-grid"></div>
             <div class="link-input-container" id="link-input-container">
                 <input type="url" id="new-link-url" placeholder="Entrez votre lien..." autocomplete="off">
-                <!-- Planification -->
                 <div class="datetime-group">
                     <div style="flex:1; min-width:120px;">
                         <label>Début (optionnel)</label>
@@ -1434,10 +1503,9 @@
                         <input type="datetime-local" id="new-link-end">
                     </div>
                 </div>
-                <!-- Upload image optionnel -->
                 <div class="upload-row">
                     <button class="btn btn-outline" id="btn-upload-link-image" style="padding:0.4rem 1rem; font-size:0.85rem;">
-                        <i class="fas fa-image"></i> Ajouter une image d'illustration (Optionnel)
+                        <i class="fas fa-image"></i> Ajouter une image (Optionnel)
                     </button>
                     <img id="link-image-preview" class="image-preview hidden" src="" alt="aperçu">
                 </div>
@@ -1449,7 +1517,6 @@
     <!-- ========== VUE PROFIL PUBLIC ========== -->
     <div id="view-profile-public" class="view">
         <div class="glass-card" style="text-align:center; padding-top:0;">
-            <!-- En-tête compact -->
             <div class="public-header">
                 <div class="public-header-top">
                     <div class="avatar-glow-ring">
@@ -1472,7 +1539,6 @@
 
             <div class="public-links-divider"></div>
 
-            <!-- Liste des cartes Rich Link -->
             <div id="public-links"></div>
         </div>
         <p class="text-center" style="font-size:0.7rem; color:var(--text-secondary); padding:0.4rem 0;">Propulsé par LinkExt</p>
@@ -1596,9 +1662,9 @@
                             if (!l.title) l.title = '';
                             return l;
                         });
-                        // Trier par order
                         userProfile.links.sort((a, b) => (a.order || 0) - (b.order || 0));
                     }
+                    if (typeof userProfile.views !== 'number') userProfile.views = 0;
                     return userProfile;
                 } else {
                     userProfile = null;
@@ -1626,18 +1692,22 @@
             }
         }
 
-        // --- Incrémentation vues ---
+        // --- Incrémentation des vues globales (page publique) ---
         async function incrementViews(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
                 await docRef.update({
                     views: firebase.firestore.FieldValue.increment(1)
                 });
+                if (userProfile && userProfile._id === uid) {
+                    userProfile.views = (userProfile.views || 0) + 1;
+                }
             } catch (error) {
                 console.warn('Impossible d\'incrémenter les vues :', error);
             }
         }
 
+        // --- Incrémenter les clics d'un lien spécifique ---
         async function incrementLinkClick(uid, linkId) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1657,6 +1727,66 @@
                 }
             } catch (error) {
                 console.warn('Impossible d\'incrémenter le clic :', error);
+            }
+        }
+
+        // --- Réinitialiser les vues globales ---
+        async function resetViews() {
+            if (!currentUser) {
+                showToast('Vous devez être connecté.', 'error');
+                return;
+            }
+            if (!userProfile) {
+                showToast('Profil non chargé.', 'error');
+                return;
+            }
+            try {
+                const docRef = db.collection('users').doc(currentUser.uid);
+                await docRef.update({ views: 0 });
+                userProfile.views = 0;
+                document.getElementById('views-count-display').textContent = '0';
+                showToast('Vues globales réinitialisées !', 'info');
+            } catch (error) {
+                console.error('Erreur lors de la réinitialisation :', error);
+                showToast('Erreur lors de la réinitialisation.', 'error');
+            }
+        }
+
+        // --- Réinitialiser les clics d'un lien individuel ---
+        async function resetLinkClicks(linkId) {
+            if (!currentUser) {
+                showToast('Vous devez être connecté.', 'error');
+                return;
+            }
+            if (!userProfile || !userProfile.links) {
+                showToast('Profil non chargé.', 'error');
+                return;
+            }
+            const linkIndex = userProfile.links.findIndex(l => l.id === linkId);
+            if (linkIndex === -1) {
+                showToast('Lien introuvable.', 'error');
+                return;
+            }
+            if (userProfile.links[linkIndex].isSection) {
+                showToast('Une section ne peut pas avoir de clics.', 'info');
+                return;
+            }
+            try {
+                const updatedLinks = userProfile.links.map(l => {
+                    if (l.id === linkId) {
+                        return { ...l, clicks: 0 };
+                    }
+                    return l;
+                });
+                const docRef = db.collection('users').doc(currentUser.uid);
+                await docRef.update({ links: updatedLinks });
+                userProfile.links = updatedLinks;
+                renderDashboardLinks();
+                renderTopNetworks();
+                showToast('Clics du lien réinitialisés !', 'info');
+            } catch (error) {
+                console.error('Erreur lors de la réinitialisation du lien :', error);
+                showToast('Erreur lors de la réinitialisation.', 'error');
             }
         }
 
@@ -1787,6 +1917,7 @@
 
             updateStatusUI(userProfile.status || 'disponible');
             updateMaintenanceUI(userProfile.maintenance || false);
+            applyThemeToPrivateUI(); // Applique le thème sauvegardé dans le Dashboard
             renderDashboardLinks();
             renderTopNetworks();
         }
@@ -1797,7 +1928,6 @@
                 container.innerHTML = '';
                 return;
             }
-            // Filtrer les liens (pas les sections) et trier par clics décroissant
             const linkItems = userProfile.links.filter(l => !l.isSection && l.active);
             const sorted = [...linkItems].sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
             const top3 = sorted.slice(0, 3);
@@ -1835,7 +1965,6 @@
                 const isSection = item.isSection === true;
 
                 if (isSection) {
-                    // Section - titre séparateur
                     const div = document.createElement('div');
                     div.className = 'section-item';
                     div.innerHTML = `
@@ -1851,7 +1980,6 @@
                     `;
                     container.appendChild(div);
                 } else {
-                    // Lien standard
                     const platform = PLATFORMS.find(p => p.id === item.platform);
                     if (!platform) return;
                     const isFeatured = (userProfile.featuredLink === item.id);
@@ -1864,7 +1992,7 @@
                         <input type="text" class="input-field link-url-input" value="${item.url || ''}" placeholder="URL" data-id="${item.id}">
                         <div class="toggle-switch ${item.active ? 'active' : ''}" data-id="${item.id}" data-action="toggle"></div>
                         <button class="delete-link-btn" data-id="${item.id}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
-                        <button class="btn btn-outline feature-btn" data-id="${item.id}" style="padding:0.2rem 0.5rem; font-size:0.8rem;">
+                        <button class="btn btn-outline feature-btn" data-id="${item.id}" style="padding:0.2rem 0.4rem; font-size:0.7rem;">
                             ${isFeatured ? '<i class="fas fa-thumbtack" style="color:var(--cyan);"></i>' : '<i class="fas fa-thumbtack"></i>'}
                         </button>
                         <div class="order-controls">
@@ -1872,6 +2000,7 @@
                             ${index < total - 1 ? `<button data-id="${item.id}" data-dir="down"><i class="fas fa-chevron-down"></i></button>` : ''}
                         </div>
                         <span style="font-size:0.7rem; color:var(--text-secondary);">${clicks} clics</span>
+                        <button class="reset-clicks-btn" data-id="${item.id}" title="Réinitialiser les clics de ce lien"><i class="fas fa-sync-alt"></i></button>
                         ${item.startDate ? `<span style="font-size:0.6rem; color:var(--text-secondary);"><i class="fas fa-calendar-alt"></i></span>` : ''}
                     `;
                     container.appendChild(div);
@@ -1880,7 +2009,7 @@
 
             // Gestion des événements
             container.onclick = (e) => {
-                // Actions pour les liens (toggle, delete, feature, ordre)
+                // Actions pour les liens
                 const btn = e.target.closest('[data-action]');
                 if (btn) {
                     const id = btn.dataset.id;
@@ -1893,10 +2022,13 @@
                             renderTopNetworks();
                         }
                     } else if (btn.dataset.action === 'delete') {
-                        userProfile.links = userProfile.links.filter(l => l.id !== id);
-                        if (userProfile.featuredLink === id) userProfile.featuredLink = null;
-                        renderDashboardLinks();
-                        renderTopNetworks();
+                        if (confirm('Supprimer ce lien ?')) {
+                            userProfile.links = userProfile.links.filter(l => l.id !== id);
+                            if (userProfile.featuredLink === id) userProfile.featuredLink = null;
+                            renderDashboardLinks();
+                            renderTopNetworks();
+                            saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                        }
                     }
                     return;
                 }
@@ -1913,6 +2045,7 @@
                         userProfile.featuredLink = id;
                     }
                     renderDashboardLinks();
+                    saveUserProfile(currentUser.uid, { featuredLink: userProfile.featuredLink }).catch(() => {});
                     return;
                 }
                 // Ordre
@@ -1935,6 +2068,13 @@
                     renderDashboardLinks();
                     renderTopNetworks();
                     saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                }
+                // Réinitialisation individuelle des clics
+                const resetBtn = e.target.closest('.reset-clicks-btn');
+                if (resetBtn) {
+                    const id = resetBtn.dataset.id;
+                    if (id) resetLinkClicks(id);
+                    return;
                 }
                 // Édition de section
                 const editSection = e.target.closest('[data-action="edit-section"]');
@@ -1974,7 +2114,6 @@
             };
         }
 
-        // --- Ajout d'une section ---
         function addSection() {
             if (!currentUser) {
                 showToast('Connectez-vous pour ajouter une section.', 'error');
@@ -2073,7 +2212,6 @@
             });
         }
 
-        // --- Upload photo de profil ---
         function setupAvatarUpload() {
             const btn = document.getElementById('btn-change-photo');
             btn.addEventListener('click', () => {
@@ -2088,7 +2226,6 @@
             });
         }
 
-        // --- Upload image de lien ---
         function setupLinkImageUpload() {
             const btn = document.getElementById('btn-upload-link-image');
             const preview = document.getElementById('link-image-preview');
@@ -2108,47 +2245,6 @@
                     }
                 });
             });
-        }
-
-        // --- Réinitialisation des stats ---
-        async function resetAllStats() {
-            if (!currentUser) {
-                showToast('Vous devez être connecté.', 'error');
-                return;
-            }
-            if (!userProfile) {
-                showToast('Profil non chargé.', 'error');
-                return;
-            }
-            if (!userProfile.links || userProfile.links.length === 0) {
-                try {
-                    const docRef = db.collection('users').doc(currentUser.uid);
-                    await docRef.update({ views: 0 });
-                    userProfile.views = 0;
-                    document.getElementById('views-count-display').textContent = '0';
-                    showToast('Vues réinitialisées !', 'info');
-                } catch (e) {
-                    showToast('Erreur lors de la réinitialisation.', 'error');
-                }
-                return;
-            }
-
-            if (!confirm('Voulez-vous vraiment remettre tous les compteurs de clics et les vues à zéro ?')) return;
-
-            try {
-                const resetLinks = userProfile.links.map(link => ({ ...link, clicks: 0 }));
-                const docRef = db.collection('users').doc(currentUser.uid);
-                await docRef.update({ links: resetLinks, views: 0 });
-                userProfile.links = resetLinks;
-                userProfile.views = 0;
-                renderDashboardLinks();
-                renderTopNetworks();
-                document.getElementById('views-count-display').textContent = '0';
-                showToast('Compteurs réinitialisés !', 'info');
-            } catch (error) {
-                console.error('Erreur lors de la réinitialisation :', error);
-                showToast('Erreur lors de la réinitialisation.', 'error');
-            }
         }
 
         // --- Vue Ajout de lien ---
@@ -2241,28 +2337,53 @@
             }
         }
 
-        // --- Gestion du thème ---
+        // --- Gestion du thème (public et privé) ---
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            const icon = document.querySelector('#theme-toggle-btn i');
-            if (icon) {
-                icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-            }
+            updateThemeIcons();
+            applyThemeToPrivateUI();
         }
 
         function applySavedTheme() {
             const saved = localStorage.getItem('theme');
             if (saved === 'light') {
                 document.body.classList.add('light-mode');
-                const icon = document.querySelector('#theme-toggle-btn i');
-                if (icon) icon.className = 'fas fa-sun';
             } else {
                 document.body.classList.remove('light-mode');
-                const icon = document.querySelector('#theme-toggle-btn i');
-                if (icon) icon.className = 'fas fa-moon';
             }
+            updateThemeIcons();
+            applyThemeToPrivateUI();
+        }
+
+        function updateThemeIcons() {
+            const isLight = document.body.classList.contains('light-mode');
+            const iconPublic = document.querySelector('#theme-toggle-btn i');
+            if (iconPublic) {
+                iconPublic.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            }
+            // Icônes privées (soleil/lune)
+            const sunIcon = document.getElementById('theme-private-icon');
+            const moonIcon = document.getElementById('theme-private-icon-moon');
+            if (sunIcon && moonIcon) {
+                sunIcon.style.color = isLight ? 'var(--cyan)' : 'var(--text-secondary)';
+                moonIcon.style.color = isLight ? 'var(--text-secondary)' : 'var(--cyan)';
+            }
+            // Toggle track privé
+            const track = document.getElementById('theme-toggle-private');
+            if (track) {
+                track.classList.toggle('active', isLight);
+            }
+        }
+
+        function applyThemeToPrivateUI() {
+            const isLight = document.body.classList.contains('light-mode');
+            const track = document.getElementById('theme-toggle-private');
+            if (track) {
+                track.classList.toggle('active', isLight);
+            }
+            updateThemeIcons();
         }
 
         // --- Profil Public ---
@@ -2276,6 +2397,7 @@
                 }
                 const data = doc.data();
 
+                // Incrémenter les vues globales
                 incrementViews(uid).catch(() => {});
 
                 if (data.maintenance === true) {
@@ -2308,16 +2430,14 @@
                 statusBadge.className = `status-badge ${st.class}`;
                 statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
 
-                // Appliquer le thème sauvegardé
                 applySavedTheme();
 
-                // Cartes Rich Link + Sections
+                // Cartes
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
                 if (data.links && Array.isArray(data.links)) {
                     const now = new Date();
-                    // Filtrer les éléments actifs et dans la période de planification
                     const visibleItems = data.links.filter(item => {
                         if (!item.active) return false;
                         if (item.startDate) {
@@ -2331,12 +2451,10 @@
                         return true;
                     });
 
-                    // Trier par order
                     visibleItems.sort((a, b) => (a.order || 0) - (b.order || 0));
 
                     visibleItems.forEach((item) => {
                         if (item.isSection) {
-                            // Section : titre simple
                             const div = document.createElement('div');
                             div.className = 'public-section-title';
                             div.textContent = item.title || 'Section';
@@ -2344,7 +2462,6 @@
                             return;
                         }
 
-                        // Lien standard
                         const platform = PLATFORMS.find(p => p.id === item.platform);
                         if (!platform || !item.url) return;
 
@@ -2355,7 +2472,6 @@
                         if (isFeatured) {
                             card.classList.add('border-glow-pulse');
                             card.classList.add('card-highlight');
-                            // Badge "En évidence"
                             const badge = document.createElement('span');
                             badge.className = 'highlight-badge';
                             badge.innerHTML = '<i class="fas fa-bolt"></i> En évidence';
@@ -2365,12 +2481,10 @@
                         card.target = '_blank';
                         card.rel = 'noopener noreferrer';
 
-                        // Description
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
                         desc.textContent = item.description || `Rejoindre ${platform.name}`;
 
-                        // Média
                         const media = document.createElement('div');
                         if (item.imageUrl && item.imageUrl !== '') {
                             const img = document.createElement('img');
@@ -2397,7 +2511,6 @@
                             media.appendChild(defaultContainer);
                         }
 
-                        // Action bar
                         const actionBar = document.createElement('div');
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
@@ -2422,7 +2535,6 @@
                 const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
 
-                // Vcard
                 window._vcardData = {
                     displayName: data.displayName || 'Utilisateur',
                     links: data.links || []
@@ -2677,7 +2789,7 @@ URL:${urlProfil}
                 await populateDashboard();
             });
 
-            // Dashboard : Ajouter un lien → vue dédiée
+            // Dashboard : Ajouter un lien
             document.getElementById('add-link-btn').addEventListener('click', () => {
                 selectedNetworkType = null;
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
@@ -2780,8 +2892,13 @@ URL:${urlProfil}
                 }
             });
 
-            // Réinitialisation des stats
-            document.getElementById('reset-clicks-btn').addEventListener('click', resetAllStats);
+            // Réinitialisation des vues globales (uniquement ce compteur)
+            document.getElementById('reset-views-btn').addEventListener('click', resetViews);
+
+            // Thème privé
+            document.getElementById('theme-toggle-private').addEventListener('click', function() {
+                toggleTheme();
+            });
 
             // QR Code et Vcard
             setupQRModal();
