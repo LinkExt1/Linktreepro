@@ -7,12 +7,12 @@
 
     <!-- Font Awesome 6 (icônes) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts : Inter (moderne & lisible) -->
+    <!-- Google Fonts : Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK (compat mode, aucun build nécessaire) -->
+    <!-- Firebase SDK (compat mode) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -126,19 +126,10 @@
         }
 
         @keyframes floatOrb {
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
-            25% {
-                transform: translate(70px, -60px) scale(1.12);
-            }
-            50% {
-                transform: translate(-40px, 50px) scale(0.88);
-            }
-            75% {
-                transform: translate(-60px, -35px) scale(1.08);
-            }
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(70px, -60px) scale(1.12); }
+            50% { transform: translate(-40px, 50px) scale(0.88); }
+            75% { transform: translate(-60px, -35px) scale(1.08); }
         }
 
         /* Conteneur principal */
@@ -221,8 +212,6 @@
             cursor: pointer;
             border: none;
             transition: var(--transition-smooth);
-            position: relative;
-            overflow: hidden;
             text-decoration: none;
             white-space: nowrap;
             letter-spacing: 0.02em;
@@ -315,16 +304,8 @@
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .spinner-sm {
-            width: 16px;
-            height: 16px;
-            border-width: 2px;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner-sm { width: 16px; height: 16px; border-width: 2px; }
 
         /* Loader global */
         .global-loader {
@@ -381,40 +362,16 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
             letter-spacing: 0.02em;
         }
-        .toast.success {
-            background: rgba(46, 213, 115, 0.25);
-            border: 1px solid rgba(46, 213, 115, 0.5);
-            color: #2ed573;
-        }
-        .toast.error {
-            background: rgba(255, 71, 87, 0.25);
-            border: 1px solid rgba(255, 71, 87, 0.5);
-            color: #ff6b7a;
-        }
-        .toast.info {
-            background: rgba(79, 172, 254, 0.25);
-            border: 1px solid rgba(79, 172, 254, 0.5);
-            color: #7ec8ff;
-        }
+        .toast.success { background: rgba(46, 213, 115, 0.25); border: 1px solid rgba(46, 213, 115, 0.5); color: #2ed573; }
+        .toast.error { background: rgba(255, 71, 87, 0.25); border: 1px solid rgba(255, 71, 87, 0.5); color: #ff6b7a; }
+        .toast.info { background: rgba(79, 172, 254, 0.25); border: 1px solid rgba(79, 172, 254, 0.5); color: #7ec8ff; }
         @keyframes toastIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes toastOut {
-            from {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            to {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.85);
-            }
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-20px) scale(0.85); }
         }
 
         /* Vues */
@@ -426,18 +383,10 @@
             gap: 18px;
             animation: fadeSlideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .view.active {
-            display: flex;
-        }
+        .view.active { display: flex; }
         @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .view-title {
             font-size: 1.7rem;
@@ -466,8 +415,7 @@
             width: 100%;
             margin: 8px 0;
         }
-        .separator::before,
-        .separator::after {
+        .separator::before, .separator::after {
             content: '';
             flex: 1;
             height: 1px;
@@ -509,9 +457,7 @@
             gap: 14px;
             width: 100%;
         }
-        .auth-form.hidden {
-            display: none;
-        }
+        .auth-form.hidden { display: none; }
         .error-banner {
             background: rgba(255, 71, 87, 0.2);
             border: 1px solid rgba(255, 71, 87, 0.45);
@@ -525,9 +471,7 @@
             text-align: center;
             animation: fadeSlideIn 0.3s ease;
         }
-        .error-banner.visible {
-            display: block;
-        }
+        .error-banner.visible { display: block; }
 
         /* Onboarding */
         .platform-grid {
@@ -553,11 +497,7 @@
             gap: 7px;
             color: var(--text-secondary);
         }
-        .platform-chip i {
-            font-size: 1rem;
-            width: 20px;
-            text-align: center;
-        }
+        .platform-chip i { font-size: 1rem; width: 20px; text-align: center; }
         .platform-chip.selected {
             background: rgba(79, 172, 254, 0.2);
             border-color: var(--accent-1);
@@ -616,9 +556,7 @@
             transition: var(--transition-fast);
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
         }
-        .avatar-upload-btn:hover {
-            transform: scale(1.1);
-        }
+        .avatar-upload-btn:hover { transform: scale(1.1); }
 
         /* Lien dashboard */
         .link-item {
@@ -654,9 +592,7 @@
             outline: none;
             padding: 6px 0;
         }
-        .link-item input::placeholder {
-            color: var(--text-muted);
-        }
+        .link-item input::placeholder { color: var(--text-muted); }
         .click-badge {
             display: flex;
             align-items: center;
@@ -669,22 +605,16 @@
             border-radius: 20px;
             white-space: nowrap;
         }
-        .click-badge i {
-            color: var(--accent-1);
-        }
+        .click-badge i { color: var(--accent-1); }
 
-        /* Toggle switch */
+        /* Toggle */
         .toggle-switch {
             position: relative;
             width: 48px;
             height: 26px;
             flex-shrink: 0;
         }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .toggle-slider {
             position: absolute;
             cursor: pointer;
@@ -705,13 +635,11 @@
             transition: var(--transition-smooth);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
         }
-        .toggle-switch input:checked+.toggle-slider {
+        .toggle-switch input:checked + .toggle-slider {
             background: var(--accent-gradient);
             box-shadow: 0 0 14px rgba(79, 172, 254, 0.5);
         }
-        .toggle-switch input:checked+.toggle-slider::before {
-            transform: translateX(22px);
-        }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(22px); }
 
         /* Page publique */
         .public-avatar {
@@ -759,17 +687,9 @@
             position: relative;
             overflow: hidden;
         }
-        .public-link-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
-        }
-        .public-link-btn:active {
-            transform: scale(0.97);
-            transition: var(--transition-fast);
-        }
-        .public-link-btn i {
-            font-size: 1.3rem;
-        }
+        .public-link-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 36px rgba(0,0,0,0.6); }
+        .public-link-btn:active { transform: scale(0.97); transition: var(--transition-fast); }
+        .public-link-btn i { font-size: 1.3rem; }
         .footer-brand {
             text-align: center;
             color: var(--text-muted);
@@ -809,52 +729,18 @@
             border-color: rgba(255, 71, 87, 0.7);
         }
 
-        /* Responsive */
         @media (max-width: 480px) {
-            .app-container {
-                padding: 12px;
-                gap: 12px;
-            }
-            .glass-card {
-                padding: 18px 14px;
-                border-radius: var(--radius-sm);
-            }
-            .view-title {
-                font-size: 1.4rem;
-            }
-            .btn {
-                padding: 12px 20px;
-                font-size: 0.9rem;
-            }
-            .public-link-btn {
-                padding: 14px 18px;
-                font-size: 0.9rem;
-            }
-            .avatar-wrapper,
-            .public-avatar,
-            .public-avatar-placeholder {
-                width: 85px;
-                height: 85px;
-            }
-            .avatar-placeholder {
-                font-size: 2.2rem;
-            }
-            .public-avatar-placeholder {
-                font-size: 2.4rem;
-            }
-            .link-item {
-                padding: 12px;
-                gap: 8px;
-            }
-            .link-item input {
-                font-size: 0.85rem;
-            }
-            .logout-btn {
-                top: 8px;
-                right: 8px;
-                padding: 6px 12px;
-                font-size: 0.75rem;
-            }
+            .app-container { padding: 12px; gap: 12px; }
+            .glass-card { padding: 18px 14px; border-radius: var(--radius-sm); }
+            .view-title { font-size: 1.4rem; }
+            .btn { padding: 12px 20px; font-size: 0.9rem; }
+            .public-link-btn { padding: 14px 18px; font-size: 0.9rem; }
+            .avatar-wrapper, .public-avatar, .public-avatar-placeholder { width: 85px; height: 85px; }
+            .avatar-placeholder { font-size: 2.2rem; }
+            .public-avatar-placeholder { font-size: 2.4rem; }
+            .link-item { padding: 12px; gap: 8px; }
+            .link-item input { font-size: 0.85rem; }
+            .logout-btn { top: 8px; right: 8px; padding: 6px 12px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -902,7 +788,8 @@
                     </button>
                 </form>
                 <div class="separator">ou</div>
-                <button class="btn btn-google" style="width:100%;" id="btnGoogleAuth">
+                <!-- CORRECTION : type="button" pour éviter toute soumission de formulaire -->
+                <button type="button" class="btn btn-google" style="width:100%;" id="btnGoogleAuth">
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.95 16.46 0 20.12 0 24c0 3.88.95 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E" alt="Google">
                     Continuer avec Google
                 </button>
@@ -987,9 +874,8 @@
     <script>
         (function() {
             // ==================== CONFIGURATION ====================
-            // Remplacez ces valeurs par vos vraies clés Firebase et Cloudinary
             const firebaseConfig = {
-                apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw", // ← complétez avec votre clé API
+                apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw", // ← votre clé API
                 authDomain: "linkext1.firebaseapp.com",
                 projectId: "linkext1",
                 storageBucket: "linkext1.appspot.com",
@@ -1003,16 +889,13 @@
             // ==================== INITIALISATION FIREBASE ====================
             let firebaseReady = false;
             let auth, db;
-
             try {
                 firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 db = firebase.firestore();
                 firebaseReady = true;
-                console.log('✅ Firebase initialisé');
             } catch (err) {
-                console.warn('⚠️ Firebase non configuré — mode démo limité.', err);
-                showToast('Firebase non configuré. Certaines fonctionnalités seront désactivées.', 'info');
+                console.warn('Firebase non configuré — mode démo.');
             }
 
             // ==================== RÉFÉRENCES DOM ====================
@@ -1071,27 +954,24 @@
 
             // ==================== ÉTAT ====================
             let currentUser = null;
-            let userProfile = null; // doc Firestore userProfiles/{uid}
+            let userProfile = null;
             let selectedOnboardingPlatforms = new Set();
-            let localLinks = []; // liens en édition (tableau d'objets avec id, platform, url, active, clicks)
-            let originalLinks = []; // sauvegarde pour diff
+            let localLinks = [];
+            let originalLinks = [];
             let currentView = null;
             let publicProfileUid = null;
             let isSaving = false;
 
             // ==================== HELPERS ====================
             function showLoader() { globalLoader.classList.remove('hidden'); }
-
             function hideLoader() { globalLoader.classList.add('hidden'); }
-
-            function showToast(message, type = 'info') {
+            function showToast(msg, type='info') {
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
-                toast.textContent = message;
+                toast.textContent = msg;
                 toastContainer.appendChild(toast);
-                setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3300);
+                setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3300);
             }
-
             function showView(viewElement) {
                 if (currentView === viewElement) return;
                 allViews.forEach(v => v.classList.remove('active'));
@@ -1101,42 +981,35 @@
                 viewElement.offsetHeight;
                 viewElement.style.animation = '';
             }
-
             function showAuthError(msg) {
                 authError.textContent = msg;
                 authError.classList.add('visible');
                 setTimeout(() => authError.classList.remove('visible'), 5000);
             }
-
             function clearAuthError() { authError.classList.remove('visible'); }
-
             function setButtonLoading(btn, spinner, text, isLoading) {
                 btn.disabled = isLoading;
-                if (spinner) spinner.style.display = isLoading ? 'inline-block' : 'none';
-                if (text) text.style.opacity = isLoading ? '0.5' : '1';
+                if(spinner) spinner.style.display = isLoading ? 'inline-block' : 'none';
+                if(text) text.style.opacity = isLoading ? '0.5' : '1';
             }
-
             function getInitial(name) {
-                if (!name || !name.trim()) return '?';
+                if(!name || !name.trim()) return '?';
                 return name.trim().charAt(0).toUpperCase();
             }
-
             function generateId() {
-                return Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+                return Date.now().toString(36) + '_' + Math.random().toString(36).substr(2,9);
             }
 
-            // Plateformes
             const PLATFORMS = {
-                whatsapp: { name: 'WhatsApp', icon: 'fab fa-whatsapp', color: '#25D366', bgColor: '#25D366' },
-                telegram: { name: 'Telegram', icon: 'fab fa-telegram-plane', color: '#0088cc', bgColor: '#0088cc' },
-                facebook: { name: 'Facebook', icon: 'fab fa-facebook', color: '#1877F2', bgColor: '#1877F2' },
-                instagram: { name: 'Instagram', icon: 'fab fa-instagram', color: '#E4405F',
-                    bgColor: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' },
-                youtube: { name: 'YouTube', icon: 'fab fa-youtube', color: '#FF0000', bgColor: '#FF0000' },
-                x: { name: 'X (Twitter)', icon: 'fab fa-x-twitter', color: '#1DA1F2', bgColor: '#1DA1F2' },
-                tiktok: { name: 'TikTok', icon: 'fab fa-tiktok', color: '#fe2c55', bgColor: '#111' },
-                site: { name: 'Site web', icon: 'fas fa-globe', color: '#aaa', bgColor: '#444' },
-                autre: { name: 'Autre', icon: 'fas fa-link', color: '#ccc', bgColor: '#555' }
+                whatsapp: { name:'WhatsApp', icon:'fab fa-whatsapp', color:'#25D366', bgColor:'#25D366' },
+                telegram: { name:'Telegram', icon:'fab fa-telegram-plane', color:'#0088cc', bgColor:'#0088cc' },
+                facebook: { name:'Facebook', icon:'fab fa-facebook', color:'#1877F2', bgColor:'#1877F2' },
+                instagram: { name:'Instagram', icon:'fab fa-instagram', color:'#E4405F', bgColor:'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' },
+                youtube: { name:'YouTube', icon:'fab fa-youtube', color:'#FF0000', bgColor:'#FF0000' },
+                x: { name:'X (Twitter)', icon:'fab fa-x-twitter', color:'#1DA1F2', bgColor:'#1DA1F2' },
+                tiktok: { name:'TikTok', icon:'fab fa-tiktok', color:'#fe2c55', bgColor:'#111' },
+                site: { name:'Site web', icon:'fas fa-globe', color:'#aaa', bgColor:'#444' },
+                autre: { name:'Autre', icon:'fas fa-link', color:'#ccc', bgColor:'#555' }
             };
 
             // ==================== CLOUDINARY ====================
@@ -1145,44 +1018,41 @@
                 formData.append('file', file);
                 formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
                 formData.append('folder', 'linkext');
-                const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-                const response = await fetch(url, { method: 'POST', body: formData });
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    throw new Error(errData.error?.message || 'Échec upload Cloudinary');
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method:'POST', body:formData
+                });
+                if(!res.ok) {
+                    const err = await res.json().catch(()=>({}));
+                    throw new Error(err.error?.message || 'Échec upload');
                 }
-                const data = await response.json();
+                const data = await res.json();
                 return data.secure_url;
             }
 
             // ==================== FIRESTORE ====================
             async function fetchUserProfile(uid) {
-                if (!firebaseReady) return null;
-                const docRef = db.collection('userProfiles').doc(uid);
-                const snap = await docRef.get();
-                return snap.exists ? { id: snap.id, ...snap.data() } : null;
+                if(!firebaseReady) return null;
+                const snap = await db.collection('userProfiles').doc(uid).get();
+                return snap.exists ? { id:snap.id, ...snap.data() } : null;
             }
-
             async function saveUserProfile(uid, data) {
-                if (!firebaseReady) throw new Error('Firebase non disponible');
-                const docRef = db.collection('userProfiles').doc(uid);
-                await docRef.set({ ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                if(!firebaseReady) throw new Error('Firebase indisponible');
+                await db.collection('userProfiles').doc(uid).set({
+                    ...data,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge:true });
             }
-
             async function fetchUserLinks(uid) {
-                if (!firebaseReady) return [];
-                const snapshot = await db.collection('userProfiles').doc(uid).collection('links').orderBy('createdAt',
-                    'asc').get();
-                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if(!firebaseReady) return [];
+                const snap = await db.collection('userProfiles').doc(uid).collection('links').orderBy('createdAt','asc').get();
+                return snap.docs.map(d => ({ id:d.id, ...d.data() }));
             }
-
             async function saveLinksBatch(uid, linksToSave, linksToDelete) {
-                if (!firebaseReady) throw new Error('Firebase indisponible');
+                if(!firebaseReady) throw new Error('Firebase indisponible');
                 const batch = db.batch();
-                const linksCol = db.collection('userProfiles').doc(uid).collection('links');
-
-                for (const link of linksToSave) {
-                    const docRef = link.id ? linksCol.doc(link.id) : linksCol.doc(); // nouvel id si absent
+                const col = db.collection('userProfiles').doc(uid).collection('links');
+                for(const link of linksToSave) {
+                    const ref = link.id ? col.doc(link.id) : col.doc();
                     const data = {
                         platform: link.platform,
                         url: link.url || '',
@@ -1190,26 +1060,23 @@
                         clicks: link.clicks || 0,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
-                    if (!link.id) data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    batch.set(docRef, data, { merge: true });
+                    if(!link.id) data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    batch.set(ref, data, { merge:true });
                 }
-
-                for (const linkId of linksToDelete) {
-                    batch.delete(linksCol.doc(linkId));
+                for(const linkId of linksToDelete) {
+                    batch.delete(col.doc(linkId));
                 }
-
                 await batch.commit();
             }
-
             async function incrementLinkClick(uid, linkId) {
-                if (!firebaseReady) return;
-                const docRef = db.collection('userProfiles').doc(uid).collection('links').doc(linkId);
-                await docRef.update({ clicks: firebase.firestore.FieldValue.increment(1) });
+                if(!firebaseReady) return;
+                const ref = db.collection('userProfiles').doc(uid).collection('links').doc(linkId);
+                await ref.update({ clicks: firebase.firestore.FieldValue.increment(1) });
             }
 
-            // ==================== ROUTEUR & AUTH ====================
+            // ==================== ROUTAGE & AUTH ====================
             function switchAuthTab(tab) {
-                if (tab === 'login') {
+                if(tab === 'login') {
                     tabLogin.classList.add('active');
                     tabRegister.classList.remove('active');
                     formLogin.classList.remove('hidden');
@@ -1223,19 +1090,59 @@
                 clearAuthError();
             }
 
+            // Fonction de redirection après authentification réussie (appelée immédiatement)
+            async function redirectAfterAuth(user) {
+                showLoader();
+                try {
+                    currentUser = user;
+                    userProfile = await fetchUserProfile(user.uid);
+                    if(!userProfile) {
+                        // Créer un profil par défaut
+                        const defaultProfile = {
+                            displayName: user.email ? user.email.split('@')[0] : 'Utilisateur',
+                            bio: '',
+                            photoURL: '',
+                            previewImageURL: '',
+                            onboardingCompleted: false,
+                            onboardingPlatforms: [],
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+                        await saveUserProfile(user.uid, defaultProfile);
+                        userProfile = await fetchUserProfile(user.uid);
+                    }
+                    if(!userProfile.onboardingCompleted) {
+                        navigateToOnboarding();
+                    } else {
+                        // Charger liens et afficher dashboard
+                        const links = await fetchUserLinks(user.uid);
+                        localLinks = links.map(l=>({...l}));
+                        originalLinks = JSON.parse(JSON.stringify(localLinks));
+                        populateDashboard();
+                        showView(viewDashboard);
+                    }
+                } catch(err) {
+                    console.error(err);
+                    showToast('Erreur chargement profil', 'error');
+                    showView(viewAuth);
+                }
+                hideLoader();
+            }
+
             async function handleLogin(email, password) {
-                if (!firebaseReady) { showToast('Firebase non configuré', 'error'); return; }
+                if(!firebaseReady) { showToast('Firebase non configuré','error'); return; }
                 setButtonLoading($('#btnLoginSubmit'), $('#btnLoginSpinner'), $('#btnLoginText'), true);
                 clearAuthError();
                 try {
-                    await auth.signInWithEmailAndPassword(email, password);
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
                     showToast('Connexion réussie !', 'success');
-                } catch (err) {
+                    // Redirection immédiate sans attendre le listener global
+                    await redirectAfterAuth(userCredential.user);
+                } catch(err) {
                     let msg = 'Erreur de connexion.';
-                    if (err.code === 'auth/user-not-found') msg = 'Aucun compte trouvé.';
-                    else if (err.code === 'auth/wrong-password') msg = 'Mot de passe incorrect.';
-                    else if (err.code === 'auth/invalid-email') msg = 'Email invalide.';
-                    else if (err.code === 'auth/invalid-credential') msg = 'Identifiants incorrects.';
+                    if(err.code === 'auth/user-not-found') msg = 'Aucun compte trouvé.';
+                    else if(err.code === 'auth/wrong-password') msg = 'Mot de passe incorrect.';
+                    else if(err.code === 'auth/invalid-email') msg = 'Email invalide.';
+                    else if(err.code === 'auth/invalid-credential') msg = 'Identifiants incorrects.';
                     else msg = err.message;
                     showAuthError(msg);
                 }
@@ -1243,37 +1150,41 @@
             }
 
             async function handleRegister(email, password) {
-                if (!firebaseReady) { showToast('Firebase non configuré', 'error'); return; }
-                if (password.length < 6) { showAuthError('6 caractères minimum.'); return; }
+                if(!firebaseReady) { showToast('Firebase non configuré','error'); return; }
+                if(password.length < 6) { showAuthError('6 caractères minimum.'); return; }
                 setButtonLoading($('#btnRegisterSubmit'), $('#btnRegisterSpinner'), $('#btnRegisterText'), true);
                 clearAuthError();
                 try {
-                    await auth.createUserWithEmailAndPassword(email, password);
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                     showToast('Compte créé ! 🎉', 'success');
-                } catch (err) {
+                    await redirectAfterAuth(userCredential.user);
+                } catch(err) {
                     let msg = 'Erreur inscription.';
-                    if (err.code === 'auth/email-already-in-use') msg = 'Email déjà utilisé.';
-                    else if (err.code === 'auth/weak-password') msg = 'Mot de passe trop faible.';
+                    if(err.code === 'auth/email-already-in-use') msg = 'Email déjà utilisé.';
+                    else if(err.code === 'auth/weak-password') msg = 'Mot de passe trop faible.';
                     else msg = err.message;
                     showAuthError(msg);
                 }
                 setButtonLoading($('#btnRegisterSubmit'), $('#btnRegisterSpinner'), $('#btnRegisterText'), false);
             }
 
-            async function handleGoogleAuth() {
-                if (!firebaseReady) { showToast('Firebase indisponible', 'error'); return; }
+            async function handleGoogleAuth(e) {
+                e.preventDefault(); // empêche le comportement par défaut
+                if(!firebaseReady) { showToast('Firebase indisponible','error'); return; }
                 const provider = new firebase.auth.GoogleAuthProvider();
                 try {
-                    await auth.signInWithPopup(provider);
-                } catch (err) {
-                    if (err.code !== 'auth/popup-closed-by-user') {
+                    const result = await auth.signInWithPopup(provider);
+                    showToast('Connexion Google réussie', 'success');
+                    await redirectAfterAuth(result.user);
+                } catch(err) {
+                    if(err.code !== 'auth/popup-closed-by-user') {
                         showToast('Erreur Google : ' + err.message, 'error');
                     }
                 }
             }
 
             async function handleLogout() {
-                if (!firebaseReady) return;
+                if(!firebaseReady) return;
                 await auth.signOut();
                 currentUser = null;
                 userProfile = null;
@@ -1283,7 +1194,7 @@
             }
 
             // ==================== NAVIGATION ====================
-            async function navigateToAuth() {
+            function navigateToAuth() {
                 showView(viewAuth);
                 loginEmail.value = '';
                 loginPassword.value = '';
@@ -1291,65 +1202,25 @@
                 registerPassword.value = '';
                 switchAuthTab('login');
             }
-
-            async function navigateToOnboarding() {
+            function navigateToOnboarding() {
                 showView(viewOnboarding);
                 selectedOnboardingPlatforms.clear();
                 onboardingBio.value = userProfile?.bio || '';
                 $$('#onboardingPlatforms .platform-chip').forEach(chip => chip.classList.remove('selected'));
-                if (userProfile?.onboardingPlatforms) {
+                if(userProfile?.onboardingPlatforms) {
                     userProfile.onboardingPlatforms.forEach(p => {
                         selectedOnboardingPlatforms.add(p);
                         const chip = $(`#onboardingPlatforms .platform-chip[data-platform="${p}"]`);
-                        if (chip) chip.classList.add('selected');
+                        if(chip) chip.classList.add('selected');
                     });
                 }
             }
-
-            async function navigateToDashboard() {
-                if (!currentUser || !firebaseReady) { navigateToAuth(); return; }
-                showLoader();
-                try {
-                    userProfile = await fetchUserProfile(currentUser.uid);
-                    if (!userProfile) {
-                        // Créer profil par défaut
-                        const defaultProfile = {
-                            displayName: currentUser.email ? currentUser.email.split('@')[0] : 'Utilisateur',
-                            bio: '',
-                            photoURL: '',
-                            previewImageURL: '',
-                            onboardingCompleted: false,
-                            onboardingPlatforms: [],
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        };
-                        await saveUserProfile(currentUser.uid, defaultProfile);
-                        userProfile = await fetchUserProfile(currentUser.uid);
-                    }
-                    if (!userProfile.onboardingCompleted) {
-                        hideLoader();
-                        navigateToOnboarding();
-                        return;
-                    }
-                    // Charger liens
-                    const links = await fetchUserLinks(currentUser.uid);
-                    localLinks = links.map(l => ({ ...l }));
-                    originalLinks = JSON.parse(JSON.stringify(localLinks));
-                    populateDashboard();
-                    showView(viewDashboard);
-                } catch (err) {
-                    console.error(err);
-                    showToast('Erreur chargement dashboard', 'error');
-                    navigateToAuth();
-                }
-                hideLoader();
-            }
-
             function populateDashboard() {
-                if (!userProfile) return;
+                if(!userProfile) return;
                 dashboardDisplayName.value = userProfile.displayName || '';
                 dashboardBio.value = userProfile.bio || '';
                 updateDashboardAvatar(userProfile.photoURL, userProfile.displayName);
-                if (userProfile.previewImageURL) {
+                if(userProfile.previewImageURL) {
                     previewThumbnail.src = userProfile.previewImageURL;
                     previewThumbnailContainer.style.display = 'block';
                 } else {
@@ -1357,9 +1228,8 @@
                 }
                 renderLinks();
             }
-
             function updateDashboardAvatar(photoURL, displayName) {
-                if (photoURL) {
+                if(photoURL) {
                     dashboardAvatarImg.src = photoURL;
                     dashboardAvatarImg.style.display = 'block';
                     dashboardAvatarPlaceholder.style.display = 'none';
@@ -1369,10 +1239,9 @@
                     dashboardAvatarPlaceholder.textContent = getInitial(displayName);
                 }
             }
-
             function renderLinks() {
                 linksContainer.innerHTML = '';
-                if (localLinks.length === 0) {
+                if(localLinks.length === 0) {
                     noLinksMsg.style.display = 'block';
                 } else {
                     noLinksMsg.style.display = 'none';
@@ -1383,34 +1252,33 @@
                         div.innerHTML = `
                             <span class="platform-icon" style="color:${platform.color};"><i class="${platform.icon}"></i></span>
                             <select class="link-platform-select glass-input" style="width:auto;flex-shrink:0;padding:8px 10px;font-size:0.8rem;" data-index="${index}">
-                                ${Object.entries(PLATFORMS).map(([key, p]) => `<option value="${key}" ${link.platform === key ? 'selected' : ''}>${p.name}</option>`).join('')}
+                                ${Object.entries(PLATFORMS).map(([key,p]) => `<option value="${key}" ${link.platform===key?'selected':''}>${p.name}</option>`).join('')}
                             </select>
-                            <input type="url" class="link-url-input" placeholder="https://..." value="${link.url || ''}" data-index="${index}">
-                            <div class="click-badge"><i class="fas fa-eye"></i> ${link.clicks || 0} clic(s)</div>
+                            <input type="url" class="link-url-input" placeholder="https://..." value="${link.url||''}" data-index="${index}">
+                            <div class="click-badge"><i class="fas fa-eye"></i> ${link.clicks||0} clic(s)</div>
                             <label class="toggle-switch">
-                                <input type="checkbox" class="link-toggle" data-index="${index}" ${link.active !== false ? 'checked' : ''}>
+                                <input type="checkbox" class="link-toggle" data-index="${index}" ${link.active!==false?'checked':''}>
                                 <span class="toggle-slider"></span>
                             </label>
                             <button class="btn-icon danger link-delete-btn" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
                         `;
                         linksContainer.appendChild(div);
                     });
-                    // Events
-                    $$('.link-platform-select').forEach(sel => sel.addEventListener('change', (e) => {
+                    $$('.link-platform-select').forEach(sel => sel.addEventListener('change', e => {
                         const idx = parseInt(e.target.dataset.index);
                         localLinks[idx].platform = e.target.value;
                     }));
-                    $$('.link-url-input').forEach(inp => inp.addEventListener('input', (e) => {
+                    $$('.link-url-input').forEach(inp => inp.addEventListener('input', e => {
                         const idx = parseInt(e.target.dataset.index);
                         localLinks[idx].url = e.target.value;
                     }));
-                    $$('.link-toggle').forEach(tog => tog.addEventListener('change', (e) => {
+                    $$('.link-toggle').forEach(tog => tog.addEventListener('change', e => {
                         const idx = parseInt(e.target.dataset.index);
                         localLinks[idx].active = e.target.checked;
                     }));
-                    $$('.link-delete-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                    $$('.link-delete-btn').forEach(btn => btn.addEventListener('click', e => {
                         const idx = parseInt(e.target.closest('.link-delete-btn').dataset.index);
-                        localLinks.splice(idx, 1);
+                        localLinks.splice(idx,1);
                         renderLinks();
                         showToast('Lien supprimé (enregistrez pour appliquer)', 'info');
                     }));
@@ -1422,7 +1290,7 @@
                 showLoader();
                 try {
                     const profile = await fetchUserProfile(uid);
-                    if (!profile) {
+                    if(!profile) {
                         showView(viewPublicProfile);
                         publicDisplayName.textContent = 'Profil introuvable';
                         publicBio.textContent = '';
@@ -1433,8 +1301,7 @@
                         hideLoader();
                         return;
                     }
-                    // Avatar
-                    if (profile.photoURL) {
+                    if(profile.photoURL) {
                         publicAvatarImg.src = profile.photoURL;
                         publicAvatarImg.style.display = 'block';
                         publicAvatarPlaceholder.style.display = 'none';
@@ -1445,14 +1312,11 @@
                     }
                     publicDisplayName.textContent = profile.displayName || 'Sans nom';
                     publicBio.textContent = profile.bio || '';
-
-                    // Liens actifs
                     const links = await fetchUserLinks(uid);
                     const activeLinks = links.filter(l => l.active !== false);
                     publicLinksContainer.innerHTML = '';
-                    if (activeLinks.length === 0) {
-                        publicLinksContainer.innerHTML =
-                            '<p style="text-align:center;color:var(--text-muted);">Aucun lien public.</p>';
+                    if(activeLinks.length === 0) {
+                        publicLinksContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);">Aucun lien public.</p>';
                     } else {
                         activeLinks.forEach(link => {
                             const platform = PLATFORMS[link.platform] || PLATFORMS['autre'];
@@ -1462,35 +1326,27 @@
                             a.target = '_blank';
                             a.rel = 'noopener noreferrer';
                             a.style.background = platform.bgColor;
-                            if (platform.bgColor.startsWith('linear-gradient')) a.style.background = platform
-                                .bgColor;
+                            if(platform.bgColor.startsWith('linear-gradient')) a.style.background = platform.bgColor;
                             a.innerHTML = `<i class="${platform.icon}"></i> ${platform.name}`;
                             a.addEventListener('click', async (e) => {
                                 e.preventDefault();
-                                // Incrémenter le compteur de clics
-                                try {
-                                    await incrementLinkClick(uid, link.id);
-                                } catch (err) {
-                                    console.warn('Erreur incrément clic:', err);
-                                }
+                                try { await incrementLinkClick(uid, link.id); } catch(err) { console.warn(err); }
                                 window.open(link.url || '#', '_blank', 'noopener,noreferrer');
                             });
                             publicLinksContainer.appendChild(a);
                         });
                     }
                     showView(viewPublicProfile);
-                } catch (err) {
+                } catch(err) {
                     console.error(err);
                     showToast('Erreur chargement profil public', 'error');
-                    publicDisplayName.textContent = 'Erreur';
-                    publicBio.textContent = '';
                 }
                 hideLoader();
             }
 
-            // ==================== HANDLERS ====================
+            // ==================== HANDLERS ONBOARDING ====================
             async function finishOnboarding() {
-                if (!currentUser || !firebaseReady) return;
+                if(!currentUser || !firebaseReady) return;
                 setButtonLoading(btnFinishOnboarding, $('#btnFinishOnboardingSpinner'), $('#btnFinishOnboardingText'), true);
                 try {
                     const platforms = Array.from(selectedOnboardingPlatforms);
@@ -1502,48 +1358,52 @@
                     });
                     userProfile = await fetchUserProfile(currentUser.uid);
                     showToast('Profil configuré !', 'success');
-                    navigateToDashboard();
-                } catch (err) {
+                    // Charger dashboard
+                    const links = await fetchUserLinks(currentUser.uid);
+                    localLinks = links.map(l=>({...l}));
+                    originalLinks = JSON.parse(JSON.stringify(localLinks));
+                    populateDashboard();
+                    showView(viewDashboard);
+                } catch(err) {
                     showToast('Erreur : ' + err.message, 'error');
                 }
                 setButtonLoading(btnFinishOnboarding, $('#btnFinishOnboardingSpinner'), $('#btnFinishOnboardingText'), false);
             }
-
             async function skipOnboarding() {
-                if (!currentUser || !firebaseReady) return;
+                if(!currentUser || !firebaseReady) return;
                 try {
                     await saveUserProfile(currentUser.uid, { onboardingCompleted: true });
                     userProfile = await fetchUserProfile(currentUser.uid);
-                    navigateToDashboard();
-                } catch (err) {
+                    const links = await fetchUserLinks(currentUser.uid);
+                    localLinks = links.map(l=>({...l}));
+                    originalLinks = JSON.parse(JSON.stringify(localLinks));
+                    populateDashboard();
+                    showView(viewDashboard);
+                } catch(err) {
                     navigateToDashboard();
                 }
             }
 
+            // ==================== HANDLERS DASHBOARD ====================
             async function saveDashboard() {
-                if (!currentUser || !firebaseReady || isSaving) return;
+                if(!currentUser || !firebaseReady || isSaving) return;
                 isSaving = true;
                 setButtonLoading(btnSaveDashboard, $('#btnSaveDashboardSpinner'), $('#btnSaveDashboardText'), true);
                 try {
-                    // Sauvegarder infos profil
                     await saveUserProfile(currentUser.uid, {
                         displayName: dashboardDisplayName.value.trim() || 'Utilisateur',
                         bio: dashboardBio.value.trim()
                     });
-
-                    // Diff liens
-                    const currentIds = localLinks.map(l => l.id).filter(id => id);
-                    const originalIds = originalLinks.map(l => l.id);
+                    const currentIds = localLinks.map(l=>l.id).filter(id=>id);
+                    const originalIds = originalLinks.map(l=>l.id);
                     const toDelete = originalIds.filter(id => !currentIds.includes(id));
                     await saveLinksBatch(currentUser.uid, localLinks, toDelete);
-
-                    // Mettre à jour originaux et recharger pour avoir les clics à jour
                     originalLinks = JSON.parse(JSON.stringify(localLinks));
                     const updatedLinks = await fetchUserLinks(currentUser.uid);
-                    localLinks = updatedLinks.map(l => ({ ...l }));
+                    localLinks = updatedLinks.map(l=>({...l}));
                     renderLinks();
                     showToast('Tout est sauvegardé ! ✅', 'success');
-                } catch (err) {
+                } catch(err) {
                     console.error(err);
                     showToast('Erreur de sauvegarde : ' + err.message, 'error');
                 }
@@ -1552,8 +1412,8 @@
             }
 
             async function handleAvatarUpload(file) {
-                if (!file || !file.type.startsWith('image/')) { showToast('Image invalide', 'error'); return; }
-                if (file.size > 5 * 1024 * 1024) { showToast('Max 5 Mo', 'error'); return; }
+                if(!file || !file.type.startsWith('image/')) { showToast('Image invalide','error'); return; }
+                if(file.size > 5*1024*1024) { showToast('Max 5 Mo','error'); return; }
                 showLoader();
                 try {
                     const url = await uploadToCloudinary(file);
@@ -1561,16 +1421,15 @@
                     userProfile.photoURL = url;
                     updateDashboardAvatar(url, userProfile.displayName);
                     showToast('Photo de profil mise à jour 📸', 'success');
-                } catch (err) {
+                } catch(err) {
                     showToast('Erreur upload : ' + err.message, 'error');
                 }
                 hideLoader();
                 avatarFileInput.value = '';
             }
-
             async function handlePreviewUpload(file) {
-                if (!file || !file.type.startsWith('image/')) { showToast('Image invalide', 'error'); return; }
-                if (file.size > 5 * 1024 * 1024) { showToast('Max 5 Mo', 'error'); return; }
+                if(!file || !file.type.startsWith('image/')) { showToast('Image invalide','error'); return; }
+                if(file.size > 5*1024*1024) { showToast('Max 5 Mo','error'); return; }
                 showLoader();
                 try {
                     const url = await uploadToCloudinary(file);
@@ -1579,16 +1438,15 @@
                     previewThumbnail.src = url;
                     previewThumbnailContainer.style.display = 'block';
                     showToast('Image d\'aperçu enregistrée 🖼️', 'success');
-                } catch (err) {
+                } catch(err) {
                     showToast('Erreur upload : ' + err.message, 'error');
                 }
                 hideLoader();
                 previewFileInput.value = '';
             }
-
             function addLink() {
                 localLinks.push({
-                    id: null, // sera généré par Firestore
+                    id: null,
                     platform: 'site',
                     url: '',
                     active: true,
@@ -1597,7 +1455,7 @@
                 renderLinks();
                 setTimeout(() => {
                     const last = linksContainer.lastElementChild;
-                    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if(last) last.scrollIntoView({ behavior:'smooth', block:'center' });
                 }, 100);
                 showToast('Nouveau lien ajouté (à enregistrer)', 'info');
             }
@@ -1605,10 +1463,8 @@
             // ==================== EVENT LISTENERS ====================
             tabLogin.addEventListener('click', () => switchAuthTab('login'));
             tabRegister.addEventListener('click', () => switchAuthTab('register'));
-            formLogin.addEventListener('submit', e => { e.preventDefault();
-                handleLogin(loginEmail.value.trim(), loginPassword.value); });
-            formRegister.addEventListener('submit', e => { e.preventDefault();
-                handleRegister(registerEmail.value.trim(), registerPassword.value); });
+            formLogin.addEventListener('submit', e => { e.preventDefault(); handleLogin(loginEmail.value.trim(), loginPassword.value); });
+            formRegister.addEventListener('submit', e => { e.preventDefault(); handleRegister(registerEmail.value.trim(), registerPassword.value); });
             btnGoogleAuth.addEventListener('click', handleGoogleAuth);
 
             btnFinishOnboarding.addEventListener('click', finishOnboarding);
@@ -1616,7 +1472,7 @@
             $$('#onboardingPlatforms .platform-chip').forEach(chip => {
                 chip.addEventListener('click', () => {
                     const p = chip.dataset.platform;
-                    if (selectedOnboardingPlatforms.has(p)) {
+                    if(selectedOnboardingPlatforms.has(p)) {
                         selectedOnboardingPlatforms.delete(p);
                         chip.classList.remove('selected');
                     } else {
@@ -1627,19 +1483,15 @@
             });
 
             btnUploadAvatar.addEventListener('click', () => avatarFileInput.click());
-            avatarFileInput.addEventListener('change', e => {
-                if (e.target.files[0]) handleAvatarUpload(e.target.files[0]);
-            });
+            avatarFileInput.addEventListener('change', e => { if(e.target.files[0]) handleAvatarUpload(e.target.files[0]); });
             btnUploadPreview.addEventListener('click', () => previewFileInput.click());
-            previewFileInput.addEventListener('change', e => {
-                if (e.target.files[0]) handlePreviewUpload(e.target.files[0]);
-            });
+            previewFileInput.addEventListener('change', e => { if(e.target.files[0]) handlePreviewUpload(e.target.files[0]); });
             btnAddLink.addEventListener('click', addLink);
             btnSaveDashboard.addEventListener('click', saveDashboard);
             btnLogout.addEventListener('click', handleLogout);
 
             document.addEventListener('keydown', e => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 's' && currentView === viewDashboard) {
+                if((e.ctrlKey || e.metaKey) && e.key === 's' && currentView === viewDashboard) {
                     e.preventDefault();
                     saveDashboard();
                 }
@@ -1649,64 +1501,52 @@
             function checkPublicRoute() {
                 const params = new URLSearchParams(window.location.search);
                 const id = params.get('id');
-                if (id) {
+                if(id) {
                     navigateToPublicProfile(id);
                     return true;
                 }
                 return false;
             }
 
-            if (firebaseReady && auth) {
+            if(firebaseReady && auth) {
                 auth.onAuthStateChanged(async (user) => {
-                    if (checkPublicRoute()) {
+                    // Si un ID public est présent, priorité absolue (même si connecté)
+                    if(checkPublicRoute()) {
                         currentUser = user;
+                        hideLoader();
                         return;
                     }
                     currentUser = user;
-                    if (user) {
+                    if(user) {
+                        // Si l'utilisateur est déjà redirigé par handleLogin, ce listener ne fait rien car la vue est déjà changée.
+                        // Mais pour les cas de rechargement de page ou de persistance de session, on exécute la redirection.
                         try {
-                            userProfile = await fetchUserProfile(user.uid);
-                            if (!userProfile) {
-                                const defaultProfile = {
-                                    displayName: user.email ? user.email.split('@')[0] : 'Utilisateur',
-                                    bio: '',
-                                    photoURL: '',
-                                    previewImageURL: '',
-                                    onboardingCompleted: false,
-                                    onboardingPlatforms: [],
-                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                                };
-                                await saveUserProfile(user.uid, defaultProfile);
-                                userProfile = await fetchUserProfile(user.uid);
+                            // Éviter double redirection si déjà sur dashboard/onboarding
+                            if(currentView !== viewDashboard && currentView !== viewOnboarding) {
+                                await redirectAfterAuth(user);
                             }
-                            if (!userProfile.onboardingCompleted) {
-                                navigateToOnboarding();
-                            } else {
-                                navigateToDashboard();
-                            }
-                        } catch (err) {
+                        } catch(err) {
                             console.error(err);
-                            showToast('Erreur chargement profil', 'error');
+                            showToast('Erreur lors de la récupération du profil', 'error');
                             navigateToAuth();
                         }
                     } else {
-                        navigateToAuth();
+                        if(currentView !== viewAuth) navigateToAuth();
                     }
                     hideLoader();
                 });
             } else {
                 hideLoader();
-                if (!checkPublicRoute()) {
+                if(!checkPublicRoute()) {
                     navigateToAuth();
                     showToast('Firebase non configuré — mode démo.', 'info');
                 }
             }
 
-            // Démasquer le loader après court délai
             window.addEventListener('load', () => {
                 setTimeout(() => hideLoader(), 400);
             });
-            console.log('🚀 LinkExt prêt — Compteur de clics, Cloudinary & Firestore.');
+            console.log('🚀 LinkExt prêt — corrections auth appliquées.');
         })();
     </script>
 </body>
