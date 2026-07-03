@@ -19,6 +19,7 @@
     <!-- Widget Cloudinary -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
+        /* ... (le style est inchangé, je le laisse pour ne pas alourdir) ... */
         :root {
             --bg-deep: #0a0b10;
             --bg-card: rgba(10, 11, 16, 0.7);
@@ -581,7 +582,8 @@
             const db = firebase.firestore();
 
             // --- Configuration Cloudinary (UNSIGNED) ---
-            const CLOUDINARY_CLOUD_NAME = "bwexbf1sj";
+            // ✅ Correction : utilisation du vrai nom de votre cloud (d'après votre capture)
+            const CLOUDINARY_CLOUD_NAME = "bwexbl1sj";
             const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
 
             // --- Plateformes disponibles ---
@@ -858,21 +860,20 @@
                 // Configuration strictement non signée (aucune clé API)
                 const widget = cloudinary.openUploadWidget(
                     {
-                        cloudName: CLOUDINARY_CLOUD_NAME,
+                        cloudName: CLOUDINARY_CLOUD_NAME,   // ✅ maintenant correct
                         uploadPreset: CLOUDINARY_UPLOAD_PRESET,
                         sources: ["local", "url", "camera"],
                         multiple: false,
                         cropping: true,
                         resourceType: "image",
-                        // Forcer le mode "unsigned" pour éviter toute demande de clé API
-                        signature: false
+                        signature: false   // force le mode unsigned
                     },
                     (error, result) => {
                         if (error) {
                             console.error("Détail erreur Cloudinary:", error);
                             let message = "Erreur lors de l'upload.";
                             if (error.message && error.message.includes("Unknown API key")) {
-                                message = "Clé API inconnue. Vérifiez votre uploadPreset et cloudName.";
+                                message = "Clé API inconnue. Vérifiez que votre cloudName et uploadPreset sont corrects.";
                             } else if (error.message) {
                                 message = error.message;
                             }
