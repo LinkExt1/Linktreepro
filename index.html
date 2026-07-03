@@ -876,7 +876,7 @@
             <div class="input-group mt-2">
                 <label>Photo de profil</label>
                 <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center;">
-                    <i class="fas fa-camera"></i> 📷 Changer la photo
+                    <i class="fas fa-camera"></i>  Changer la photo
                 </button>
             </div>
 
@@ -888,7 +888,7 @@
             <!-- Image d'aperçu -->
             <div class="mt-2 p-2" style="background: rgba(0,242,254,0.05); border-radius: 14px; border: 1px solid var(--border-glow);">
                 <div class="input-group">
-                    <label style="font-size:0.9rem; color:var(--cyan);">🖼️ Image d'aperçu</label>
+                    <label style="font-size:0.9rem; color:var(--cyan);"> Image d'aperçu</label>
                     <button class="btn btn-outline" id="btn-upload-share-preview" style="justify-content: center;">
                         <i class="fas fa-image"></i> Téléverser
                     </button>
@@ -996,7 +996,7 @@
         const db = firebase.firestore();
 
         // --- Cloudinary ---
-        const CLOUDINARY_CLOUD_NAME = "bwexbl1sj";
+        const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
         const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
 
         // --- Plateformes ---
@@ -1489,7 +1489,7 @@
                 renderDashboardLinks();
 
                 // 5. Toast de succès
-                showToast('✅ Compteurs réinitialisés !', 'info');
+                showToast(' Compteurs réinitialisés !', 'info');
             } catch (error) {
                 console.error('Erreur lors de la réinitialisation :', error);
                 showToast('Erreur lors de la réinitialisation.', 'error');
