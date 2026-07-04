@@ -251,37 +251,6 @@
             text-align: center;
             margin-bottom: 0.5rem;
         }
-        /* ===== STYLES DE LA PAGE LÉGALE ===== */
-        .legal-text {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--text-secondary);
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-        }
-        .legal-text h3 {
-            color: var(--text-primary);
-            font-family: var(--font-heading);
-            font-size: 1rem;
-            margin: 1rem 0 0.3rem 0;
-            letter-spacing: 0.5px;
-        }
-        .legal-text p {
-            margin-bottom: 0.5rem;
-        }
-        .legal-text::-webkit-scrollbar {
-            width: 4px;
-        }
-        .legal-text::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-        }
-        .legal-text::-webkit-scrollbar-thumb {
-            background: var(--cyan);
-            border-radius: 4px;
-        }
-
-        /* Autres styles inchangés (pour rester concis, on garde les classes existantes) */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -601,7 +570,39 @@
             gap: 0.5rem;
         }
 
-        /* Statut Flash */
+        /* ===== ÉCRAN DE CONSENTEMENT (CGU) ===== */
+        #view-consent .glass-card {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        #view-consent .consent-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+            margin: 0.5rem 0 1rem 0;
+            text-align: left;
+        }
+        #view-consent .consent-text h3 {
+            color: var(--text-primary);
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            margin: 1rem 0 0.3rem 0;
+        }
+        #view-consent .consent-text p {
+            margin-bottom: 0.5rem;
+        }
+        #view-consent .consent-text ul {
+            padding-left: 1.2rem;
+            margin: 0.3rem 0 0.6rem 0;
+        }
+        #view-consent .consent-text ul li {
+            margin-bottom: 0.2rem;
+        }
+
+        /* ===== STATUT ===== */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -656,7 +657,6 @@
         .status-selector .status-option[data-value="disponible"] .dot { background: #2ecc71; }
         .status-selector .status-option[data-value="occupe"] .dot { background: #f39c12; }
         .status-selector .status-option[data-value="enlive"] .dot { background: #e74c3c; }
-        /* Maintenance toggle */
         .maintenance-toggle {
             display: flex;
             align-items: center;
@@ -688,7 +688,6 @@
         .maintenance-toggle .toggle-track.active::after {
             left: 22px;
         }
-        /* Theme toggle privé (clair/sombre) */
         .theme-toggle-private {
             display: flex;
             align-items: center;
@@ -725,7 +724,6 @@
             color: var(--text-secondary);
         }
 
-        /* Redirection Unique */
         .redirect-toggle {
             display: flex;
             align-items: center;
@@ -771,7 +769,6 @@
             color: var(--cyan);
         }
 
-        /* Sélecteur de thème visuel et fond */
         .theme-selector {
             display: flex;
             gap: 0.5rem;
@@ -798,7 +795,6 @@
             color: var(--text-secondary);
         }
 
-        /* Compteur de vues global */
         .views-counter {
             display: inline-flex;
             align-items: center;
@@ -812,7 +808,6 @@
         }
         .views-counter i { font-size: 1rem; }
 
-        /* Statistiques avancées dans le Dashboard */
         .stats-summary {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -853,7 +848,6 @@
             transition: width 0.6s ease;
         }
 
-        /* MODAL QR Code */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -899,7 +893,6 @@
             border-color: var(--cyan);
         }
 
-        /* ===== VUE AJOUT DE LIEN ===== */
         .back-btn {
             background: transparent;
             border: none;
@@ -1141,7 +1134,6 @@
             gap: 0.8rem;
         }
 
-        /* ===== CARTES RICH PREVIEW ===== */
         .rich-link-card {
             display: flex;
             flex-direction: column;
@@ -1215,7 +1207,6 @@
             opacity: 0.8;
         }
 
-        /* Animation CTA sur le lien prioritaire (border-glow-pulse) */
         .border-glow-pulse {
             border: 2px solid var(--cyan) !important;
             animation: glowPulse 2.5s ease-in-out infinite;
@@ -1299,7 +1290,6 @@
             color: var(--cyan);
         }
 
-        /* Top réseaux */
         .top-networks {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -1326,7 +1316,6 @@
             color: var(--cyan);
         }
 
-        /* Canvas pour particules */
         #particles-canvas {
             position: fixed;
             top: 0;
@@ -1337,7 +1326,6 @@
             pointer-events: none;
         }
 
-        /* Responsive */
         @media (max-width: 420px) {
             #view-profile-public .glass-card {
                 padding: 0 0 1rem 0;
@@ -1413,35 +1401,55 @@
                 font-size: 0.7rem;
                 padding: 0.3rem 0.6rem;
             }
+            #view-consent .consent-text {
+                font-size: 0.75rem;
+                max-height: 40vh;
+            }
         }
     </style>
 </head>
 <body>
 <div id="app">
 
-    <!-- ========== VUE LÉGALE (POLITIQUE DE CONFIDENTIALITÉ) ========== -->
-    <div id="view-legal" class="view">
+    <!-- ========== VUE CONSENTEMENT (CGU) ========== -->
+    <div id="view-consent" class="view">
         <div class="glass-card">
             <div class="brand">LINKEXT</div>
-            <h2 style="font-family:var(--font-heading); font-size:1.2rem; text-align:center; margin:0.5rem 0 1rem 0;">Politique de confidentialité</h2>
-            <div class="legal-text">
-                <p>Bienvenue sur LinkExt. Avant de pouvoir accéder à notre plateforme d'inscription ou de connexion, vous devez lire attentivement et accepter les présentes conditions.</p>
+            <h2 style="font-family:var(--font-heading); font-size:1.4rem; text-align:center; margin-bottom:0.5rem;">Conditions d'utilisation</h2>
+            <div class="consent-text">
+                <h3>1. Conditions Générales d'Utilisation (CGU)</h3>
+                <p><strong>1.1. Objet du service</strong><br>
+                LinkExt fournit une plateforme de centralisation de liens (micro-page de profil) permettant aux utilisateurs de regrouper leurs réseaux sociaux et canaux de communication (WhatsApp, X, Telegram, etc.) sous une URL unique et personnalisée. Le service inclut des fonctionnalités de redirection dynamique, de génération de QR code, de partage de contact via fichier Vcard, ainsi qu'un outil de suivi statistique des visites et des clics.</p>
+                <p><strong>1.2. Accessibilité et gestion des thèmes</strong><br>
+                La plateforme propose une interface adaptative disposant d'un mode sombre (Cyberpunk/Noir) et d'un mode clair. L'activation de ces thèmes s'effectue via un interrupteur dédié présent sur les espaces privé et public, modifiant instantanément l'affichage visuel sans rechargement de la page.</p>
+                <p><strong>1.3. Fonctionnalités de l'Espace Public</strong><br>
+                L'espace public généré pour chaque profil permet aux visiteurs :
+                <ul>
+                    <li>D'accéder aux liens actifs configurés par l'utilisateur.</li>
+                    <li>D'utiliser la fonctionnalité de "Redirection Unique" (si activée), transformant la page en zone cliquable globale vers l'unique lien actif, à l'exception des boutons utilitaires.</li>
+                    <li>De scanner ou télécharger le QR Code menant vers le profil public LinkExt.</li>
+                    <li>De télécharger le fichier Vcard pour enregistrer directement les coordonnées de l'utilisateur dans le répertoire du téléphone.</li>
+                </ul>
+                </p>
 
-                <h3>1. Parcours utilisateur et Premier Chargement</h3>
-                <p>Conformément aux réglementations sur la protection des données, lors de la toute première ouverture de l'application ou du site LinkExt sur un nouveau téléphone ou navigateur mobile, l'utilisateur est accueilli par cette documentation légale. L'accès à l'espace de création de compte ou de connexion est strictement conditionné par l'action explicite d'appuyer sur le bouton « Accepter et continuer ». Un cookie essentiel ou une clé locale (LocalStorage) sera enregistré sur votre téléphone uniquement pour mémoriser cette acceptation et vous éviter de relire ce texte à chaque visite.</p>
+                <h3>2. Politique de Confidentialité</h3>
+                <p><strong>2.1. Collecte des données</strong><br>
+                Dans le cadre de l'utilisation de LinkExt, les données suivantes sont collectées et traitées :
+                <ul>
+                    <li><strong>Données de profil :</strong> Nom affiché, biographie, image de profil, et URL des réseaux sociaux renseignés par l'utilisateur.</li>
+                    <li><strong>Données techniques :</strong> Choix du thème visuel (clair/sombre) et statut de disponibilité (Disponible, Occupé, En Live).</li>
+                    <li><strong>Données analytiques anonymes :</strong> Nombre de vues du profil et statistiques de clics individuels par réseau social afin d'alimenter le Dashboard privé de l'utilisateur.</li>
+                </ul>
+                </p>
+                <p><strong>2.2. Utilisation et transmission des données</strong><br>
+                Les données collectées ont pour unique but le bon fonctionnement du service, l'affichage du profil public et la fourniture des statistiques à l'utilisateur titulaire du compte. Aucune donnée personnelle ou statistique n'est vendue, cédée ou transmise à des tiers.</p>
+                <p><strong>2.3. Sécurité et Cookies</strong><br>
+                Le site utilise des mécanismes de stockage local (localStorage ou cookies techniques) pour retenir les préférences de thème de l'utilisateur et valider l'acceptation des présentes conditions lors de la navigation. L'effacement des données de session ou la déconnexion réinitialise ce consentement, imposant une nouvelle validation lors de l'accès suivant.</p>
 
-                <h3>2. Utilisation des données et Espace Privé (Dashboard)</h3>
-                <p>LinkExt collecte uniquement les données nécessaires à la personnalisation de votre profil public : votre nom affiché, votre biographie, votre image de profil, ainsi que les liens de vos réseaux sociaux (WhatsApp, Telegram, X, etc.). Depuis votre espace privé, vous disposez d'un contrôle total : vous pouvez modifier, ajouter ou supprimer définitivement vos liens, vos images et vos textes à tout moment.</p>
-
-                <h3>3. Statistiques et Compteurs de Clics</h3>
-                <p>Pour permettre aux utilisateurs de suivre la performance de leur profil, LinkExt intègre un système de compteurs anonymes dans l'espace privé : un compteur de vues globales du profil, et un compteur de clics individuels sur chaque lien actif pour afficher le pourcentage de répartition des visites. Ces données sont strictement anonymes, restent confidentielles, et ne sont visibles que par le propriétaire du profil depuis son Dashboard. Aucune information d'identification personnelle ou de géolocalisation n'est partagée avec des entreprises tierces.</p>
-
-                <h3>4. Fonctionnalités et Interactions Matérielles</h3>
-                <p>Le site intègre des options de confort visuel et matériel (bascule de thèmes clair/sombre, animations fluides). L'activation de l'option « Redirection Unique » permet de transformer l'intégralité de l'espace public en un lien cliquable global menant vers votre unique réseau social actif, tout en excluant et en préservant le bon fonctionnement autonome des boutons QR code et Vcard (enregistrement de contact).</p>
-
-                <p style="margin-top:1rem; font-weight:500;">En cliquant sur « Accepter et continuer », vous certifiez avoir pris connaissance de ces règles, vous acceptez l'utilisation du stockage local pour vos préférences de navigation, et vous êtes redirigé vers l'espace d'inscription/connexion.</p>
+                <h3>3. Processus de Consentement Obligatoire</h3>
+                <p>Pour garantir la transparence, tout utilisateur se déconnectant de la plateforme verra s'afficher, lors de sa tentative de reconnexion ou d'inscription sur son téléphone ou ordinateur, un écran de contrôle bloquant. Cet écran présente les présentes CGU et Politique de Confidentialité. L'utilisateur doit obligatoirement cliquer sur le bouton "Accepter et continuer" pour être redirigé vers l'interface de connexion/inscription. Aucun accès aux serveurs privés n'est autorisé sans cette validation préalable.</p>
             </div>
-            <button class="btn mt-2" id="accept-legal-btn" style="width:100%;">Accepter et continuer</button>
+            <button class="btn" id="accept-consent-btn" style="width:100%;">Accepter et continuer</button>
         </div>
     </div>
 
@@ -1673,8 +1681,8 @@
                             <button class="theme-toggle" id="theme-toggle-btn" title="Basculer le thème">
                                 <i class="fas fa-moon"></i>
                             </button>
-                            <button class="btn btn-outline exclude-click" id="qr-code-btn"><i class="fas fa-qrcode"></i></button>
-                            <button class="btn btn-outline exclude-click" id="vcard-btn"><i class="fas fa-user-plus"></i></button>
+                            <button class="btn btn-outline exclude-click" id="qr-code-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-qrcode"></i></button>
+                            <button class="btn btn-outline exclude-click" id="vcard-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-user-plus"></i></button>
                         </div>
                     </div>
                     <h2 id="public-name" class="public-name">Utilisateur</h2>
@@ -1712,32 +1720,6 @@
 
 <script>
     (function() {
-        // ============================================================
-        //  GESTION DE LA PAGE LÉGALE (POLITIQUE DE CONFIDENTIALITÉ)
-        // ============================================================
-        const LEGAL_KEY = 'linkext_legal_accepted';
-
-        function checkLegal() {
-            if (localStorage.getItem(LEGAL_KEY) === 'true') {
-                // Déjà accepté, on passe directement à l'auth
-                showView('view-auth');
-                return true;
-            } else {
-                // Afficher la vue légale
-                showView('view-legal');
-                return false;
-            }
-        }
-
-        function acceptLegal() {
-            localStorage.setItem(LEGAL_KEY, 'true');
-            showView('view-auth');
-        }
-
-        // ============================================================
-        //  SUITE DE L'APPLICATION (Firebase, Cloudinary, etc.)
-        // ============================================================
-
         // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
@@ -1780,13 +1762,26 @@
 
         // --- Vues ---
         const views = {
-            legal: document.getElementById('view-legal'),
+            consent: document.getElementById('view-consent'),
             auth: document.getElementById('view-auth'),
             onboarding: document.getElementById('view-onboarding'),
             dashboard: document.getElementById('view-dashboard'),
             addLink: document.getElementById('view-add-link'),
             publicProfile: document.getElementById('view-profile-public')
         };
+
+        // --- Consentement ---
+        function isConsentGiven() {
+            return sessionStorage.getItem('consentGiven') === 'true';
+        }
+
+        function setConsentGiven(value) {
+            if (value) {
+                sessionStorage.setItem('consentGiven', 'true');
+            } else {
+                sessionStorage.removeItem('consentGiven');
+            }
+        }
 
         // --- Utilitaires ---
         function showView(viewId) {
@@ -1895,7 +1890,6 @@
             }
         }
 
-        // --- Incrémenter les clics d'un lien ---
         async function incrementLinkClick(uid, linkId) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1921,7 +1915,6 @@
             }
         }
 
-        // --- Réinitialiser les vues globales ---
         async function resetViews() {
             if (!currentUser) {
                 showToast('Vous devez être connecté.', 'error');
@@ -1944,7 +1937,6 @@
             }
         }
 
-        // --- Réinitialiser les clics d'un lien individuel ---
         async function resetLinkClicks(linkId) {
             if (!currentUser) {
                 showToast('Vous devez être connecté.', 'error');
@@ -2072,13 +2064,19 @@
             barsContainer.innerHTML = html;
         }
 
-        // --- Routage ---
+        // --- Routage avec consentement ---
         async function handleAuthRedirection(user) {
             if (!user) {
+                // Vérifier le consentement
+                if (!isConsentGiven()) {
+                    showView('view-consent');
+                    return;
+                }
                 showView('view-auth');
                 updateAuthUIForMode('login');
                 return;
             }
+            // Utilisateur connecté
             const profile = await loadUserProfile(user.uid);
             if (!profile) {
                 const defaultProfile = {
@@ -2201,7 +2199,7 @@
 
             updateStatusUI(userProfile.status || 'disponible');
             updateMaintenanceUI(userProfile.maintenance || false);
-            applyThemeToPrivateUI(); // Applique le thème clair/sombre
+            applyThemeToPrivateUI();
             updateRedirectToggleState();
             updateStats();
             renderDashboardLinks();
@@ -2297,7 +2295,6 @@
                 }
             });
 
-            // Gestion des événements
             container.onclick = (e) => {
                 const btn = e.target.closest('[data-action]');
                 if (btn) {
@@ -2633,9 +2630,7 @@
             }
         }
 
-        // ============================================================
-        //  GESTION DES THÈMES (clair/sombre) CORRIGÉE
-        // ============================================================
+        // --- Gestion du thème (clair/sombre) ---
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
@@ -2712,7 +2707,6 @@
             localStorage.setItem('background', bg);
         }
 
-        // --- Particules (Canvas léger) ---
         function initParticles() {
             const canvas = document.createElement('canvas');
             canvas.id = 'particles-canvas';
@@ -2783,7 +2777,6 @@
                 }
                 const data = doc.data();
 
-                // Incrémenter les vues globales (une seule fois par session)
                 await incrementViews(uid);
 
                 if (data.maintenance === true) {
@@ -2798,7 +2791,6 @@
                     return;
                 }
 
-                // En-tête
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
@@ -2820,7 +2812,6 @@
                 applyVisualTheme();
                 applyBackground();
 
-                // Redirection unique
                 const wrapperLink = document.getElementById('public-wrapper-link');
                 const activeLinks = data.links ? data.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '') : [];
                 const isRedirectActive = data.redirectUnique === true && activeLinks.length === 1;
@@ -2836,7 +2827,6 @@
                     wrapperLink.style.cursor = 'default';
                 }
 
-                // Contenu des liens (cartes)
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
@@ -2942,7 +2932,7 @@
                     });
                 }
 
-                // QR Code
+                // QR Code : génération dans la modale
                 const qrImg = document.getElementById('qr-image');
                 const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
@@ -2966,7 +2956,7 @@
 
             openBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                e.preventDefault(); // évite tout rechargement
+                e.preventDefault();
                 modal.classList.add('active');
             });
             closeBtn.addEventListener('click', () => {
@@ -3016,14 +3006,6 @@ URL:${urlProfil}
             });
         }
 
-        // --- Theme toggle public (CORRIGÉ) ---
-        function setupPublicThemeToggle() {
-            document.getElementById('theme-toggle-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                toggleTheme();
-            });
-        }
-
         // --- isPublicMode ---
         function isPublicMode() {
             return new URLSearchParams(window.location.search).has('id');
@@ -3034,8 +3016,19 @@ URL:${urlProfil}
 
         // ==================== ATTACHEMENT GLOBAL DES ÉVÉNEMENTS ====================
         function attachAllEventListeners() {
-            // --- Acceptation de la politique légale ---
-            document.getElementById('accept-legal-btn').addEventListener('click', acceptLegal);
+            // --- Consentement ---
+            document.getElementById('accept-consent-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                setConsentGiven(true);
+                if (currentUser) {
+                    // Si déjà connecté (cas rare), on va au dashboard
+                    showView('view-dashboard');
+                    populateDashboard();
+                } else {
+                    // Sinon on affiche la page d'authentification
+                    showView('view-auth');
+                }
+            });
 
             // --- Auth tabs ---
             document.getElementById('auth-tabs').addEventListener('click', (e) => {
@@ -3231,15 +3224,12 @@ URL:${urlProfil}
                 showView('view-add-link');
             });
 
-            // --- Dashboard : Ajouter une section ---
             document.getElementById('add-section-btn').addEventListener('click', addSection);
 
-            // --- Vue add-link : Retour ---
             document.getElementById('back-from-add-link').addEventListener('click', () => {
                 showView('view-dashboard');
             });
 
-            // --- Vue add-link : Valider ---
             document.getElementById('validate-link-btn').addEventListener('click', validateAndAddLink);
 
             // --- Dashboard : Enregistrer ---
@@ -3295,9 +3285,15 @@ URL:${urlProfil}
                 }
             });
 
-            // --- Déconnexion ---
+            // --- Déconnexion (supprime le consentement) ---
             document.getElementById('logout-btn').addEventListener('click', () => {
+                setConsentGiven(false);
                 auth.signOut();
+                // Réinitialiser l'état local
+                currentUser = null;
+                userProfile = null;
+                showView('view-consent');
+                showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
             });
 
             // --- Uploads ---
@@ -3323,7 +3319,6 @@ URL:${urlProfil}
                 }
             });
 
-            // --- Réinitialisation des vues globales ---
             document.getElementById('reset-views-btn').addEventListener('click', resetViews);
 
             // --- Thème privé (clair/sombre) ---
@@ -3336,18 +3331,25 @@ URL:${urlProfil}
             document.getElementById('redirect-toggle-track').addEventListener('click', toggleRedirectUnique);
 
             // --- Sélecteurs de thème visuel et fond ---
-            document.getElementById('visual-theme-select').addEventListener('change', applyVisualTheme);
-            document.getElementById('background-select').addEventListener('change', applyBackground);
+            document.getElementById('visual-theme-select').addEventListener('change', function() {
+                applyVisualTheme();
+            });
+            document.getElementById('background-select').addEventListener('change', function() {
+                applyBackground();
+            });
 
-            // --- QR Code et Vcard (public) ---
+            // --- QR Code et Vcard ---
             setupQRModal();
             setupVcard();
 
-            // --- Theme toggle public ---
-            setupPublicThemeToggle();
-
             // --- Grille d'ajout ---
             renderAddLinkGrid();
+
+            // --- Theme toggle public ---
+            document.getElementById('theme-toggle-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleTheme();
+            });
         }
 
         // --- Auth state ---
@@ -3360,13 +3362,6 @@ URL:${urlProfil}
                 return;
             }
 
-            // Vérifier d'abord si l'utilisateur a accepté les conditions légales
-            const legalAccepted = localStorage.getItem(LEGAL_KEY) === 'true';
-            if (!legalAccepted) {
-                showView('view-legal');
-                return;
-            }
-
             currentUser = user;
             await handleAuthRedirection(user);
         });
@@ -3374,21 +3369,7 @@ URL:${urlProfil}
         // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
-
-            // Si mode public, on ne vérifie pas la politique (le profil public est accessible sans acceptation)
-            if (isPublicMode()) {
-                showView('view-profile-public');
-                loadPublicProfile(getPublicUid());
-                return;
-            }
-
-            // Sinon, on vérifie la politique
-            const legalAccepted = localStorage.getItem(LEGAL_KEY) === 'true';
-            if (!legalAccepted) {
-                showView('view-legal');
-            } else {
-                showView('view-auth');
-            }
+            // On laisse onAuthStateChanged gérer le routage initial
         });
 
     })();
