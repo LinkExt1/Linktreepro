@@ -1544,7 +1544,7 @@
                 <select id="visual-theme-select">
                     <option value="cyberpunk">Cyberpunk</option>
                     <option value="minimaliste">Minimaliste Blanc</option>
-                    <option value="neo-brutaliste">Néo‑brutaliste</option>
+                    <option value="neo-brutaliste">Néobrutaliste</option>
                 </select>
                 <label style="margin-left:0.5rem;"><i class="fas fa-image"></i> Fond</label>
                 <select id="background-select">
@@ -1774,6 +1774,7 @@
         function isConsentGiven() {
             return sessionStorage.getItem('consentGiven') === 'true';
         }
+
         function setConsentGiven(value) {
             if (value) {
                 sessionStorage.setItem('consentGiven', 'true');
@@ -1868,6 +1869,8 @@
         }
 
         // --- Incrémentation des vues globales (avec protection double comptage) ---
+        let viewCountedFlag = false;
+
         async function incrementViews(uid) {
             const key = 'viewCounted_' + uid;
             if (sessionStorage.getItem(key) === 'true') {
@@ -1887,7 +1890,6 @@
             }
         }
 
-        // --- Incrémenter les clics d'un lien (accessible globalement) ---
         async function incrementLinkClick(uid, linkId) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1904,7 +1906,6 @@
                 await docRef.update({ links: updatedLinks });
                 if (userProfile && userProfile._id === uid) {
                     userProfile.links = updatedLinks;
-                    // Mettre à jour le dashboard si affiché
                     if (document.getElementById('view-dashboard').classList.contains('active')) {
                         updateStats();
                     }
@@ -1914,7 +1915,6 @@
             }
         }
 
-        // --- Réinitialiser les vues ---
         async function resetViews() {
             if (!currentUser) {
                 showToast('Vous devez être connecté.', 'error');
@@ -1937,7 +1937,6 @@
             }
         }
 
-        // --- Réinitialiser les clics d'un lien individuel ---
         async function resetLinkClicks(linkId) {
             if (!currentUser) {
                 showToast('Vous devez être connecté.', 'error');
@@ -2068,6 +2067,7 @@
         // --- Routage avec consentement ---
         async function handleAuthRedirection(user) {
             if (!user) {
+                // Vérifier le consentement
                 if (!isConsentGiven()) {
                     showView('view-consent');
                     return;
@@ -2076,6 +2076,7 @@
                 updateAuthUIForMode('login');
                 return;
             }
+            // Utilisateur connecté
             const profile = await loadUserProfile(user.uid);
             if (!profile) {
                 const defaultProfile = {
@@ -2765,9 +2766,7 @@
             draw();
         }
 
-        // ==========================================================
-        //  PROFIL PUBLIC (CORRIGÉ POUR LA REDIRECTION UNIQUE)
-        // ==========================================================
+        // --- Profil Public (CORRIGÉ) ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -2792,10 +2791,10 @@
                     return;
                 }
 
-                // En-tête
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
+
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
 
@@ -2813,38 +2812,21 @@
                 applyVisualTheme();
                 applyBackground();
 
-                // Redirection Unique
                 const wrapperLink = document.getElementById('public-wrapper-link');
                 const activeLinks = data.links ? data.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '') : [];
                 const isRedirectActive = data.redirectUnique === true && activeLinks.length === 1;
 
-                // Supprimer tous les anciens écouteurs pour éviter les doublons
-                wrapperLink.onclick = null;
-
                 if (isRedirectActive) {
                     const targetUrl = sanitizeUrl(activeLinks[0].url);
-                    const linkId = activeLinks[0].id;
-
-                    // Définir le gestionnaire de clic
-                    wrapperLink.onclick = function(e) {
-                        e.preventDefault();
-                        // Incrémenter le clic, puis rediriger
-                        incrementLinkClick(uid, linkId).then(() => {
-                            window.open(targetUrl, '_blank');
-                        });
-                    };
-
+                    wrapperLink.href = targetUrl;
                     wrapperLink.style.pointerEvents = 'auto';
                     wrapperLink.style.cursor = 'pointer';
                 } else {
-                    wrapperLink.onclick = function(e) {
-                        e.preventDefault();
-                    };
+                    wrapperLink.href = '#';
                     wrapperLink.style.pointerEvents = 'none';
                     wrapperLink.style.cursor = 'default';
                 }
 
-                // Contenu des liens (cartes)
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
@@ -2890,22 +2872,19 @@
                             card.appendChild(badge);
                         }
 
-                        // Gestion du clic sur la carte (uniquement si redirection unique désactivée)
-                        if (!isRedirectActive) {
-                            const linkUrl = sanitizeUrl(item.url);
-                            const linkId = item.id;
-                            card.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                incrementLinkClick(uid, linkId).then(() => {
-                                    window.open(linkUrl, '_blank');
-                                });
-                            });
-                            card.style.cursor = 'pointer';
-                            card.style.pointerEvents = 'auto';
-                        } else {
-                            // Redirection active : on désactive les cartes individuelles
-                            card.style.cursor = 'default';
+                        const handleCardClick = (e) => {
+                            if (isRedirectActive) return;
+                            e.preventDefault();
+                            window.open(sanitizeUrl(item.url), '_blank');
+                            incrementLinkClick(uid, item.id).catch(() => {});
+                        };
+                        card.addEventListener('click', handleCardClick);
+
+                        if (isRedirectActive) {
                             card.style.pointerEvents = 'none';
+                        } else {
+                            card.style.pointerEvents = 'auto';
+                            card.style.cursor = 'pointer';
                         }
 
                         const desc = document.createElement('div');
@@ -2953,12 +2932,11 @@
                     });
                 }
 
-                // QR Code (modale)
+                // QR Code : génération dans la modale
                 const qrImg = document.getElementById('qr-image');
                 const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
 
-                // Vcard
                 window._vcardData = {
                     displayName: data.displayName || 'Utilisateur',
                     links: data.links || []
@@ -3038,26 +3016,28 @@ URL:${urlProfil}
 
         // ==================== ATTACHEMENT GLOBAL DES ÉVÉNEMENTS ====================
         function attachAllEventListeners() {
-            // Consentement
+            // --- Consentement ---
             document.getElementById('accept-consent-btn').addEventListener('click', function(e) {
                 e.preventDefault();
                 setConsentGiven(true);
                 if (currentUser) {
+                    // Si déjà connecté (cas rare), on va au dashboard
                     showView('view-dashboard');
                     populateDashboard();
                 } else {
+                    // Sinon on affiche la page d'authentification
                     showView('view-auth');
                 }
             });
 
-            // Auth tabs
+            // --- Auth tabs ---
             document.getElementById('auth-tabs').addEventListener('click', (e) => {
                 if (e.target.classList.contains('tab')) {
                     updateAuthUIForMode(e.target.dataset.tab);
                 }
             });
 
-            // Auth form
+            // --- Auth form ---
             document.getElementById('auth-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('auth-email').value.trim();
@@ -3096,7 +3076,7 @@ URL:${urlProfil}
                 }
             });
 
-            // Google Sign-In
+            // --- Google Sign-In ---
             document.getElementById('google-signin-btn').addEventListener('click', async () => {
                 const googleBtn = document.getElementById('google-signin-btn');
                 const googleText = document.getElementById('google-btn-text');
@@ -3128,7 +3108,7 @@ URL:${urlProfil}
                 }
             });
 
-            // Mot de passe oublié
+            // --- Mot de passe oublié ---
             document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
                 e.preventDefault();
                 const email = prompt('Entrez votre adresse email pour réinitialiser le mot de passe :');
@@ -3141,7 +3121,7 @@ URL:${urlProfil}
                 }
             });
 
-            // Onboarding : Passer
+            // --- Onboarding : Passer ---
             document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const bio = document.getElementById('onboarding-bio').value.trim();
@@ -3184,7 +3164,7 @@ URL:${urlProfil}
                 showToast('Profil créé avec succès (sauvegarde en cours).', 'info');
             });
 
-            // Onboarding : Finaliser
+            // --- Onboarding : Finaliser ---
             document.getElementById('finish-onboarding-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const bio = document.getElementById('onboarding-bio').value.trim();
@@ -3231,7 +3211,7 @@ URL:${urlProfil}
                 await populateDashboard();
             });
 
-            // Dashboard : Ajouter un lien
+            // --- Dashboard : Ajouter un lien ---
             document.getElementById('add-link-btn').addEventListener('click', () => {
                 selectedNetworkType = null;
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
@@ -3252,7 +3232,7 @@ URL:${urlProfil}
 
             document.getElementById('validate-link-btn').addEventListener('click', validateAndAddLink);
 
-            // Dashboard : Enregistrer
+            // --- Dashboard : Enregistrer ---
             document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const name = document.getElementById('dashboard-name').value.trim();
@@ -3287,7 +3267,7 @@ URL:${urlProfil}
                 }
             });
 
-            // Dashboard : Copier le lien de partage
+            // --- Dashboard : Copier le lien de partage ---
             document.getElementById('copy-share-link-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const shareUrl = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
@@ -3305,21 +3285,22 @@ URL:${urlProfil}
                 }
             });
 
-            // Déconnexion (supprime le consentement)
+            // --- Déconnexion (supprime le consentement) ---
             document.getElementById('logout-btn').addEventListener('click', () => {
                 setConsentGiven(false);
                 auth.signOut();
+                // Réinitialiser l'état local
                 currentUser = null;
                 userProfile = null;
                 showView('view-consent');
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
             });
 
-            // Uploads
+            // --- Uploads ---
             setupAvatarUpload();
             setupLinkImageUpload();
 
-            // Événements dashboard (statut, maintenance)
+            // --- Événements dashboard (statut, maintenance) ---
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
                 el.addEventListener('click', () => {
                     const value = el.dataset.value;
@@ -3340,16 +3321,16 @@ URL:${urlProfil}
 
             document.getElementById('reset-views-btn').addEventListener('click', resetViews);
 
-            // Thème privé (clair/sombre)
+            // --- Thème privé (clair/sombre) ---
             document.getElementById('theme-toggle-private').addEventListener('click', function(e) {
                 e.preventDefault();
                 toggleTheme();
             });
 
-            // Redirection Unique
+            // --- Redirection Unique ---
             document.getElementById('redirect-toggle-track').addEventListener('click', toggleRedirectUnique);
 
-            // Sélecteurs de thème visuel et fond
+            // --- Sélecteurs de thème visuel et fond ---
             document.getElementById('visual-theme-select').addEventListener('change', function() {
                 applyVisualTheme();
             });
@@ -3357,14 +3338,14 @@ URL:${urlProfil}
                 applyBackground();
             });
 
-            // QR Code et Vcard
+            // --- QR Code et Vcard ---
             setupQRModal();
             setupVcard();
 
-            // Grille d'ajout
+            // --- Grille d'ajout ---
             renderAddLinkGrid();
 
-            // Theme toggle public
+            // --- Theme toggle public ---
             document.getElementById('theme-toggle-btn').addEventListener('click', function(e) {
                 e.preventDefault();
                 toggleTheme();
@@ -3388,6 +3369,7 @@ URL:${urlProfil}
         // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
+            // On laisse onAuthStateChanged gérer le routage initial
         });
 
     })();
