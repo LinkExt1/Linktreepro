@@ -6,12 +6,9 @@
     <title>LinkExt | Cyber Linktree</title>
 
     <!-- ===== META SEO ===== -->
-    <!-- Ils seront dynamiquement injectés par JavaScript, on laisse les valeurs par défaut -->
     <title>LinkExt</title>
     <meta name="description" content="Centralisez vos liens et réseaux sociaux en un seul endroit.">
     <meta name="keywords" content="linktree, réseaux sociaux, cyberpunk">
-
-    <!-- Open Graph -->
     <meta property="og:title" content="LinkExt">
     <meta property="og:description" content="Centralisez vos liens et réseaux sociaux en un seul endroit.">
     <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
@@ -24,7 +21,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
-    <!-- ===== STYLES ===== -->
     <style>
         /* ===== VARIABLES (thème Cyberpunk par défaut) ===== */
         :root {
@@ -39,9 +35,9 @@
             --success: #2ecc71;
             --font-heading: 'Orbitron', sans-serif;
             --font-body: 'Inter', sans-serif;
-            --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            --card-bg: rgba(255,255,255,0.04);
-            --card-border: rgba(255,255,255,0.08);
+            --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --card-bg: rgba(255,255,255,0.03);
+            --card-border: rgba(255,255,255,0.06);
             --input-bg: rgba(255,255,255,0.05);
             --input-border: rgba(255,255,255,0.1);
             --shadow-color: rgba(0,0,0,0.6);
@@ -49,24 +45,26 @@
                               radial-gradient(circle at 100% 30%, rgba(79, 172, 254, 0.05) 0%, transparent 50%);
             --flash-bg: #ff1744;
             --flash-text: #fff;
+            --nav-bg: rgba(10, 11, 16, 0.85);
         }
 
         /* ===== THÈMES VISUELS ===== */
         body.theme-minimaliste {
             --bg-deep: #f5f5f7;
-            --bg-card: rgba(255,255,255,0.85);
+            --bg-card: rgba(255,255,255,0.8);
             --border-glow: rgba(0,0,0,0.1);
             --cyan: #0071e3;
             --violet: #5856d6;
             --text-primary: #1d1d1f;
             --text-secondary: #6e6e73;
             --card-bg: rgba(0,0,0,0.02);
-            --card-border: rgba(0,0,0,0.08);
+            --card-border: rgba(0,0,0,0.06);
             --input-bg: rgba(0,0,0,0.04);
             --input-border: rgba(0,0,0,0.12);
             --shadow-color: rgba(0,0,0,0.08);
             --bg-deep-image: none;
             font-family: 'Inter', sans-serif;
+            --nav-bg: rgba(245, 245, 247, 0.85);
         }
         body.theme-minimaliste .brand {
             background: linear-gradient(135deg, #0071e3, #5856d6);
@@ -87,16 +85,8 @@
             color: var(--text-secondary);
         }
         body.theme-minimaliste .glass-card {
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
             background: var(--bg-card);
-        }
-        body.theme-minimaliste .link-item {
-            background: var(--card-bg);
-            border-color: var(--card-border);
-        }
-        body.theme-minimaliste .rich-link-card {
-            background: var(--card-bg);
-            border-color: var(--card-border);
         }
 
         body.theme-neo-brutaliste {
@@ -115,6 +105,7 @@
             --bg-deep-image: none;
             border-radius: 0 !important;
             font-family: 'Inter', sans-serif;
+            --nav-bg: #faf3e0;
         }
         body.theme-neo-brutaliste .glass-card {
             border: 4px solid #1a1a2e;
@@ -141,18 +132,8 @@
             border-radius: 0 !important;
             box-shadow: 4px 4px 0 #1a1a2e;
         }
-        body.theme-neo-brutaliste .link-item {
-            border: 3px solid #1a1a2e;
+        body.theme-neo-brutaliste .nav-item {
             border-radius: 0 !important;
-            background: #ffffff;
-        }
-        body.theme-neo-brutaliste .rich-link-card {
-            border: 3px solid #1a1a2e;
-            border-radius: 0 !important;
-            background: #ffffff;
-        }
-        body.theme-neo-brutaliste .public-section-title {
-            border-bottom: 3px solid #1a1a2e;
         }
 
         /* ===== FONDS DYNAMIQUES ===== */
@@ -166,15 +147,10 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        body.fond-aurora #view-profile-public .glass-card {
+        body.fond-aurora .glass-card {
             backdrop-filter: blur(14px);
             background: rgba(0,0,0,0.3);
-            border-color: rgba(255,255,255,0.2);
-        }
-        body.fond-aurora .public-name {
-            background: linear-gradient(135deg, #fff, #fff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            border-color: rgba(255,255,255,0.15);
         }
 
         body.fond-particules {
@@ -190,21 +166,17 @@
             z-index: 0;
             pointer-events: none;
         }
-        body.fond-particules #view-profile-public {
+        body.fond-particules #app {
             position: relative;
             z-index: 1;
         }
-        body.fond-particules #view-profile-public .glass-card {
+        body.fond-particules .glass-card {
             backdrop-filter: blur(6px);
             background: rgba(10, 11, 16, 0.6);
         }
 
         body.fond-unique {
             background: var(--bg-deep);
-        }
-        body.fond-unique #view-profile-public .glass-card {
-            backdrop-filter: blur(14px);
-            background: var(--bg-card);
         }
 
         /* ===== STYLES GÉNÉRAUX ===== */
@@ -327,6 +299,9 @@
             cursor: not-allowed;
             filter: grayscale(30%);
         }
+        .btn:active {
+            transform: scale(0.95);
+        }
         .btn-outline {
             background: transparent;
             border: 1px solid var(--cyan);
@@ -440,7 +415,7 @@
             align-items: center;
             gap: 0.5rem;
             flex-wrap: wrap;
-            transition: var(--transition);
+            transition: all var(--transition);
         }
         .link-item .platform-icon { font-size: 1.4rem; width: 1.8rem; text-align: center; }
         .link-item input { flex: 1; min-width: 120px; font-size: 0.85rem; padding: 0.5rem 0.7rem; }
@@ -498,6 +473,9 @@
             transition: var(--transition);
         }
         .toggle-switch.active::after { left: 20px; }
+        .toggle-switch:active {
+            transform: scale(0.95);
+        }
         .delete-link-btn {
             background: transparent;
             border: none;
@@ -1037,7 +1015,6 @@
             border-radius: 20px;
             position: relative;
         }
-        /* Bannière Alerte Flash (en haut de la page publique) */
         .flash-banner {
             background: var(--flash-bg);
             color: var(--flash-text);
@@ -1052,9 +1029,7 @@
             display: none;
             border-radius: 20px 20px 0 0;
         }
-        .flash-banner.active {
-            display: block;
-        }
+        .flash-banner.active { display: block; }
         .flash-banner.flash-red { --flash-bg: #ff1744; }
         .flash-banner.flash-cyan { --flash-bg: #00e5ff; --flash-text: #0a0b10; }
         .flash-banner.flash-orange { --flash-bg: #ff9100; }
@@ -1073,9 +1048,7 @@
             transition: var(--transition);
             padding: 0 0.3rem;
         }
-        .flash-banner .flash-close:hover {
-            opacity: 1;
-        }
+        .flash-banner .flash-close:hover { opacity: 1; }
 
         .public-header {
             padding: 1.2rem 1.8rem 0.4rem 1.8rem;
@@ -1383,26 +1356,131 @@
             pointer-events: none;
         }
 
-        /* ===== NOUVEAUX STYLES POUR LES FONCTIONNALITÉS ===== */
-        .seo-section,
-        .integrations-section,
-        .flash-section,
-        .subscribers-section {
+        /* ===== DASHBOARD REFONDU (TABS + NAVBAR FIXE) ===== */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            max-height: 700px;
+            padding: 0;
+            overflow: hidden;
+            border-radius: 24px;
+        }
+        .dashboard-container .dashboard-header {
+            padding: 1.2rem 1.8rem 0.5rem 1.8rem;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-glow);
+        }
+        .dashboard-container .dashboard-header .brand {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        .dashboard-container .dashboard-header .logout-btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        /* Barre de navigation (Navbar) */
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0.8rem;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .dashboard-nav .nav-item {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-body);
+            position: relative;
+        }
+        .dashboard-nav .nav-item i {
+            font-size: 1.3rem;
+            transition: var(--transition);
+        }
+        .dashboard-nav .nav-item span {
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .dashboard-nav .nav-item:hover {
+            color: var(--text-primary);
+        }
+        .dashboard-nav .nav-item.active {
+            color: var(--cyan);
+            background: rgba(0,242,254,0.08);
+        }
+        .dashboard-nav .nav-item.active i {
+            text-shadow: 0 0 12px var(--cyan);
+        }
+        .dashboard-nav .nav-item:active {
+            transform: scale(0.92);
+        }
+
+        /* Conteneur des onglets (Tab Content) */
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.8rem 1.8rem 1.8rem;
+            scroll-behavior: smooth;
+        }
+        .tab-content .tab-pane {
+            display: none;
+            animation: fadeSlideIn 0.25s ease-in-out;
+        }
+        .tab-content .tab-pane.active {
+            display: block;
+        }
+
+        /* Sous-titres dans les onglets */
+        .tab-pane h3 {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            color: var(--cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tab-pane h3 i {
+            font-size: 1.2rem;
+        }
+
+        /* Ajustements pour les sections existantes */
+        .tab-pane .seo-section,
+        .tab-pane .integrations-section,
+        .tab-pane .flash-section,
+        .tab-pane .subscribers-section {
             border-top: 1px solid var(--border-glow);
             padding-top: 1rem;
             margin-top: 0.5rem;
         }
-        .seo-section .input-group,
-        .integrations-section .input-group,
-        .flash-section .input-group {
+        .tab-pane .seo-section .input-group,
+        .tab-pane .integrations-section .input-group,
+        .tab-pane .flash-section .input-group {
             margin-bottom: 0.8rem;
         }
-        .flash-section .color-selector {
+        .tab-pane .flash-section .color-selector {
             display: flex;
             gap: 0.5rem;
             margin: 0.3rem 0 0.5rem 0;
         }
-        .flash-section .color-selector .color-option {
+        .tab-pane .flash-section .color-selector .color-option {
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -1410,16 +1488,16 @@
             cursor: pointer;
             transition: var(--transition);
         }
-        .flash-section .color-selector .color-option.active {
+        .tab-pane .flash-section .color-selector .color-option.active {
             border-color: var(--cyan);
             transform: scale(1.1);
         }
-        .flash-section .color-selector .color-option.color-red { background: #ff1744; }
-        .flash-section .color-selector .color-option.color-cyan { background: #00e5ff; }
-        .flash-section .color-selector .color-option.color-orange { background: #ff9100; }
+        .tab-pane .flash-section .color-selector .color-option.color-red { background: #ff1744; }
+        .tab-pane .flash-section .color-selector .color-option.color-cyan { background: #00e5ff; }
+        .tab-pane .flash-section .color-selector .color-option.color-orange { background: #ff9100; }
 
         .subscribers-list {
-            max-height: 150px;
+            max-height: 120px;
             overflow-y: auto;
             background: var(--card-bg);
             border-radius: 12px;
@@ -1443,7 +1521,6 @@
             color: var(--text-secondary);
             font-size: 0.65rem;
         }
-
         .subscribers-section .copy-email-btn {
             padding: 0.2rem 0.6rem;
             font-size: 0.7rem;
@@ -1565,6 +1642,30 @@
                 font-size: 0.75rem;
                 padding: 0.4rem 0.8rem;
             }
+            .dashboard-container {
+                height: 90vh;
+                max-height: none;
+                border-radius: 16px;
+            }
+            .dashboard-container .dashboard-header {
+                padding: 0.8rem 1rem 0.3rem 1rem;
+            }
+            .dashboard-container .dashboard-header .brand {
+                font-size: 1.1rem;
+            }
+            .dashboard-nav .nav-item {
+                font-size: 0.65rem;
+                padding: 0.2rem 0.4rem;
+            }
+            .dashboard-nav .nav-item i {
+                font-size: 1.1rem;
+            }
+            .tab-content {
+                padding: 0.8rem 1rem 1rem 1rem;
+            }
+            .tab-content .tab-pane h3 {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -1665,201 +1766,230 @@
         </div>
     </div>
 
-    <!-- ========== VUE DASHBOARD ========== -->
+    <!-- ========== VUE DASHBOARD (REFONDU) ========== -->
     <div id="view-dashboard" class="view">
-        <div class="glass-card">
-            <div style="display:flex; justify-content: space-between; align-items:center;">
-                <div class="brand" style="font-size:1.5rem; margin:0;">DASHBOARD</div>
-                <button class="btn btn-outline" id="logout-btn" style="padding:0.5rem 1rem;"><i class="fas fa-sign-out-alt"></i></button>
+        <div class="glass-card dashboard-container">
+            <!-- En-tête du Dashboard (fixe) -->
+            <div class="dashboard-header">
+                <div class="brand" style="font-size:1.3rem; margin:0;">DASHBOARD</div>
+                <button class="btn btn-outline logout-btn" id="logout-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
-            <!-- Bloc Statut Flash + Maintenance + Theme -->
-            <div class="mt-2" style="display:flex; flex-wrap:wrap; gap:0.8rem; justify-content:space-between; align-items:center;">
-                <div>
-                    <label style="font-size:0.8rem; color:var(--text-secondary);">Statut Flash</label>
-                    <div class="status-selector" id="status-selector">
-                        <span class="status-option active" data-value="disponible"><span class="dot"></span> Disponible</span>
-                        <span class="status-option" data-value="occupe"><span class="dot"></span> Occupé</span>
-                        <span class="status-option" data-value="enlive"><span class="dot"></span> En Live</span>
+            <!-- Barre de navigation (fixe) -->
+            <nav class="dashboard-nav" id="dashboard-nav">
+                <button class="nav-item active" data-tab="analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></button>
+                <button class="nav-item" data-tab="links"><i class="fas fa-link"></i><span>Liens</span></button>
+                <button class="nav-item" data-tab="profile"><i class="fas fa-user"></i><span>Profil</span></button>
+                <button class="nav-item" data-tab="advanced"><i class="fas fa-cog"></i><span>Avancé</span></button>
+            </nav>
+
+            <!-- Contenu des onglets -->
+            <div class="tab-content">
+                <!-- ===== ONGLET 1 : ANALYTICS ===== -->
+                <div class="tab-pane active" id="tab-analytics">
+                    <h3><i class="fas fa-chart-line"></i> Vue d'ensemble</h3>
+
+                    <!-- Statistiques avancées -->
+                    <div class="stats-summary" id="stats-summary">
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-views">0</div>
+                            <div class="stat-label">Vues du profil</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-total-clicks">0</div>
+                            <div class="stat-label">Clics totaux</div>
+                        </div>
+                        <div class="stat-card" style="grid-column: span 2;">
+                            <div class="stat-label" style="margin-bottom:0.3rem;">Répartition des clics</div>
+                            <div id="stat-bars"></div>
+                        </div>
+                        <!-- Bouton Export Rapport -->
+                        <div style="grid-column: span 2; margin-top:0.3rem;">
+                            <button class="btn btn-outline export-report-btn" id="export-report-btn" style="width:100%; padding:0.5rem; font-size:0.85rem;">
+                                <i class="fas fa-file-download"></i> Exporter le rapport (PDF)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Compteur vues global et réinitialisation -->
+                    <div class="flex-between" style="margin-top:0.5rem;">
+                        <span class="views-counter"><i class="fas fa-eye"></i> <span id="views-count-display">0</span> vues</span>
+                        <button class="btn btn-outline" id="reset-views-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                            <i class="fas fa-redo"></i> Réinitialiser les vues
+                        </button>
+                    </div>
+
+                    <!-- Top 3 réseaux les plus cliqués -->
+                    <div id="top-networks-container" class="top-networks"></div>
+                </div>
+
+                <!-- ===== ONGLET 2 : MES LIENS ===== -->
+                <div class="tab-pane" id="tab-links">
+                    <h3><i class="fas fa-link"></i> Gestion des liens</h3>
+
+                    <!-- Redirection Unique -->
+                    <div class="flex-between" style="margin-bottom:0.8rem; border-bottom:1px solid var(--border-glow); padding-bottom:0.5rem;">
+                        <div class="redirect-toggle">
+                            <span style="font-size:0.8rem; color:var(--text-secondary);">Redirection Unique</span>
+                            <div class="toggle-track" id="redirect-toggle-track"></div>
+                            <span class="status-label" id="redirect-status-label">Désactivé</span>
+                        </div>
+                        <span style="font-size:0.6rem; color:var(--text-secondary);" id="redirect-hint">(nécessite 1 lien actif)</span>
+                    </div>
+
+                    <!-- Liste des liens + sections -->
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:0.5rem;">
+                        <span style="font-family:var(--font-heading); font-size:0.9rem; color:var(--text-secondary);"><i class="fas fa-list"></i> Mes liens</span>
+                        <div style="display:flex; gap:0.4rem;">
+                            <button class="btn btn-outline" id="add-section-btn" style="padding:0.2rem 0.6rem; font-size:0.7rem;"><i class="fas fa-heading"></i> Section</button>
+                            <button class="btn btn-outline" id="add-link-btn" style="padding:0.2rem 0.6rem; font-size:0.7rem;"><i class="fas fa-plus"></i> Lien</button>
+                        </div>
+                    </div>
+                    <div id="dashboard-links-container" style="display:flex; flex-direction:column; gap:0.4rem; max-height:220px; overflow-y:auto; padding-right:0.3rem;"></div>
+                </div>
+
+                <!-- ===== ONGLET 3 : PROFIL & STYLE ===== -->
+                <div class="tab-pane" id="tab-profile">
+                    <h3><i class="fas fa-user-circle"></i> Profil & Style</h3>
+
+                    <!-- Nom, bio, photo -->
+                    <div class="profile-header">
+                        <div class="avatar-wrapper">
+                            <img id="dashboard-avatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=128" alt="avatar">
+                        </div>
+                        <div style="flex:1;">
+                            <div class="input-group">
+                                <label>Nom affiché</label>
+                                <input type="text" class="input-field" id="dashboard-name" placeholder="Votre nom">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group mt-1">
+                        <label>Photo de profil</label>
+                        <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center; padding:0.4rem;">
+                            <i class="fas fa-camera"></i> Changer la photo
+                        </button>
+                    </div>
+
+                    <div class="input-group mt-1">
+                        <label>Biographie</label>
+                        <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
+                    </div>
+
+                    <!-- Statut Flash -->
+                    <div class="mt-1">
+                        <label style="font-size:0.8rem; color:var(--text-secondary);">Statut Flash</label>
+                        <div class="status-selector" id="status-selector">
+                            <span class="status-option active" data-value="disponible"><span class="dot"></span> Disponible</span>
+                            <span class="status-option" data-value="occupe"><span class="dot"></span> Occupé</span>
+                            <span class="status-option" data-value="enlive"><span class="dot"></span> En Live</span>
+                        </div>
+                    </div>
+
+                    <!-- Style visuel et fond -->
+                    <div class="theme-selector mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
+                        <label><i class="fas fa-palette"></i> Style visuel</label>
+                        <select id="visual-theme-select">
+                            <option value="cyberpunk">Cyberpunk</option>
+                            <option value="minimaliste">Minimaliste Blanc</option>
+                            <option value="neo-brutaliste">Néo‑brutaliste</option>
+                        </select>
+                        <label style="margin-left:0.5rem;"><i class="fas fa-image"></i> Fond</label>
+                        <select id="background-select">
+                            <option value="cyberpunk">Dégradé Cyberpunk</option>
+                            <option value="aurora">Dégradé Aurora</option>
+                            <option value="particules">Particules légères</option>
+                            <option value="uni">Fond uni</option>
+                        </select>
+                    </div>
+
+                    <!-- Maintenance & Theme (clair/sombre) -->
+                    <div class="flex-between mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.5rem;">
+                        <div class="maintenance-toggle">
+                            <span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span>
+                            <div class="toggle-track" id="maintenance-toggle"></div>
+                        </div>
+                        <div class="theme-toggle-private">
+                            <i class="fas fa-sun" id="theme-private-icon"></i>
+                            <div class="toggle-track" id="theme-toggle-private"></div>
+                            <i class="fas fa-moon" id="theme-private-icon-moon"></i>
+                        </div>
                     </div>
                 </div>
-                <div style="display:flex; flex-wrap:wrap; gap:0.8rem; align-items:center;">
-                    <div class="maintenance-toggle">
-                        <span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span>
-                        <div class="toggle-track" id="maintenance-toggle"></div>
+
+                <!-- ===== ONGLET 4 : OUTILS AVANCÉS ===== -->
+                <div class="tab-pane" id="tab-advanced">
+                    <h3><i class="fas fa-cogs"></i> Outils Avancés</h3>
+
+                    <!-- SEO -->
+                    <div class="seo-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-search"></i> Optimisation SEO</h4>
+                        <div class="input-group">
+                            <label>Méta-Titre (max 60 caractères)</label>
+                            <input type="text" class="input-field" id="seo-title" maxlength="60" placeholder="Titre de votre profil...">
+                        </div>
+                        <div class="input-group">
+                            <label>Méta-Description (max 160 caractères)</label>
+                            <input type="text" class="input-field" id="seo-description" maxlength="160" placeholder="Description...">
+                        </div>
+                        <div class="input-group">
+                            <label>Mots-clés (séparés par des virgules)</label>
+                            <input type="text" class="input-field" id="seo-keywords" placeholder="mot1, mot2, mot3">
+                        </div>
                     </div>
-                    <div class="theme-toggle-private">
-                        <i class="fas fa-sun" id="theme-private-icon"></i>
-                        <div class="toggle-track" id="theme-toggle-private"></div>
-                        <i class="fas fa-moon" id="theme-private-icon-moon"></i>
+
+                    <!-- Intégrations Marketing -->
+                    <div class="integrations-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-chart-line"></i> Intégrations Marketing</h4>
+                        <div class="input-group">
+                            <label>ID Pixel Meta (Facebook)</label>
+                            <input type="text" class="input-field" id="meta-pixel-id" placeholder="123456789012345">
+                        </div>
+                        <div class="input-group">
+                            <label>ID Google Analytics (G-XXXXX)</label>
+                            <input type="text" class="input-field" id="google-analytics-id" placeholder="G-XXXXXXXXXX">
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Sélecteur de thème visuel et fond -->
-            <div class="theme-selector" style="margin-top:0.3rem; border-top:1px solid var(--border-glow); padding-top:0.4rem;">
-                <label><i class="fas fa-palette"></i> Style visuel</label>
-                <select id="visual-theme-select">
-                    <option value="cyberpunk">Cyberpunk</option>
-                    <option value="minimaliste">Minimaliste Blanc</option>
-                    <option value="neo-brutaliste">Néo‑brutaliste</option>
-                </select>
-                <label style="margin-left:0.5rem;"><i class="fas fa-image"></i> Fond</label>
-                <select id="background-select">
-                    <option value="cyberpunk">Dégradé Cyberpunk</option>
-                    <option value="aurora">Dégradé Aurora</option>
-                    <option value="particules">Particules légères</option>
-                    <option value="uni">Fond uni</option>
-                </select>
-            </div>
+                    <!-- Alerte Flash -->
+                    <div class="flash-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-bolt"></i> Alerte Flash</h4>
+                        <div class="flex-between">
+                            <span style="font-size:0.8rem; color:var(--text-secondary);">Activer la bannière</span>
+                            <div class="toggle-switch" id="flash-toggle"></div>
+                        </div>
+                        <div class="input-group">
+                            <label>Message d'alerte</label>
+                            <input type="text" class="input-field" id="flash-message" placeholder="Offre limitée !...">
+                        </div>
+                        <div>
+                            <label style="font-size:0.8rem; color:var(--text-secondary);">Couleur</label>
+                            <div class="color-selector">
+                                <span class="color-option color-red active" data-color="red" title="Rouge Électrique"></span>
+                                <span class="color-option color-cyan" data-color="cyan" title="Cyan"></span>
+                                <span class="color-option color-orange" data-color="orange" title="Orange Néon"></span>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Ligne Redirection Unique -->
-            <div class="flex-between" style="margin-top:0.3rem; border-top:1px solid var(--border-glow); padding-top:0.4rem;">
-                <div class="redirect-toggle">
-                    <span style="font-size:0.8rem; color:var(--text-secondary);">Redirection Unique</span>
-                    <div class="toggle-track" id="redirect-toggle-track"></div>
-                    <span class="status-label" id="redirect-status-label">Désactivé</span>
-                </div>
-                <span style="font-size:0.6rem; color:var(--text-secondary);" id="redirect-hint">(nécessite 1 lien actif)</span>
-            </div>
-
-            <!-- Statistiques avancées -->
-            <div class="stats-summary" id="stats-summary">
-                <div class="stat-card">
-                    <div class="stat-number" id="stat-views">0</div>
-                    <div class="stat-label">Vues du profil</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="stat-total-clicks">0</div>
-                    <div class="stat-label">Clics totaux</div>
-                </div>
-                <div class="stat-card" style="grid-column: span 2;">
-                    <div class="stat-label" style="margin-bottom:0.3rem;">Répartition des clics</div>
-                    <div id="stat-bars"></div>
-                </div>
-                <!-- Bouton Export Rapport -->
-                <div style="grid-column: span 2; margin-top:0.3rem;">
-                    <button class="btn btn-outline export-report-btn" id="export-report-btn" style="width:100%; padding:0.5rem; font-size:0.85rem;">
-                        <i class="fas fa-file-download"></i> Exporter le rapport (PDF)
-                    </button>
-                </div>
-            </div>
-
-            <!-- Compteur vues global et réinitialisation -->
-            <div class="flex-between" style="margin-top:0.5rem;">
-                <span class="views-counter"><i class="fas fa-eye"></i> <span id="views-count-display">0</span> vues</span>
-                <button class="btn btn-outline" id="reset-views-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
-                    <i class="fas fa-redo"></i> Réinitialiser les vues
-                </button>
-            </div>
-
-            <!-- Top 3 réseaux les plus cliqués -->
-            <div id="top-networks-container" class="top-networks"></div>
-
-            <div class="profile-header mt-2">
-                <div class="avatar-wrapper">
-                    <img id="dashboard-avatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=128" alt="avatar">
-                </div>
-                <div style="flex:1;">
-                    <div class="input-group">
-                        <label>Nom affiché</label>
-                        <input type="text" class="input-field" id="dashboard-name" placeholder="Votre nom">
+                    <!-- Liste des abonnés -->
+                    <div class="subscribers-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-users"></i> Liste des abonnés</h4>
+                        <div id="subscribers-list-container" class="subscribers-list">
+                            <span style="color:var(--text-secondary); font-size:0.8rem;">Aucun abonné pour le moment.</span>
+                        </div>
+                        <button class="btn btn-outline copy-email-btn" id="copy-emails-btn" style="margin-top:0.4rem; padding:0.2rem 0.8rem; font-size:0.7rem;">
+                            <i class="fas fa-copy"></i> Copier les emails
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="input-group mt-2">
-                <label>Photo de profil</label>
-                <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center;">
-                    <i class="fas fa-camera"></i> Changer la photo
-                </button>
+            <!-- Bouton Enregistrer (fixe en bas) -->
+            <div style="padding:0.8rem 1.8rem 1.2rem 1.8rem; border-top:1px solid var(--border-glow); flex-shrink:0;">
+                <button class="btn" id="save-dashboard-btn" style="width:100%; padding:0.7rem;">Enregistrer les modifications</button>
             </div>
-
-            <div class="input-group mt-2">
-                <label>Biographie</label>
-                <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
-            </div>
-
-            <div class="input-group mt-2">
-                <label><i class="fas fa-link"></i> Lien de clic sur la bannière (personnalisé)</label>
-                <input type="url" class="input-field" id="dashboard-banner-link" placeholder="https://..." value="">
-                <p style="color:var(--text-secondary); font-size:0.7rem;">Laissez vide pour utiliser le premier lien social actif.</p>
-            </div>
-
-            <!-- ===== NOUVELLE SECTION : SEO Personnalisé ===== -->
-            <div class="seo-section">
-                <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-search"></i> Optimisation SEO</h4>
-                <div class="input-group">
-                    <label>Méta-Titre (max 60 caractères)</label>
-                    <input type="text" class="input-field" id="seo-title" maxlength="60" placeholder="Titre de votre profil...">
-                </div>
-                <div class="input-group">
-                    <label>Méta-Description (max 160 caractères)</label>
-                    <input type="text" class="input-field" id="seo-description" maxlength="160" placeholder="Description...">
-                </div>
-                <div class="input-group">
-                    <label>Mots-clés (séparés par des virgules)</label>
-                    <input type="text" class="input-field" id="seo-keywords" placeholder="mot1, mot2, mot3">
-                </div>
-            </div>
-
-            <!-- ===== NOUVELLE SECTION : Intégrations Marketing ===== -->
-            <div class="integrations-section">
-                <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-chart-line"></i> Intégrations Marketing</h4>
-                <div class="input-group">
-                    <label>ID Pixel Meta (Facebook)</label>
-                    <input type="text" class="input-field" id="meta-pixel-id" placeholder="123456789012345">
-                </div>
-                <div class="input-group">
-                    <label>ID Google Analytics (G-XXXXX)</label>
-                    <input type="text" class="input-field" id="google-analytics-id" placeholder="G-XXXXXXXXXX">
-                </div>
-            </div>
-
-            <!-- ===== NOUVELLE SECTION : Alerte Flash ===== -->
-            <div class="flash-section">
-                <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-bolt"></i> Alerte Flash</h4>
-                <div class="flex-between">
-                    <span style="font-size:0.8rem; color:var(--text-secondary);">Activer la bannière</span>
-                    <div class="toggle-switch" id="flash-toggle"></div>
-                </div>
-                <div class="input-group">
-                    <label>Message d'alerte</label>
-                    <input type="text" class="input-field" id="flash-message" placeholder="🚨 Offre limitée !...">
-                </div>
-                <div>
-                    <label style="font-size:0.8rem; color:var(--text-secondary);">Couleur</label>
-                    <div class="color-selector">
-                        <span class="color-option color-red active" data-color="red" title="Rouge Électrique"></span>
-                        <span class="color-option color-cyan" data-color="cyan" title="Cyan"></span>
-                        <span class="color-option color-orange" data-color="orange" title="Orange Néon"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Liste des liens + sections -->
-            <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
-                <h3 style="font-family:var(--font-heading); font-size:1rem;"><i class="fas fa-link"></i> Mes liens</h3>
-                <div style="display:flex; gap:0.4rem;">
-                    <button class="btn btn-outline" id="add-section-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-heading"></i> Section</button>
-                    <button class="btn btn-outline" id="add-link-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-plus"></i> Lien</button>
-                </div>
-            </div>
-            <div id="dashboard-links-container" class="mt-1" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
-
-            <!-- ===== NOUVELLE SECTION : Liste des abonnés (pour liens verrouillés) ===== -->
-            <div class="subscribers-section">
-                <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-users"></i> Liste des abonnés</h4>
-                <div id="subscribers-list-container" class="subscribers-list">
-                    <span style="color:var(--text-secondary); font-size:0.8rem;">Aucun abonné pour le moment.</span>
-                </div>
-                <button class="btn btn-outline copy-email-btn" id="copy-emails-btn" style="margin-top:0.4rem; padding:0.2rem 0.8rem; font-size:0.7rem;">
-                    <i class="fas fa-copy"></i> Copier les emails
-                </button>
-            </div>
-
-            <button class="btn mt-2" id="save-dashboard-btn" style="width:100%">Enregistrer les modifications</button>
-            <button class="btn btn-outline mt-1" id="copy-share-link-btn" style="width:100%"><i class="fas fa-copy"></i> Copier mon lien de partage</button>
         </div>
     </div>
 
@@ -1900,7 +2030,6 @@
 
     <!-- ========== VUE PROFIL PUBLIC ========== -->
     <div id="view-profile-public" class="view">
-        <!-- Bannière Alerte Flash (injectée dynamiquement) -->
         <div id="flash-banner-container"></div>
         <a id="public-wrapper-link" class="public-wrapper" href="#" target="_blank" rel="noopener noreferrer" style="display:block; text-decoration:none; color:inherit; width:100%;">
             <div class="glass-card" style="text-align:center; padding-top:0; position:relative;">
@@ -1941,7 +2070,7 @@
         </div>
     </div>
 
-    <!-- ========== MODALE GATED CONTENT (Collecte d'email) ========== -->
+    <!-- ========== MODALE GATED CONTENT ========== -->
     <div class="modal-overlay gated-modal" id="gated-modal">
         <div class="modal-content">
             <h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-lock"></i> Accès verrouillé</h3>
@@ -2004,8 +2133,8 @@
         let isCloudinaryWidgetOpen = false;
         let selectedNetworkType = null;
         let linkImageUrl = '';
-        let gatedPendingLink = null; // stocke le lien en cours de déverrouillage
-        let gatedPendingTarget = null; // stocke l'uid du propriétaire
+        let gatedPendingLink = null;
+        let gatedPendingTarget = null;
 
         // --- Vues ---
         const views = {
@@ -2081,14 +2210,13 @@
                             if (!l.endDate) l.endDate = null;
                             if (l.isSection === undefined) l.isSection = false;
                             if (!l.title) l.title = '';
-                            if (l.locked === undefined) l.locked = false; // nouveau champ
+                            if (l.locked === undefined) l.locked = false;
                             return l;
                         });
                         userProfile.links.sort((a, b) => (a.order || 0) - (b.order || 0));
                     }
                     if (typeof userProfile.views !== 'number') userProfile.views = 0;
                     if (typeof userProfile.redirectUnique !== 'boolean') userProfile.redirectUnique = false;
-                    // Nouveaux champs
                     if (!userProfile.seo) userProfile.seo = { title: '', description: '', keywords: '' };
                     if (!userProfile.integrations) userProfile.integrations = { metaPixel: '', ga: '' };
                     if (!userProfile.flash) userProfile.flash = { active: false, message: '', color: 'red' };
@@ -2136,7 +2264,6 @@
             }
         }
 
-        // --- Incrémenter les clics d'un lien (avec vérification du verrouillage) ---
         async function incrementLinkClick(uid, linkId) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -2162,7 +2289,6 @@
             }
         }
 
-        // --- Ajouter un abonné (collecte d'email) ---
         async function addSubscriber(uid, email) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -2170,7 +2296,6 @@
                 if (!doc.exists) return;
                 const data = doc.data();
                 const subscribers = data.subscribers || [];
-                // Éviter les doublons
                 if (subscribers.some(s => s.email === email)) {
                     showToast('Cet email est déjà enregistré.', 'info');
                     return false;
@@ -2277,7 +2402,7 @@
             barsContainer.innerHTML = html;
         }
 
-        // --- Export Rapport (PDF) ---
+        // --- Export Rapport ---
         function exportReport() {
             if (!userProfile) {
                 showToast('Profil non chargé.', 'error');
@@ -2288,7 +2413,7 @@
                 totalClicks: userProfile.links ? userProfile.links.reduce((sum, l) => sum + (l.clicks || 0), 0) : 0,
                 links: userProfile.links ? userProfile.links.filter(l => !l.isSection && l.active) : []
             };
-            const total = stats.totalClicks || 1; // éviter division par zéro
+            const total = stats.totalClicks || 1;
             let report = `RAPPORT STATISTIQUES LinkExt\n`;
             report += `==========================\n`;
             report += `Date : ${new Date().toLocaleString()}\n\n`;
@@ -2307,7 +2432,6 @@
             }
             report += `\nFin du rapport.`;
 
-            // Création d'un fichier texte (format simple) – pour un PDF complet on utiliserait une librairie, mais ici on génère un .txt propre.
             const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -2448,10 +2572,9 @@
                 };
             }
 
-            // Remplir les champs existants
+            // Remplir les champs
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
-            document.getElementById('dashboard-banner-link').value = userProfile.bannerLink || '';
             document.getElementById('views-count-display').textContent = userProfile.views || 0;
 
             // SEO
@@ -2463,7 +2586,7 @@
             document.getElementById('meta-pixel-id').value = userProfile.integrations?.metaPixel || '';
             document.getElementById('google-analytics-id').value = userProfile.integrations?.ga || '';
 
-            // Alerte Flash
+            // Flash
             const flash = userProfile.flash || { active: false, message: '', color: 'red' };
             const flashToggle = document.getElementById('flash-toggle');
             flashToggle.classList.toggle('active', flash.active);
@@ -2581,9 +2704,7 @@
                 }
             });
 
-            // Gestion des événements
             container.onclick = (e) => {
-                // Actions principales
                 const btn = e.target.closest('[data-action]');
                 if (btn) {
                     const id = btn.dataset.id;
@@ -2611,7 +2732,6 @@
                     }
                     return;
                 }
-                // Feature btn
                 const featureBtn = e.target.closest('.feature-btn');
                 if (featureBtn) {
                     const id = featureBtn.dataset.id;
@@ -2627,7 +2747,6 @@
                     saveUserProfile(currentUser.uid, { featuredLink: userProfile.featuredLink }).catch(() => {});
                     return;
                 }
-                // Order
                 const orderBtn = e.target.closest('[data-dir]');
                 if (orderBtn) {
                     const id = orderBtn.dataset.id;
@@ -2648,14 +2767,12 @@
                     renderTopNetworks();
                     saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                 }
-                // Reset clicks
                 const resetBtn = e.target.closest('.reset-clicks-btn');
                 if (resetBtn) {
                     const id = resetBtn.dataset.id;
                     if (id) resetLinkClicks(id);
                     return;
                 }
-                // Lock toggle
                 const lockBtn = e.target.closest('.lock-toggle-btn');
                 if (lockBtn) {
                     const id = lockBtn.dataset.id;
@@ -2668,7 +2785,6 @@
                     }
                     return;
                 }
-                // Edit / delete section
                 const editSection = e.target.closest('[data-action="edit-section"]');
                 if (editSection) {
                     const id = editSection.dataset.id;
@@ -3095,7 +3211,6 @@
             container.innerHTML = html;
         }
 
-        // --- Copie des emails ---
         function copyEmails() {
             if (!userProfile || !userProfile.subscribers || userProfile.subscribers.length === 0) {
                 showToast('Aucun email à copier.', 'info');
@@ -3105,7 +3220,6 @@
             navigator.clipboard.writeText(emails).then(() => {
                 showToast('Emails copiés !', 'info');
             }).catch(() => {
-                // fallback
                 const textarea = document.createElement('textarea');
                 textarea.value = emails;
                 document.body.appendChild(textarea);
@@ -3118,7 +3232,6 @@
 
         // --- Injection des scripts de tracking (Meta Pixel & GA) ---
         function injectTrackingScripts(integrations) {
-            // Supprimer les anciens scripts pour éviter les doublons
             document.querySelectorAll('[data-linkext-tracking]').forEach(el => el.remove());
 
             if (integrations.metaPixel) {
@@ -3158,9 +3271,8 @@
             }
         }
 
-        // --- Injection des balises SEO ---
+        // --- Injection SEO ---
         function injectSEO(seo) {
-            // Titre
             let titleEl = document.querySelector('title');
             if (!titleEl) {
                 titleEl = document.createElement('title');
@@ -3168,7 +3280,6 @@
             }
             titleEl.textContent = seo.title || 'LinkExt | Cyber Linktree';
 
-            // Meta description
             let descEl = document.querySelector('meta[name="description"]');
             if (!descEl) {
                 descEl = document.createElement('meta');
@@ -3177,7 +3288,6 @@
             }
             descEl.content = seo.description || 'Centralisez vos liens et réseaux sociaux en un seul endroit.';
 
-            // Meta keywords
             let kwEl = document.querySelector('meta[name="keywords"]');
             if (!kwEl) {
                 kwEl = document.createElement('meta');
@@ -3187,7 +3297,7 @@
             kwEl.content = seo.keywords || 'linktree, réseaux sociaux, cyberpunk';
         }
 
-        // --- Profil Public (CORRIGÉ avec les nouvelles fonctionnalités) ---
+        // --- Profil Public ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -3198,14 +3308,11 @@
                 }
                 const data = doc.data();
 
-                // Incrémenter les vues
                 await incrementViews(uid);
 
-                // SEO
                 const seo = data.seo || { title: '', description: '', keywords: '' };
                 injectSEO(seo);
 
-                // Tracking
                 const integrations = data.integrations || { metaPixel: '', ga: '' };
                 injectTrackingScripts(integrations);
 
@@ -3221,7 +3328,6 @@
                     return;
                 }
 
-                // Avatar, nom, bio, statut
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
@@ -3243,7 +3349,7 @@
                 applyVisualTheme();
                 applyBackground();
 
-                // Bannière Alerte Flash
+                // Bannière Flash
                 const flashContainer = document.getElementById('flash-banner-container');
                 flashContainer.innerHTML = '';
                 if (data.flash && data.flash.active && data.flash.message) {
@@ -3254,14 +3360,12 @@
                         <button class="flash-close" id="flash-close-btn"><i class="fas fa-times"></i></button>
                     `;
                     flashContainer.appendChild(flashDiv);
-                    // Fermeture locale (pas de persistance)
                     document.getElementById('flash-close-btn').addEventListener('click', function() {
                         flashDiv.classList.remove('active');
                         flashDiv.style.display = 'none';
                     });
                 }
 
-                // Wrapper redirection unique
                 const wrapperLink = document.getElementById('public-wrapper-link');
                 const activeLinks = data.links ? data.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '') : [];
                 const isRedirectActive = data.redirectUnique === true && activeLinks.length === 1;
@@ -3277,7 +3381,6 @@
                     wrapperLink.style.cursor = 'default';
                 }
 
-                // Contenu des liens (avec gestion du verrouillage)
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
@@ -3323,13 +3426,11 @@
                             card.appendChild(badge);
                         }
 
-                        // Gestion du clic : si verrouillé, on ouvre la modale
                         const handleCardClick = (e) => {
                             if (isRedirectActive) return;
                             e.preventDefault();
 
                             if (item.locked) {
-                                // Ouvrir la modale de collecte d'email
                                 gatedPendingLink = item.id;
                                 gatedPendingTarget = uid;
                                 document.getElementById('gated-email').value = '';
@@ -3338,7 +3439,6 @@
                                 return;
                             }
 
-                            // Sinon redirection directe
                             window.open(sanitizeUrl(item.url), '_blank');
                             incrementLinkClick(uid, item.id).catch(() => {});
                         };
@@ -3351,13 +3451,11 @@
                             card.style.cursor = 'pointer';
                         }
 
-                        // Description
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
                         const lockIcon = item.locked ? ' <i class="fas fa-lock" style="color:var(--cyan);"></i>' : '';
                         desc.innerHTML = (item.description || `Rejoindre ${platform.name}`) + lockIcon;
 
-                        // Média
                         const media = document.createElement('div');
                         if (item.imageUrl && item.imageUrl !== '') {
                             const img = document.createElement('img');
@@ -3384,7 +3482,6 @@
                             media.appendChild(defaultContainer);
                         }
 
-                        // Barre d'action
                         const actionBar = document.createElement('div');
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
@@ -3400,7 +3497,6 @@
                     });
                 }
 
-                // QR Code
                 const qrImg = document.getElementById('qr-image');
                 const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
@@ -3474,7 +3570,7 @@ URL:${urlProfil}
             });
         }
 
-        // --- Gated Content : soumission email ---
+        // --- Gated Modal ---
         function setupGatedModal() {
             const modal = document.getElementById('gated-modal');
             const submitBtn = document.getElementById('gated-submit-btn');
@@ -3495,17 +3591,14 @@ URL:${urlProfil}
                     return;
                 }
 
-                // Ajouter l'email aux abonnés
                 const added = await addSubscriber(gatedPendingTarget, email);
                 if (!added) {
-                    // L'email existe déjà ou erreur
                     modal.classList.remove('active');
                     gatedPendingLink = null;
                     gatedPendingTarget = null;
                     return;
                 }
 
-                // Récupérer l'URL du lien
                 const targetDoc = await db.collection('users').doc(gatedPendingTarget).get();
                 if (!targetDoc.exists) {
                     showToast('Erreur profil.', 'error');
@@ -3520,21 +3613,17 @@ URL:${urlProfil}
                     return;
                 }
 
-                // Incrémenter le clic et rediriger
                 await incrementLinkClick(gatedPendingTarget, gatedPendingLink);
                 modal.classList.remove('active');
                 window.open(sanitizeUrl(link.url), '_blank');
 
-                // Nettoyer
                 gatedPendingLink = null;
                 gatedPendingTarget = null;
-                // Mettre à jour la liste des abonnés si le dashboard est visible
                 if (document.getElementById('view-dashboard').classList.contains('active')) {
                     renderSubscribers();
                 }
             });
 
-            // Fermeture de la modale par clic extérieur
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.classList.remove('active');
@@ -3542,14 +3631,6 @@ URL:${urlProfil}
                     gatedPendingTarget = null;
                 }
             });
-        }
-
-        // --- isPublicMode ---
-        function isPublicMode() {
-            return new URLSearchParams(window.location.search).has('id');
-        }
-        function getPublicUid() {
-            return new URLSearchParams(window.location.search).get('id');
         }
 
         // --- Reset clicks individuels ---
@@ -3612,6 +3693,25 @@ URL:${urlProfil}
                 console.error('Erreur lors de la réinitialisation :', error);
                 showToast('Erreur lors de la réinitialisation.', 'error');
             }
+        }
+
+        // --- Gestion des onglets du Dashboard ---
+        function setupTabs() {
+            const navItems = document.querySelectorAll('#dashboard-nav .nav-item');
+            const panes = document.querySelectorAll('.tab-content .tab-pane');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    // Désactiver tous les items et panes
+                    navItems.forEach(n => n.classList.remove('active'));
+                    panes.forEach(p => p.classList.remove('active'));
+                    // Activer le bon
+                    this.classList.add('active');
+                    const targetPane = document.getElementById('tab-' + tabId);
+                    if (targetPane) targetPane.classList.add('active');
+                });
+            });
         }
 
         // ==================== ATTACHEMENT GLOBAL DES ÉVÉNEMENTS ====================
@@ -3840,7 +3940,6 @@ URL:${urlProfil}
 
             document.getElementById('validate-link-btn').addEventListener('click', validateAndAddLink);
 
-            // Lock toggle dans la vue d'ajout
             document.getElementById('new-link-locked-toggle').addEventListener('click', function() {
                 this.classList.toggle('active');
             });
@@ -3850,18 +3949,14 @@ URL:${urlProfil}
                 if (!currentUser) return;
                 const name = document.getElementById('dashboard-name').value.trim();
                 const bio = document.getElementById('dashboard-bio').value.trim();
-                const bannerLink = document.getElementById('dashboard-banner-link').value.trim();
 
-                // SEO
                 const seoTitle = document.getElementById('seo-title').value.trim();
                 const seoDesc = document.getElementById('seo-description').value.trim();
                 const seoKeywords = document.getElementById('seo-keywords').value.trim();
 
-                // Intégrations
                 const metaPixel = document.getElementById('meta-pixel-id').value.trim();
                 const gaId = document.getElementById('google-analytics-id').value.trim();
 
-                // Flash
                 const flashActive = document.getElementById('flash-toggle').classList.contains('active');
                 const flashMessage = document.getElementById('flash-message').value.trim();
                 const flashColor = document.querySelector('.color-selector .color-option.active')?.dataset.color || 'red';
@@ -3885,7 +3980,6 @@ URL:${urlProfil}
                 const saved = await saveUserProfile(currentUser.uid, {
                     displayName: name,
                     bio: bio,
-                    bannerLink: bannerLink,
                     links: links,
                     seo: { title: seoTitle, description: seoDesc, keywords: seoKeywords },
                     integrations: { metaPixel: metaPixel, ga: gaId },
@@ -3898,24 +3992,6 @@ URL:${urlProfil}
                     updateRedirectToggleState();
                     updateStats();
                     renderSubscribers();
-                }
-            });
-
-            // --- Dashboard : Copier le lien de partage ---
-            document.getElementById('copy-share-link-btn').addEventListener('click', async () => {
-                if (!currentUser) return;
-                const shareUrl = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
-                try {
-                    await navigator.clipboard.writeText(shareUrl);
-                    showToast('Lien copié !', 'info');
-                } catch {
-                    const input = document.createElement('input');
-                    input.value = shareUrl;
-                    document.body.appendChild(input);
-                    input.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(input);
-                    showToast('Lien copié !', 'info');
                 }
             });
 
@@ -4004,10 +4080,8 @@ URL:${urlProfil}
                 toggleTheme();
             });
 
-            // --- Si on est en mode public, on charge le profil ---
-            if (isPublicMode()) {
-                // déjà géré par onAuthStateChanged
-            }
+            // --- Tabs du Dashboard ---
+            setupTabs();
         }
 
         // --- Auth state ---
@@ -4024,10 +4098,17 @@ URL:${urlProfil}
             await handleAuthRedirection(user);
         });
 
+        // --- isPublicMode ---
+        function isPublicMode() {
+            return new URLSearchParams(window.location.search).has('id');
+        }
+        function getPublicUid() {
+            return new URLSearchParams(window.location.search).get('id');
+        }
+
         // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
-            // Laisser onAuthStateChanged gérer l'affichage initial
         });
 
     })();
