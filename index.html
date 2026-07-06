@@ -5,11 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>LinkExt | Cyber Linktree</title>
 
+    <!-- ===== META SEO ===== -->
+    <!-- Ils seront dynamiquement injectés par JavaScript, on laisse les valeurs par défaut -->
+    <title>LinkExt</title>
+    <meta name="description" content="Centralisez vos liens et réseaux sociaux en un seul endroit.">
+    <meta name="keywords" content="linktree, réseaux sociaux, cyberpunk">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="LinkExt">
+    <meta property="og:description" content="Centralisez vos liens et réseaux sociaux en un seul endroit.">
+    <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
+    <meta property="og:url" content="https://linkext.example.com">
+    <meta property="og:type" content="website">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
+    <!-- ===== STYLES ===== -->
     <style>
         /* ===== VARIABLES (thème Cyberpunk par défaut) ===== */
         :root {
@@ -32,6 +47,8 @@
             --shadow-color: rgba(0,0,0,0.6);
             --bg-deep-image: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
                               radial-gradient(circle at 100% 30%, rgba(79, 172, 254, 0.05) 0%, transparent 50%);
+            --flash-bg: #ff1744;
+            --flash-text: #fff;
         }
 
         /* ===== THÈMES VISUELS ===== */
@@ -1020,6 +1037,46 @@
             border-radius: 20px;
             position: relative;
         }
+        /* Bannière Alerte Flash (en haut de la page publique) */
+        .flash-banner {
+            background: var(--flash-bg);
+            color: var(--flash-text);
+            padding: 0.6rem 1rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            animation: flashPulse 2s ease-in-out infinite;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            width: 100%;
+            display: none;
+            border-radius: 20px 20px 0 0;
+        }
+        .flash-banner.active {
+            display: block;
+        }
+        .flash-banner.flash-red { --flash-bg: #ff1744; }
+        .flash-banner.flash-cyan { --flash-bg: #00e5ff; --flash-text: #0a0b10; }
+        .flash-banner.flash-orange { --flash-bg: #ff9100; }
+        @keyframes flashPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        .flash-banner .flash-close {
+            float: right;
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition);
+            padding: 0 0.3rem;
+        }
+        .flash-banner .flash-close:hover {
+            opacity: 1;
+        }
+
         .public-header {
             padding: 1.2rem 1.8rem 0.4rem 1.8rem;
             margin: 0;
@@ -1326,6 +1383,105 @@
             pointer-events: none;
         }
 
+        /* ===== NOUVEAUX STYLES POUR LES FONCTIONNALITÉS ===== */
+        .seo-section,
+        .integrations-section,
+        .flash-section,
+        .subscribers-section {
+            border-top: 1px solid var(--border-glow);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+        .seo-section .input-group,
+        .integrations-section .input-group,
+        .flash-section .input-group {
+            margin-bottom: 0.8rem;
+        }
+        .flash-section .color-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.3rem 0 0.5rem 0;
+        }
+        .flash-section .color-selector .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .flash-section .color-selector .color-option.active {
+            border-color: var(--cyan);
+            transform: scale(1.1);
+        }
+        .flash-section .color-selector .color-option.color-red { background: #ff1744; }
+        .flash-section .color-selector .color-option.color-cyan { background: #00e5ff; }
+        .flash-section .color-selector .color-option.color-orange { background: #ff9100; }
+
+        .subscribers-list {
+            max-height: 150px;
+            overflow-y: auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            border: 1px solid var(--card-border);
+        }
+        .subscribers-list .sub-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0.2rem;
+            border-bottom: 1px solid var(--border-glow);
+        }
+        .subscribers-list .sub-item:last-child {
+            border-bottom: none;
+        }
+        .subscribers-list .sub-item .sub-email {
+            color: var(--text-primary);
+        }
+        .subscribers-list .sub-item .sub-date {
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+        }
+
+        .subscribers-section .copy-email-btn {
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+        }
+
+        .export-report-btn {
+            margin-top: 0.5rem;
+        }
+
+        /* Modale de collecte d'email (gated content) */
+        .gated-modal .modal-content {
+            max-width: 360px;
+        }
+        .gated-modal .modal-content input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin: 0.8rem 0;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .gated-modal .modal-content input:focus {
+            border-color: var(--cyan);
+        }
+        .gated-modal .modal-content .btn {
+            width: 100%;
+        }
+        .gated-modal .modal-content .error-msg {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
         @media (max-width: 420px) {
             #view-profile-public .glass-card {
                 padding: 0 0 1rem 0;
@@ -1405,6 +1561,10 @@
                 font-size: 0.75rem;
                 max-height: 40vh;
             }
+            .flash-banner {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.8rem;
+            }
         }
     </style>
 </head>
@@ -1431,7 +1591,6 @@
                     <li>De télécharger le fichier Vcard pour enregistrer directement les coordonnées de l'utilisateur dans le répertoire du téléphone.</li>
                 </ul>
                 </p>
-
                 <h3>2. Politique de Confidentialité</h3>
                 <p><strong>2.1. Collecte des données</strong><br>
                 Dans le cadre de l'utilisation de LinkExt, les données suivantes sont collectées et traitées :
@@ -1445,7 +1604,6 @@
                 Les données collectées ont pour unique but le bon fonctionnement du service, l'affichage du profil public et la fourniture des statistiques à l'utilisateur titulaire du compte. Aucune donnée personnelle ou statistique n'est vendue, cédée ou transmise à des tiers.</p>
                 <p><strong>2.3. Sécurité et Cookies</strong><br>
                 Le site utilise des mécanismes de stockage local (localStorage ou cookies techniques) pour retenir les préférences de thème de l'utilisateur et valider l'acceptation des présentes conditions lors de la navigation. L'effacement des données de session ou la déconnexion réinitialise ce consentement, imposant une nouvelle validation lors de l'accès suivant.</p>
-
                 <h3>3. Processus de Consentement Obligatoire</h3>
                 <p>Pour garantir la transparence, tout utilisateur se déconnectant de la plateforme verra s'afficher, lors de sa tentative de reconnexion ou d'inscription sur son téléphone ou ordinateur, un écran de contrôle bloquant. Cet écran présente les présentes CGU et Politique de Confidentialité. L'utilisateur doit obligatoirement cliquer sur le bouton "Accepter et continuer" pour être redirigé vers l'interface de connexion/inscription. Aucun accès aux serveurs privés n'est autorisé sans cette validation préalable.</p>
             </div>
@@ -1544,7 +1702,7 @@
                 <select id="visual-theme-select">
                     <option value="cyberpunk">Cyberpunk</option>
                     <option value="minimaliste">Minimaliste Blanc</option>
-                    <option value="neo-brutaliste">Néobrutaliste</option>
+                    <option value="neo-brutaliste">Néo‑brutaliste</option>
                 </select>
                 <label style="margin-left:0.5rem;"><i class="fas fa-image"></i> Fond</label>
                 <select id="background-select">
@@ -1578,6 +1736,12 @@
                 <div class="stat-card" style="grid-column: span 2;">
                     <div class="stat-label" style="margin-bottom:0.3rem;">Répartition des clics</div>
                     <div id="stat-bars"></div>
+                </div>
+                <!-- Bouton Export Rapport -->
+                <div style="grid-column: span 2; margin-top:0.3rem;">
+                    <button class="btn btn-outline export-report-btn" id="export-report-btn" style="width:100%; padding:0.5rem; font-size:0.85rem;">
+                        <i class="fas fa-file-download"></i> Exporter le rapport (PDF)
+                    </button>
                 </div>
             </div>
 
@@ -1622,6 +1786,57 @@
                 <p style="color:var(--text-secondary); font-size:0.7rem;">Laissez vide pour utiliser le premier lien social actif.</p>
             </div>
 
+            <!-- ===== NOUVELLE SECTION : SEO Personnalisé ===== -->
+            <div class="seo-section">
+                <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-search"></i> Optimisation SEO</h4>
+                <div class="input-group">
+                    <label>Méta-Titre (max 60 caractères)</label>
+                    <input type="text" class="input-field" id="seo-title" maxlength="60" placeholder="Titre de votre profil...">
+                </div>
+                <div class="input-group">
+                    <label>Méta-Description (max 160 caractères)</label>
+                    <input type="text" class="input-field" id="seo-description" maxlength="160" placeholder="Description...">
+                </div>
+                <div class="input-group">
+                    <label>Mots-clés (séparés par des virgules)</label>
+                    <input type="text" class="input-field" id="seo-keywords" placeholder="mot1, mot2, mot3">
+                </div>
+            </div>
+
+            <!-- ===== NOUVELLE SECTION : Intégrations Marketing ===== -->
+            <div class="integrations-section">
+                <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-chart-line"></i> Intégrations Marketing</h4>
+                <div class="input-group">
+                    <label>ID Pixel Meta (Facebook)</label>
+                    <input type="text" class="input-field" id="meta-pixel-id" placeholder="123456789012345">
+                </div>
+                <div class="input-group">
+                    <label>ID Google Analytics (G-XXXXX)</label>
+                    <input type="text" class="input-field" id="google-analytics-id" placeholder="G-XXXXXXXXXX">
+                </div>
+            </div>
+
+            <!-- ===== NOUVELLE SECTION : Alerte Flash ===== -->
+            <div class="flash-section">
+                <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-bolt"></i> Alerte Flash</h4>
+                <div class="flex-between">
+                    <span style="font-size:0.8rem; color:var(--text-secondary);">Activer la bannière</span>
+                    <div class="toggle-switch" id="flash-toggle"></div>
+                </div>
+                <div class="input-group">
+                    <label>Message d'alerte</label>
+                    <input type="text" class="input-field" id="flash-message" placeholder="🚨 Offre limitée !...">
+                </div>
+                <div>
+                    <label style="font-size:0.8rem; color:var(--text-secondary);">Couleur</label>
+                    <div class="color-selector">
+                        <span class="color-option color-red active" data-color="red" title="Rouge Électrique"></span>
+                        <span class="color-option color-cyan" data-color="cyan" title="Cyan"></span>
+                        <span class="color-option color-orange" data-color="orange" title="Orange Néon"></span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Liste des liens + sections -->
             <div class="mt-2" style="display:flex; justify-content: space-between; align-items:center;">
                 <h3 style="font-family:var(--font-heading); font-size:1rem;"><i class="fas fa-link"></i> Mes liens</h3>
@@ -1631,6 +1846,17 @@
                 </div>
             </div>
             <div id="dashboard-links-container" class="mt-1" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
+
+            <!-- ===== NOUVELLE SECTION : Liste des abonnés (pour liens verrouillés) ===== -->
+            <div class="subscribers-section">
+                <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-users"></i> Liste des abonnés</h4>
+                <div id="subscribers-list-container" class="subscribers-list">
+                    <span style="color:var(--text-secondary); font-size:0.8rem;">Aucun abonné pour le moment.</span>
+                </div>
+                <button class="btn btn-outline copy-email-btn" id="copy-emails-btn" style="margin-top:0.4rem; padding:0.2rem 0.8rem; font-size:0.7rem;">
+                    <i class="fas fa-copy"></i> Copier les emails
+                </button>
+            </div>
 
             <button class="btn mt-2" id="save-dashboard-btn" style="width:100%">Enregistrer les modifications</button>
             <button class="btn btn-outline mt-1" id="copy-share-link-btn" style="width:100%"><i class="fas fa-copy"></i> Copier mon lien de partage</button>
@@ -1663,6 +1889,10 @@
                     </button>
                     <img id="link-image-preview" class="image-preview hidden" src="" alt="aperçu">
                 </div>
+                <div class="flex-between" style="margin-top:0.2rem;">
+                    <span style="font-size:0.8rem; color:var(--text-secondary);">Verrouiller ce lien (collecte d'email)</span>
+                    <div class="toggle-switch" id="new-link-locked-toggle"></div>
+                </div>
                 <button class="btn" id="validate-link-btn">Valider et Enregistrer</button>
             </div>
         </div>
@@ -1670,6 +1900,8 @@
 
     <!-- ========== VUE PROFIL PUBLIC ========== -->
     <div id="view-profile-public" class="view">
+        <!-- Bannière Alerte Flash (injectée dynamiquement) -->
+        <div id="flash-banner-container"></div>
         <a id="public-wrapper-link" class="public-wrapper" href="#" target="_blank" rel="noopener noreferrer" style="display:block; text-decoration:none; color:inherit; width:100%;">
             <div class="glass-card" style="text-align:center; padding-top:0; position:relative;">
                 <div class="public-header">
@@ -1706,6 +1938,19 @@
             <h3 style="margin-bottom:1rem; font-family:var(--font-heading);">QR Code du profil</h3>
             <img id="qr-image" src="" alt="QR Code">
             <button class="close-modal" id="close-qr-modal">Fermer</button>
+        </div>
+    </div>
+
+    <!-- ========== MODALE GATED CONTENT (Collecte d'email) ========== -->
+    <div class="modal-overlay gated-modal" id="gated-modal">
+        <div class="modal-content">
+            <h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-lock"></i> Accès verrouillé</h3>
+            <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">
+                Entrez votre adresse email pour accéder à ce lien.
+            </p>
+            <input type="email" id="gated-email" placeholder="votre@email.com" autocomplete="email">
+            <div class="error-msg" id="gated-error">Email invalide.</div>
+            <button class="btn" id="gated-submit-btn">Déverrouiller et accéder</button>
         </div>
     </div>
 
@@ -1759,6 +2004,8 @@
         let isCloudinaryWidgetOpen = false;
         let selectedNetworkType = null;
         let linkImageUrl = '';
+        let gatedPendingLink = null; // stocke le lien en cours de déverrouillage
+        let gatedPendingTarget = null; // stocke l'uid du propriétaire
 
         // --- Vues ---
         const views = {
@@ -1774,7 +2021,6 @@
         function isConsentGiven() {
             return sessionStorage.getItem('consentGiven') === 'true';
         }
-
         function setConsentGiven(value) {
             if (value) {
                 sessionStorage.setItem('consentGiven', 'true');
@@ -1835,12 +2081,18 @@
                             if (!l.endDate) l.endDate = null;
                             if (l.isSection === undefined) l.isSection = false;
                             if (!l.title) l.title = '';
+                            if (l.locked === undefined) l.locked = false; // nouveau champ
                             return l;
                         });
                         userProfile.links.sort((a, b) => (a.order || 0) - (b.order || 0));
                     }
                     if (typeof userProfile.views !== 'number') userProfile.views = 0;
                     if (typeof userProfile.redirectUnique !== 'boolean') userProfile.redirectUnique = false;
+                    // Nouveaux champs
+                    if (!userProfile.seo) userProfile.seo = { title: '', description: '', keywords: '' };
+                    if (!userProfile.integrations) userProfile.integrations = { metaPixel: '', ga: '' };
+                    if (!userProfile.flash) userProfile.flash = { active: false, message: '', color: 'red' };
+                    if (!userProfile.subscribers) userProfile.subscribers = [];
                     return userProfile;
                 } else {
                     userProfile = null;
@@ -1868,19 +2120,13 @@
             }
         }
 
-        // --- Incrémentation des vues globales (avec protection double comptage) ---
-        let viewCountedFlag = false;
-
+        // --- Incrémentation des vues ---
         async function incrementViews(uid) {
             const key = 'viewCounted_' + uid;
-            if (sessionStorage.getItem(key) === 'true') {
-                return;
-            }
+            if (sessionStorage.getItem(key) === 'true') return;
             try {
                 const docRef = db.collection('users').doc(uid);
-                await docRef.update({
-                    views: firebase.firestore.FieldValue.increment(1)
-                });
+                await docRef.update({ views: firebase.firestore.FieldValue.increment(1) });
                 if (userProfile && userProfile._id === uid) {
                     userProfile.views = (userProfile.views || 0) + 1;
                 }
@@ -1890,6 +2136,7 @@
             }
         }
 
+        // --- Incrémenter les clics d'un lien (avec vérification du verrouillage) ---
         async function incrementLinkClick(uid, linkId) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -1915,63 +2162,29 @@
             }
         }
 
-        async function resetViews() {
-            if (!currentUser) {
-                showToast('Vous devez être connecté.', 'error');
-                return;
-            }
-            if (!userProfile) {
-                showToast('Profil non chargé.', 'error');
-                return;
-            }
+        // --- Ajouter un abonné (collecte d'email) ---
+        async function addSubscriber(uid, email) {
             try {
-                const docRef = db.collection('users').doc(currentUser.uid);
-                await docRef.update({ views: 0 });
-                userProfile.views = 0;
-                document.getElementById('views-count-display').textContent = '0';
-                updateStats();
-                showToast('Vues globales réinitialisées !', 'info');
+                const docRef = db.collection('users').doc(uid);
+                const doc = await docRef.get();
+                if (!doc.exists) return;
+                const data = doc.data();
+                const subscribers = data.subscribers || [];
+                // Éviter les doublons
+                if (subscribers.some(s => s.email === email)) {
+                    showToast('Cet email est déjà enregistré.', 'info');
+                    return false;
+                }
+                const newSub = { email, date: new Date().toISOString() };
+                const updated = [...subscribers, newSub];
+                await docRef.update({ subscribers: updated });
+                if (userProfile && userProfile._id === uid) {
+                    userProfile.subscribers = updated;
+                }
+                return true;
             } catch (error) {
-                console.error('Erreur lors de la réinitialisation :', error);
-                showToast('Erreur lors de la réinitialisation.', 'error');
-            }
-        }
-
-        async function resetLinkClicks(linkId) {
-            if (!currentUser) {
-                showToast('Vous devez être connecté.', 'error');
-                return;
-            }
-            if (!userProfile || !userProfile.links) {
-                showToast('Profil non chargé.', 'error');
-                return;
-            }
-            const linkIndex = userProfile.links.findIndex(l => l.id === linkId);
-            if (linkIndex === -1) {
-                showToast('Lien introuvable.', 'error');
-                return;
-            }
-            if (userProfile.links[linkIndex].isSection) {
-                showToast('Une section ne peut pas avoir de clics.', 'info');
-                return;
-            }
-            try {
-                const updatedLinks = userProfile.links.map(l => {
-                    if (l.id === linkId) {
-                        return { ...l, clicks: 0 };
-                    }
-                    return l;
-                });
-                const docRef = db.collection('users').doc(currentUser.uid);
-                await docRef.update({ links: updatedLinks });
-                userProfile.links = updatedLinks;
-                renderDashboardLinks();
-                renderTopNetworks();
-                updateStats();
-                showToast('Clics du lien réinitialisés !', 'info');
-            } catch (error) {
-                console.error('Erreur lors de la réinitialisation du lien :', error);
-                showToast('Erreur lors de la réinitialisation.', 'error');
+                console.warn('Impossible d\'ajouter l\'abonné :', error);
+                return false;
             }
         }
 
@@ -2064,10 +2277,50 @@
             barsContainer.innerHTML = html;
         }
 
+        // --- Export Rapport (PDF) ---
+        function exportReport() {
+            if (!userProfile) {
+                showToast('Profil non chargé.', 'error');
+                return;
+            }
+            const stats = {
+                views: userProfile.views || 0,
+                totalClicks: userProfile.links ? userProfile.links.reduce((sum, l) => sum + (l.clicks || 0), 0) : 0,
+                links: userProfile.links ? userProfile.links.filter(l => !l.isSection && l.active) : []
+            };
+            const total = stats.totalClicks || 1; // éviter division par zéro
+            let report = `RAPPORT STATISTIQUES LinkExt\n`;
+            report += `==========================\n`;
+            report += `Date : ${new Date().toLocaleString()}\n\n`;
+            report += `Vues du profil : ${stats.views}\n`;
+            report += `Clics totaux : ${stats.totalClicks}\n\n`;
+            report += `Répartition des clics :\n`;
+            if (stats.links.length === 0) {
+                report += `  Aucun clic enregistré.\n`;
+            } else {
+                stats.links.forEach(link => {
+                    const platform = PLATFORMS.find(p => p.id === link.platform);
+                    const name = platform ? platform.name : link.platform;
+                    const percent = Math.round((link.clicks / total) * 100);
+                    report += `  - ${name} : ${link.clicks} clics (${percent}%)\n`;
+                });
+            }
+            report += `\nFin du rapport.`;
+
+            // Création d'un fichier texte (format simple) – pour un PDF complet on utiliserait une librairie, mais ici on génère un .txt propre.
+            const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `rapport_linkext_${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Rapport exporté !', 'info');
+        }
+
         // --- Routage avec consentement ---
         async function handleAuthRedirection(user) {
             if (!user) {
-                // Vérifier le consentement
                 if (!isConsentGiven()) {
                     showView('view-consent');
                     return;
@@ -2076,7 +2329,6 @@
                 updateAuthUIForMode('login');
                 return;
             }
-            // Utilisateur connecté
             const profile = await loadUserProfile(user.uid);
             if (!profile) {
                 const defaultProfile = {
@@ -2090,6 +2342,10 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    seo: { title: '', description: '', keywords: '' },
+                    integrations: { metaPixel: '', ga: '' },
+                    flash: { active: false, message: '', color: 'red' },
+                    subscribers: [],
                     onboardingCompleted: false
                 };
                 saveUserProfile(user.uid, defaultProfile).catch(() => {});
@@ -2184,15 +2440,39 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    seo: { title: '', description: '', keywords: '' },
+                    integrations: { metaPixel: '', ga: '' },
+                    flash: { active: false, message: '', color: 'red' },
+                    subscribers: [],
                     onboardingCompleted: false
                 };
             }
 
+            // Remplir les champs existants
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
             document.getElementById('dashboard-banner-link').value = userProfile.bannerLink || '';
             document.getElementById('views-count-display').textContent = userProfile.views || 0;
 
+            // SEO
+            document.getElementById('seo-title').value = userProfile.seo?.title || '';
+            document.getElementById('seo-description').value = userProfile.seo?.description || '';
+            document.getElementById('seo-keywords').value = userProfile.seo?.keywords || '';
+
+            // Intégrations
+            document.getElementById('meta-pixel-id').value = userProfile.integrations?.metaPixel || '';
+            document.getElementById('google-analytics-id').value = userProfile.integrations?.ga || '';
+
+            // Alerte Flash
+            const flash = userProfile.flash || { active: false, message: '', color: 'red' };
+            const flashToggle = document.getElementById('flash-toggle');
+            flashToggle.classList.toggle('active', flash.active);
+            document.getElementById('flash-message').value = flash.message || '';
+            document.querySelectorAll('.color-selector .color-option').forEach(el => {
+                el.classList.toggle('active', el.dataset.color === flash.color);
+            });
+
+            // Avatar
             const avatarImg = document.getElementById('dashboard-avatar');
             avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
             avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
@@ -2206,6 +2486,7 @@
             renderTopNetworks();
             applyVisualTheme();
             applyBackground();
+            renderSubscribers();
         }
 
         function renderTopNetworks() {
@@ -2274,6 +2555,7 @@
                     const div = document.createElement('div');
                     div.className = 'link-item';
                     const startDisplay = item.startDate || item.endDate ? `<span style="font-size:0.55rem; color:var(--text-secondary);"><i class="fas fa-calendar-alt"></i></span>` : '';
+                    const lockedDisplay = item.locked ? `<span style="font-size:0.55rem; color:var(--cyan);"><i class="fas fa-lock"></i></span>` : '';
                     div.innerHTML = `
                         <i class="${platform.icon} platform-icon" style="color:var(--cyan);"></i>
                         <input type="text" class="input-field link-url-input" value="${item.url || ''}" placeholder="URL" data-id="${item.id}">
@@ -2288,14 +2570,20 @@
                         </div>
                         <span style="font-size:0.7rem; color:var(--text-secondary);">${clicks} clics</span>
                         <button class="reset-clicks-btn" data-id="${item.id}" title="Réinitialiser les clics de ce lien"><i class="fas fa-sync-alt"></i></button>
+                        ${lockedDisplay}
                         ${startDisplay}
                         ${item.startDate ? `<span style="font-size:0.55rem; color:var(--text-secondary);">${new Date(item.startDate).toLocaleDateString()}</span>` : ''}
+                        <button class="btn btn-outline lock-toggle-btn" data-id="${item.id}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
+                            ${item.locked ? '🔓 Déverrouiller' : '🔒 Verrouiller'}
+                        </button>
                     `;
                     container.appendChild(div);
                 }
             });
 
+            // Gestion des événements
             container.onclick = (e) => {
+                // Actions principales
                 const btn = e.target.closest('[data-action]');
                 if (btn) {
                     const id = btn.dataset.id;
@@ -2323,6 +2611,7 @@
                     }
                     return;
                 }
+                // Feature btn
                 const featureBtn = e.target.closest('.feature-btn');
                 if (featureBtn) {
                     const id = featureBtn.dataset.id;
@@ -2338,6 +2627,7 @@
                     saveUserProfile(currentUser.uid, { featuredLink: userProfile.featuredLink }).catch(() => {});
                     return;
                 }
+                // Order
                 const orderBtn = e.target.closest('[data-dir]');
                 if (orderBtn) {
                     const id = orderBtn.dataset.id;
@@ -2358,12 +2648,27 @@
                     renderTopNetworks();
                     saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                 }
+                // Reset clicks
                 const resetBtn = e.target.closest('.reset-clicks-btn');
                 if (resetBtn) {
                     const id = resetBtn.dataset.id;
                     if (id) resetLinkClicks(id);
                     return;
                 }
+                // Lock toggle
+                const lockBtn = e.target.closest('.lock-toggle-btn');
+                if (lockBtn) {
+                    const id = lockBtn.dataset.id;
+                    if (!id) return;
+                    const link = userProfile.links.find(l => l.id === id);
+                    if (link && !link.isSection) {
+                        link.locked = !link.locked;
+                        renderDashboardLinks();
+                        saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                    }
+                    return;
+                }
+                // Edit / delete section
                 const editSection = e.target.closest('[data-action="edit-section"]');
                 if (editSection) {
                     const id = editSection.dataset.id;
@@ -2419,7 +2724,8 @@
                 description: '',
                 imageUrl: '',
                 startDate: null,
-                endDate: null
+                endDate: null,
+                locked: false
             };
             if (!userProfile.links) userProfile.links = [];
             userProfile.links.push(newSection);
@@ -2566,6 +2872,7 @@
             document.getElementById('link-image-preview').classList.add('hidden');
             document.getElementById('new-link-start').value = '';
             document.getElementById('new-link-end').value = '';
+            document.getElementById('new-link-locked-toggle').classList.remove('active');
         }
 
         async function validateAndAddLink() {
@@ -2590,6 +2897,7 @@
 
             const startDate = document.getElementById('new-link-start').value;
             const endDate = document.getElementById('new-link-end').value;
+            const locked = document.getElementById('new-link-locked-toggle').classList.contains('active');
 
             const newLink = {
                 id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
@@ -2603,7 +2911,8 @@
                 startDate: startDate || null,
                 endDate: endDate || null,
                 isSection: false,
-                title: ''
+                title: '',
+                locked: locked
             };
 
             try {
@@ -2620,6 +2929,7 @@
                 document.getElementById('link-image-preview').classList.add('hidden');
                 document.getElementById('new-link-start').value = '';
                 document.getElementById('new-link-end').value = '';
+                document.getElementById('new-link-locked-toggle').classList.remove('active');
 
                 showToast('Lien ajouté avec succès !', 'info');
                 showView('view-dashboard');
@@ -2766,7 +3076,118 @@
             draw();
         }
 
-        // --- Profil Public (CORRIGÉ) ---
+        // --- Affichage des abonnés ---
+        function renderSubscribers() {
+            const container = document.getElementById('subscribers-list-container');
+            if (!userProfile || !userProfile.subscribers || userProfile.subscribers.length === 0) {
+                container.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Aucun abonné pour le moment.</span>';
+                return;
+            }
+            let html = '';
+            userProfile.subscribers.forEach(sub => {
+                html += `
+                    <div class="sub-item">
+                        <span class="sub-email">${sub.email}</span>
+                        <span class="sub-date">${new Date(sub.date).toLocaleDateString()}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // --- Copie des emails ---
+        function copyEmails() {
+            if (!userProfile || !userProfile.subscribers || userProfile.subscribers.length === 0) {
+                showToast('Aucun email à copier.', 'info');
+                return;
+            }
+            const emails = userProfile.subscribers.map(s => s.email).join(', ');
+            navigator.clipboard.writeText(emails).then(() => {
+                showToast('Emails copiés !', 'info');
+            }).catch(() => {
+                // fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = emails;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('Emails copiés !', 'info');
+            });
+        }
+
+        // --- Injection des scripts de tracking (Meta Pixel & GA) ---
+        function injectTrackingScripts(integrations) {
+            // Supprimer les anciens scripts pour éviter les doublons
+            document.querySelectorAll('[data-linkext-tracking]').forEach(el => el.remove());
+
+            if (integrations.metaPixel) {
+                const metaScript = document.createElement('script');
+                metaScript.setAttribute('data-linkext-tracking', 'meta');
+                metaScript.innerHTML = `
+                    !function(f,b,e,v,n,t,s)
+                    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                    n.queue=[];t=b.createElement(e);t.async=!0;
+                    t.src=v;s=b.getElementsByTagName(e)[0];
+                    s.parentNode.insertBefore(t,s)}(window, document,'script',
+                    'https://connect.facebook.net/en_US/fbevents.js');
+                    fbq('init', '${integrations.metaPixel}');
+                    fbq('track', 'PageView');
+                `;
+                document.head.appendChild(metaScript);
+            }
+
+            if (integrations.ga) {
+                const gaScript = document.createElement('script');
+                gaScript.setAttribute('data-linkext-tracking', 'ga');
+                gaScript.async = true;
+                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${integrations.ga}`;
+                document.head.appendChild(gaScript);
+
+                const gaInit = document.createElement('script');
+                gaInit.setAttribute('data-linkext-tracking', 'ga-init');
+                gaInit.innerHTML = `
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', '${integrations.ga}');
+                `;
+                document.head.appendChild(gaInit);
+            }
+        }
+
+        // --- Injection des balises SEO ---
+        function injectSEO(seo) {
+            // Titre
+            let titleEl = document.querySelector('title');
+            if (!titleEl) {
+                titleEl = document.createElement('title');
+                document.head.appendChild(titleEl);
+            }
+            titleEl.textContent = seo.title || 'LinkExt | Cyber Linktree';
+
+            // Meta description
+            let descEl = document.querySelector('meta[name="description"]');
+            if (!descEl) {
+                descEl = document.createElement('meta');
+                descEl.name = 'description';
+                document.head.appendChild(descEl);
+            }
+            descEl.content = seo.description || 'Centralisez vos liens et réseaux sociaux en un seul endroit.';
+
+            // Meta keywords
+            let kwEl = document.querySelector('meta[name="keywords"]');
+            if (!kwEl) {
+                kwEl = document.createElement('meta');
+                kwEl.name = 'keywords';
+                document.head.appendChild(kwEl);
+            }
+            kwEl.content = seo.keywords || 'linktree, réseaux sociaux, cyberpunk';
+        }
+
+        // --- Profil Public (CORRIGÉ avec les nouvelles fonctionnalités) ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -2777,7 +3198,16 @@
                 }
                 const data = doc.data();
 
+                // Incrémenter les vues
                 await incrementViews(uid);
+
+                // SEO
+                const seo = data.seo || { title: '', description: '', keywords: '' };
+                injectSEO(seo);
+
+                // Tracking
+                const integrations = data.integrations || { metaPixel: '', ga: '' };
+                injectTrackingScripts(integrations);
 
                 if (data.maintenance === true) {
                     const publicView = document.getElementById('view-profile-public');
@@ -2791,6 +3221,7 @@
                     return;
                 }
 
+                // Avatar, nom, bio, statut
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
@@ -2812,6 +3243,25 @@
                 applyVisualTheme();
                 applyBackground();
 
+                // Bannière Alerte Flash
+                const flashContainer = document.getElementById('flash-banner-container');
+                flashContainer.innerHTML = '';
+                if (data.flash && data.flash.active && data.flash.message) {
+                    const flashDiv = document.createElement('div');
+                    flashDiv.className = `flash-banner active flash-${data.flash.color || 'red'}`;
+                    flashDiv.innerHTML = `
+                        ${data.flash.message}
+                        <button class="flash-close" id="flash-close-btn"><i class="fas fa-times"></i></button>
+                    `;
+                    flashContainer.appendChild(flashDiv);
+                    // Fermeture locale (pas de persistance)
+                    document.getElementById('flash-close-btn').addEventListener('click', function() {
+                        flashDiv.classList.remove('active');
+                        flashDiv.style.display = 'none';
+                    });
+                }
+
+                // Wrapper redirection unique
                 const wrapperLink = document.getElementById('public-wrapper-link');
                 const activeLinks = data.links ? data.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '') : [];
                 const isRedirectActive = data.redirectUnique === true && activeLinks.length === 1;
@@ -2827,6 +3277,7 @@
                     wrapperLink.style.cursor = 'default';
                 }
 
+                // Contenu des liens (avec gestion du verrouillage)
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
@@ -2872,9 +3323,22 @@
                             card.appendChild(badge);
                         }
 
+                        // Gestion du clic : si verrouillé, on ouvre la modale
                         const handleCardClick = (e) => {
                             if (isRedirectActive) return;
                             e.preventDefault();
+
+                            if (item.locked) {
+                                // Ouvrir la modale de collecte d'email
+                                gatedPendingLink = item.id;
+                                gatedPendingTarget = uid;
+                                document.getElementById('gated-email').value = '';
+                                document.getElementById('gated-error').style.display = 'none';
+                                document.getElementById('gated-modal').classList.add('active');
+                                return;
+                            }
+
+                            // Sinon redirection directe
                             window.open(sanitizeUrl(item.url), '_blank');
                             incrementLinkClick(uid, item.id).catch(() => {});
                         };
@@ -2887,10 +3351,13 @@
                             card.style.cursor = 'pointer';
                         }
 
+                        // Description
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
-                        desc.textContent = item.description || `Rejoindre ${platform.name}`;
+                        const lockIcon = item.locked ? ' <i class="fas fa-lock" style="color:var(--cyan);"></i>' : '';
+                        desc.innerHTML = (item.description || `Rejoindre ${platform.name}`) + lockIcon;
 
+                        // Média
                         const media = document.createElement('div');
                         if (item.imageUrl && item.imageUrl !== '') {
                             const img = document.createElement('img');
@@ -2917,11 +3384,12 @@
                             media.appendChild(defaultContainer);
                         }
 
+                        // Barre d'action
                         const actionBar = document.createElement('div');
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
                             <i class="${platform.icon}"></i>
-                            <span>${isRedirectActive ? 'Redirection active' : 'Cliqué ici pour rejoindre'}</span>
+                            <span>${item.locked ? '🔒 Déverrouiller' : (isRedirectActive ? 'Redirection active' : 'Cliqué ici pour rejoindre')}</span>
                         `;
 
                         card.appendChild(desc);
@@ -2932,7 +3400,7 @@
                     });
                 }
 
-                // QR Code : génération dans la modale
+                // QR Code
                 const qrImg = document.getElementById('qr-image');
                 const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
@@ -3006,12 +3474,144 @@ URL:${urlProfil}
             });
         }
 
+        // --- Gated Content : soumission email ---
+        function setupGatedModal() {
+            const modal = document.getElementById('gated-modal');
+            const submitBtn = document.getElementById('gated-submit-btn');
+            const emailInput = document.getElementById('gated-email');
+            const errorMsg = document.getElementById('gated-error');
+
+            submitBtn.addEventListener('click', async () => {
+                const email = emailInput.value.trim();
+                if (!email || !email.includes('@') || !email.includes('.')) {
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+                errorMsg.style.display = 'none';
+
+                if (!gatedPendingTarget || !gatedPendingLink) {
+                    showToast('Erreur : lien introuvable.', 'error');
+                    modal.classList.remove('active');
+                    return;
+                }
+
+                // Ajouter l'email aux abonnés
+                const added = await addSubscriber(gatedPendingTarget, email);
+                if (!added) {
+                    // L'email existe déjà ou erreur
+                    modal.classList.remove('active');
+                    gatedPendingLink = null;
+                    gatedPendingTarget = null;
+                    return;
+                }
+
+                // Récupérer l'URL du lien
+                const targetDoc = await db.collection('users').doc(gatedPendingTarget).get();
+                if (!targetDoc.exists) {
+                    showToast('Erreur profil.', 'error');
+                    modal.classList.remove('active');
+                    return;
+                }
+                const data = targetDoc.data();
+                const link = data.links ? data.links.find(l => l.id === gatedPendingLink) : null;
+                if (!link || !link.url) {
+                    showToast('Lien introuvable.', 'error');
+                    modal.classList.remove('active');
+                    return;
+                }
+
+                // Incrémenter le clic et rediriger
+                await incrementLinkClick(gatedPendingTarget, gatedPendingLink);
+                modal.classList.remove('active');
+                window.open(sanitizeUrl(link.url), '_blank');
+
+                // Nettoyer
+                gatedPendingLink = null;
+                gatedPendingTarget = null;
+                // Mettre à jour la liste des abonnés si le dashboard est visible
+                if (document.getElementById('view-dashboard').classList.contains('active')) {
+                    renderSubscribers();
+                }
+            });
+
+            // Fermeture de la modale par clic extérieur
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    gatedPendingLink = null;
+                    gatedPendingTarget = null;
+                }
+            });
+        }
+
         // --- isPublicMode ---
         function isPublicMode() {
             return new URLSearchParams(window.location.search).has('id');
         }
         function getPublicUid() {
             return new URLSearchParams(window.location.search).get('id');
+        }
+
+        // --- Reset clicks individuels ---
+        async function resetLinkClicks(linkId) {
+            if (!currentUser) {
+                showToast('Vous devez être connecté.', 'error');
+                return;
+            }
+            if (!userProfile || !userProfile.links) {
+                showToast('Profil non chargé.', 'error');
+                return;
+            }
+            const linkIndex = userProfile.links.findIndex(l => l.id === linkId);
+            if (linkIndex === -1) {
+                showToast('Lien introuvable.', 'error');
+                return;
+            }
+            if (userProfile.links[linkIndex].isSection) {
+                showToast('Une section ne peut pas avoir de clics.', 'info');
+                return;
+            }
+            try {
+                const updatedLinks = userProfile.links.map(l => {
+                    if (l.id === linkId) {
+                        return { ...l, clicks: 0 };
+                    }
+                    return l;
+                });
+                const docRef = db.collection('users').doc(currentUser.uid);
+                await docRef.update({ links: updatedLinks });
+                userProfile.links = updatedLinks;
+                renderDashboardLinks();
+                renderTopNetworks();
+                updateStats();
+                showToast('Clics du lien réinitialisés !', 'info');
+            } catch (error) {
+                console.error('Erreur lors de la réinitialisation du lien :', error);
+                showToast('Erreur lors de la réinitialisation.', 'error');
+            }
+        }
+
+        // --- Reset vues globales ---
+        async function resetViews() {
+            if (!currentUser) {
+                showToast('Vous devez être connecté.', 'error');
+                return;
+            }
+            if (!userProfile) {
+                showToast('Profil non chargé.', 'error');
+                return;
+            }
+            try {
+                const docRef = db.collection('users').doc(currentUser.uid);
+                await docRef.update({ views: 0 });
+                userProfile.views = 0;
+                document.getElementById('views-count-display').textContent = '0';
+                updateStats();
+                showToast('Vues globales réinitialisées !', 'info');
+            } catch (error) {
+                console.error('Erreur lors de la réinitialisation :', error);
+                showToast('Erreur lors de la réinitialisation.', 'error');
+            }
         }
 
         // ==================== ATTACHEMENT GLOBAL DES ÉVÉNEMENTS ====================
@@ -3021,11 +3621,9 @@ URL:${urlProfil}
                 e.preventDefault();
                 setConsentGiven(true);
                 if (currentUser) {
-                    // Si déjà connecté (cas rare), on va au dashboard
                     showView('view-dashboard');
                     populateDashboard();
                 } else {
-                    // Sinon on affiche la page d'authentification
                     showView('view-auth');
                 }
             });
@@ -3121,7 +3719,7 @@ URL:${urlProfil}
                 }
             });
 
-            // --- Onboarding : Passer ---
+            // --- Onboarding ---
             document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const bio = document.getElementById('onboarding-bio').value.trim();
@@ -3141,7 +3739,8 @@ URL:${urlProfil}
                             startDate: null,
                             endDate: null,
                             isSection: false,
-                            title: ''
+                            title: '',
+                            locked: false
                         });
                     }
                 });
@@ -3156,6 +3755,10 @@ URL:${urlProfil}
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    seo: { title: '', description: '', keywords: '' },
+                    integrations: { metaPixel: '', ga: '' },
+                    flash: { active: false, message: '', color: 'red' },
+                    subscribers: [],
                     onboardingCompleted: true
                 };
                 saveUserProfile(currentUser.uid, profileData).catch(() => {});
@@ -3164,7 +3767,6 @@ URL:${urlProfil}
                 showToast('Profil créé avec succès (sauvegarde en cours).', 'info');
             });
 
-            // --- Onboarding : Finaliser ---
             document.getElementById('finish-onboarding-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const bio = document.getElementById('onboarding-bio').value.trim();
@@ -3184,7 +3786,8 @@ URL:${urlProfil}
                             startDate: null,
                             endDate: null,
                             isSection: false,
-                            title: ''
+                            title: '',
+                            locked: false
                         });
                     }
                 });
@@ -3199,6 +3802,10 @@ URL:${urlProfil}
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    seo: { title: '', description: '', keywords: '' },
+                    integrations: { metaPixel: '', ga: '' },
+                    flash: { active: false, message: '', color: 'red' },
+                    subscribers: [],
                     onboardingCompleted: true
                 };
                 const saved = await saveUserProfile(currentUser.uid, profileData);
@@ -3221,6 +3828,7 @@ URL:${urlProfil}
                 document.getElementById('link-image-preview').classList.add('hidden');
                 document.getElementById('new-link-start').value = '';
                 document.getElementById('new-link-end').value = '';
+                document.getElementById('new-link-locked-toggle').classList.remove('active');
                 showView('view-add-link');
             });
 
@@ -3232,12 +3840,32 @@ URL:${urlProfil}
 
             document.getElementById('validate-link-btn').addEventListener('click', validateAndAddLink);
 
+            // Lock toggle dans la vue d'ajout
+            document.getElementById('new-link-locked-toggle').addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+
             // --- Dashboard : Enregistrer ---
             document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const name = document.getElementById('dashboard-name').value.trim();
                 const bio = document.getElementById('dashboard-bio').value.trim();
                 const bannerLink = document.getElementById('dashboard-banner-link').value.trim();
+
+                // SEO
+                const seoTitle = document.getElementById('seo-title').value.trim();
+                const seoDesc = document.getElementById('seo-description').value.trim();
+                const seoKeywords = document.getElementById('seo-keywords').value.trim();
+
+                // Intégrations
+                const metaPixel = document.getElementById('meta-pixel-id').value.trim();
+                const gaId = document.getElementById('google-analytics-id').value.trim();
+
+                // Flash
+                const flashActive = document.getElementById('flash-toggle').classList.contains('active');
+                const flashMessage = document.getElementById('flash-message').value.trim();
+                const flashColor = document.querySelector('.color-selector .color-option.active')?.dataset.color || 'red';
+
                 const links = userProfile.links ? userProfile.links.map(l => ({
                     id: l.id || Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
                     platform: l.platform || '',
@@ -3250,13 +3878,18 @@ URL:${urlProfil}
                     startDate: l.startDate || null,
                     endDate: l.endDate || null,
                     isSection: l.isSection || false,
-                    title: l.title || ''
+                    title: l.title || '',
+                    locked: l.locked || false
                 })) : [];
+
                 const saved = await saveUserProfile(currentUser.uid, {
                     displayName: name,
                     bio: bio,
                     bannerLink: bannerLink,
                     links: links,
+                    seo: { title: seoTitle, description: seoDesc, keywords: seoKeywords },
+                    integrations: { metaPixel: metaPixel, ga: gaId },
+                    flash: { active: flashActive, message: flashMessage, color: flashColor },
                     onboardingCompleted: true
                 });
                 if (saved) {
@@ -3264,6 +3897,7 @@ URL:${urlProfil}
                     document.getElementById('views-count-display').textContent = userProfile.views || 0;
                     updateRedirectToggleState();
                     updateStats();
+                    renderSubscribers();
                 }
             });
 
@@ -3285,11 +3919,10 @@ URL:${urlProfil}
                 }
             });
 
-            // --- Déconnexion (supprime le consentement) ---
+            // --- Déconnexion ---
             document.getElementById('logout-btn').addEventListener('click', () => {
                 setConsentGiven(false);
                 auth.signOut();
-                // Réinitialiser l'état local
                 currentUser = null;
                 userProfile = null;
                 showView('view-consent');
@@ -3321,7 +3954,7 @@ URL:${urlProfil}
 
             document.getElementById('reset-views-btn').addEventListener('click', resetViews);
 
-            // --- Thème privé (clair/sombre) ---
+            // --- Thème privé ---
             document.getElementById('theme-toggle-private').addEventListener('click', function(e) {
                 e.preventDefault();
                 toggleTheme();
@@ -3338,9 +3971,29 @@ URL:${urlProfil}
                 applyBackground();
             });
 
+            // --- Flash toggle et couleurs ---
+            document.getElementById('flash-toggle').addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+            document.querySelectorAll('.color-selector .color-option').forEach(el => {
+                el.addEventListener('click', function() {
+                    document.querySelectorAll('.color-selector .color-option').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // --- Export Rapport ---
+            document.getElementById('export-report-btn').addEventListener('click', exportReport);
+
+            // --- Copier les emails ---
+            document.getElementById('copy-emails-btn').addEventListener('click', copyEmails);
+
             // --- QR Code et Vcard ---
             setupQRModal();
             setupVcard();
+
+            // --- Gated Modal ---
+            setupGatedModal();
 
             // --- Grille d'ajout ---
             renderAddLinkGrid();
@@ -3350,6 +4003,11 @@ URL:${urlProfil}
                 e.preventDefault();
                 toggleTheme();
             });
+
+            // --- Si on est en mode public, on charge le profil ---
+            if (isPublicMode()) {
+                // déjà géré par onAuthStateChanged
+            }
         }
 
         // --- Auth state ---
@@ -3369,7 +4027,7 @@ URL:${urlProfil}
         // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
-            // On laisse onAuthStateChanged gérer le routage initial
+            // Laisser onAuthStateChanged gérer l'affichage initial
         });
 
     })();
