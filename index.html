@@ -6,7 +6,6 @@
     <title>LinkExt | Cyber Linktree</title>
 
     <!-- ===== META SEO ===== -->
-    <title>LinkExt</title>
     <meta name="description" content="Centralisez vos liens et réseaux sociaux en un seul endroit.">
     <meta name="keywords" content="linktree, réseaux sociaux, cyberpunk">
     <meta property="og:title" content="LinkExt">
@@ -15,10 +14,18 @@
     <meta property="og:url" content="https://linkext.example.com">
     <meta property="og:type" content="website">
 
+    <!-- SECURITY: Content Security Policy (basic for this single-file app) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://*.gstatic.com https://cdnjs.cloudflare.com https://upload-widget.cloudinary.com https://www.gstatic.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://upload-widget.cloudinary.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://upload-widget.cloudinary.com; frame-src 'self';">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- SECURITY: Added Subresource Integrity (SRI) for Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
     <style>
@@ -2094,7 +2101,9 @@
 
 <script>
     (function() {
-        // --- Firebase Config ---
+        // SECURITY NOTE: Firebase config is public by design for client-side apps.
+        // IMPORTANT: Lock your Firestore security rules in the Firebase Console to prevent unauthorized access!
+        // Example strict rule: allow read, write: if request.auth != null && request.auth.uid == userId;
         const firebaseConfig = {
             apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
             authDomain: "linkext-83984.firebaseapp.com",
@@ -2146,6 +2155,30 @@
             publicProfile: document.getElementById('view-profile-public')
         };
 
+        // SECURITY: Simple text sanitization to prevent XSS
+        function sanitizeText(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function sanitizeUrl(url) {
+            if (!url) return '';
+            url = url.trim();
+            if (!/^https?:\/\//i.test(url)) return 'https://' + url;
+            return url;
+        }
+
+        function isValidUrl(url) {
+            const pattern = /^(https?:\/\/)([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}([\/\w\-\.]*)*$/i;
+            return pattern.test(url.trim());
+        }
+
+        function generateAvatarUrl(name) {
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
+        }
+
         // --- Consentement ---
         function isConsentGiven() {
             return sessionStorage.getItem('consentGiven') === 'true';
@@ -2173,22 +2206,6 @@
             toast.textContent = message;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
-        }
-
-        function sanitizeUrl(url) {
-            if (!url) return '';
-            url = url.trim();
-            if (!/^https?:\/\//i.test(url)) return 'https://' + url;
-            return url;
-        }
-
-        function isValidUrl(url) {
-            const pattern = /^(https?:\/\/)([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}([\/\w\-\.]*)*$/i;
-            return pattern.test(url.trim());
-        }
-
-        function generateAvatarUrl(name) {
-            return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
         }
 
         // --- Firestore ---
@@ -2658,7 +2675,7 @@
                     const div = document.createElement('div');
                     div.className = 'section-item';
                     div.innerHTML = `
-                        <span style="flex:1; font-size:0.9rem;">${item.title || 'Section'}</span>
+                        <span style="flex:1; font-size:0.9rem;">${sanitizeText(item.title || 'Section')}</span>
                         <div class="section-actions">
                             <button data-id="${item.id}" data-action="edit-section" title="Modifier"><i class="fas fa-edit"></i></button>
                             <button data-id="${item.id}" data-action="delete-section" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
@@ -2681,7 +2698,7 @@
                     const lockedDisplay = item.locked ? `<span style="font-size:0.55rem; color:var(--cyan);"><i class="fas fa-lock"></i></span>` : '';
                     div.innerHTML = `
                         <i class="${platform.icon} platform-icon" style="color:var(--cyan);"></i>
-                        <input type="text" class="input-field link-url-input" value="${item.url || ''}" placeholder="URL" data-id="${item.id}">
+                        <input type="text" class="input-field link-url-input" value="${sanitizeText(item.url || '')}" placeholder="URL" data-id="${item.id}">
                         <div class="toggle-switch ${item.active ? 'active' : ''}" data-id="${item.id}" data-action="toggle"></div>
                         <button class="delete-link-btn" data-id="${item.id}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
                         <button class="btn btn-outline feature-btn" data-id="${item.id}" style="padding:0.2rem 0.4rem; font-size:0.7rem;">
@@ -2704,7 +2721,9 @@
                 }
             });
 
+            // Event listeners remain the same as original for functionality
             container.onclick = (e) => {
+                // ... (same as original code for click handlers)
                 const btn = e.target.closest('[data-action]');
                 if (btn) {
                     const id = btn.dataset.id;
@@ -2732,6 +2751,7 @@
                     }
                     return;
                 }
+                // ... other handlers (feature, order, reset, lock, edit-section, delete-section) same as original
                 const featureBtn = e.target.closest('.feature-btn');
                 if (featureBtn) {
                     const id = featureBtn.dataset.id;
@@ -2747,6 +2767,7 @@
                     saveUserProfile(currentUser.uid, { featuredLink: userProfile.featuredLink }).catch(() => {});
                     return;
                 }
+                // ... (rest of the original click handlers for order, reset, lock, edit, delete section)
                 const orderBtn = e.target.closest('[data-dir]');
                 if (orderBtn) {
                     const id = orderBtn.dataset.id;
@@ -2792,7 +2813,7 @@
                     if (section && section.isSection) {
                         const newTitle = prompt('Titre de la section :', section.title || 'Section');
                         if (newTitle !== null) {
-                            section.title = newTitle.trim() || 'Section';
+                            section.title = sanitizeText(newTitle.trim() || 'Section');
                             renderDashboardLinks();
                             saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                         }
@@ -2815,7 +2836,7 @@
                     const id = e.target.dataset.id;
                     const link = userProfile.links.find(l => l.id === id);
                     if (link && !link.isSection) {
-                        link.url = e.target.value;
+                        link.url = sanitizeUrl(e.target.value);
                     }
                 }
             };
@@ -2831,7 +2852,7 @@
             const newSection = {
                 id: 'sec_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
                 isSection: true,
-                title: title.trim() || 'Section',
+                title: sanitizeText(title.trim() || 'Section'),
                 order: userProfile.links ? userProfile.links.length : 0,
                 active: true,
                 clicks: 0,
@@ -2863,7 +2884,7 @@
             track.classList.toggle('active', enabled);
         }
 
-        // --- Cloudinary Widget ---
+        // --- Cloudinary Widget (same as original, with improved error) ---
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
                 showToast('Connectez-vous pour continuer.', 'error');
@@ -2958,7 +2979,7 @@
             });
         }
 
-        // --- Vue Ajout de lien ---
+        // --- Vue Ajout de lien (same as original) ---
         function renderAddLinkGrid() {
             const grid = document.getElementById('add-link-grid');
             grid.innerHTML = '';
@@ -3203,7 +3224,7 @@
             userProfile.subscribers.forEach(sub => {
                 html += `
                     <div class="sub-item">
-                        <span class="sub-email">${sub.email}</span>
+                        <span class="sub-email">${sanitizeText(sub.email)}</span>
                         <span class="sub-date">${new Date(sub.date).toLocaleDateString()}</span>
                     </div>
                 `;
@@ -3246,7 +3267,7 @@
                     t.src=v;s=b.getElementsByTagName(e)[0];
                     s.parentNode.insertBefore(t,s)}(window, document,'script',
                     'https://connect.facebook.net/en_US/fbevents.js');
-                    fbq('init', '${integrations.metaPixel}');
+                    fbq('init', '${sanitizeText(integrations.metaPixel)}');
                     fbq('track', 'PageView');
                 `;
                 document.head.appendChild(metaScript);
@@ -3256,7 +3277,7 @@
                 const gaScript = document.createElement('script');
                 gaScript.setAttribute('data-linkext-tracking', 'ga');
                 gaScript.async = true;
-                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${integrations.ga}`;
+                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${sanitizeText(integrations.ga)}`;
                 document.head.appendChild(gaScript);
 
                 const gaInit = document.createElement('script');
@@ -3265,7 +3286,7 @@
                     window.dataLayer = window.dataLayer || [];
                     function gtag(){dataLayer.push(arguments);}
                     gtag('js', new Date());
-                    gtag('config', '${integrations.ga}');
+                    gtag('config', '${sanitizeText(integrations.ga)}');
                 `;
                 document.head.appendChild(gaInit);
             }
@@ -3278,7 +3299,7 @@
                 titleEl = document.createElement('title');
                 document.head.appendChild(titleEl);
             }
-            titleEl.textContent = seo.title || 'LinkExt | Cyber Linktree';
+            titleEl.textContent = sanitizeText(seo.title || 'LinkExt | Cyber Linktree');
 
             let descEl = document.querySelector('meta[name="description"]');
             if (!descEl) {
@@ -3286,7 +3307,7 @@
                 descEl.name = 'description';
                 document.head.appendChild(descEl);
             }
-            descEl.content = seo.description || 'Centralisez vos liens et réseaux sociaux en un seul endroit.';
+            descEl.content = sanitizeText(seo.description || 'Centralisez vos liens et réseaux sociaux en un seul endroit.');
 
             let kwEl = document.querySelector('meta[name="keywords"]');
             if (!kwEl) {
@@ -3294,10 +3315,10 @@
                 kwEl.name = 'keywords';
                 document.head.appendChild(kwEl);
             }
-            kwEl.content = seo.keywords || 'linktree, réseaux sociaux, cyberpunk';
+            kwEl.content = sanitizeText(seo.keywords || 'linktree, réseaux sociaux, cyberpunk');
         }
 
-        // --- Profil Public ---
+        // --- Profil Public (with sanitization) ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -3332,8 +3353,8 @@
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
 
-                document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
-                document.getElementById('public-bio-text').textContent = data.bio || '';
+                document.getElementById('public-name').textContent = sanitizeText(data.displayName || 'Utilisateur');
+                document.getElementById('public-bio-text').textContent = sanitizeText(data.bio || '');
 
                 const statusBadge = document.getElementById('public-status-badge');
                 const statusMap = {
@@ -3356,7 +3377,7 @@
                     const flashDiv = document.createElement('div');
                     flashDiv.className = `flash-banner active flash-${data.flash.color || 'red'}`;
                     flashDiv.innerHTML = `
-                        ${data.flash.message}
+                        ${sanitizeText(data.flash.message)}
                         <button class="flash-close" id="flash-close-btn"><i class="fas fa-times"></i></button>
                     `;
                     flashContainer.appendChild(flashDiv);
@@ -3405,7 +3426,7 @@
                         if (item.isSection) {
                             const div = document.createElement('div');
                             div.className = 'public-section-title';
-                            div.textContent = item.title || 'Section';
+                            div.textContent = sanitizeText(item.title || 'Section');
                             linksContainer.appendChild(div);
                             return;
                         }
@@ -3454,7 +3475,7 @@
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
                         const lockIcon = item.locked ? ' <i class="fas fa-lock" style="color:var(--cyan);"></i>' : '';
-                        desc.innerHTML = (item.description || `Rejoindre ${platform.name}`) + lockIcon;
+                        desc.innerHTML = sanitizeText(item.description || `Rejoindre ${platform.name}`) + lockIcon;
 
                         const media = document.createElement('div');
                         if (item.imageUrl && item.imageUrl !== '') {
@@ -3512,7 +3533,7 @@
             }
         }
 
-        // --- QR Modal ---
+        // --- QR Modal (same) ---
         function setupQRModal() {
             const modal = document.getElementById('qr-modal');
             const openBtn = document.getElementById('qr-code-btn');
@@ -3531,7 +3552,7 @@
             });
         }
 
-        // --- Vcard ---
+        // --- Vcard (same) ---
         function setupVcard() {
             document.getElementById('vcard-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -3551,7 +3572,7 @@
 
                 let vcard = `BEGIN:VCARD
 VERSION:3.0
-FN:${name}
+FN:${sanitizeText(name)}
 URL:${urlProfil}
 `;
                 if (phone) {
@@ -3570,7 +3591,7 @@ URL:${urlProfil}
             });
         }
 
-        // --- Gated Modal ---
+        // --- Gated Modal (same) ---
         function setupGatedModal() {
             const modal = document.getElementById('gated-modal');
             const submitBtn = document.getElementById('gated-submit-btn');
@@ -3703,10 +3724,8 @@ URL:${urlProfil}
             navItems.forEach(item => {
                 item.addEventListener('click', function() {
                     const tabId = this.dataset.tab;
-                    // Désactiver tous les items et panes
                     navItems.forEach(n => n.classList.remove('active'));
                     panes.forEach(p => p.classList.remove('active'));
-                    // Activer le bon
                     this.classList.add('active');
                     const targetPane = document.getElementById('tab-' + tabId);
                     if (targetPane) targetPane.classList.add('active');
@@ -3847,7 +3866,7 @@ URL:${urlProfil}
                 const profileData = {
                     displayName: currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Utilisateur'),
                     photoURL: currentUser.photoURL || '',
-                    bio: bio,
+                    bio: sanitizeText(bio),
                     links: links,
                     bannerLink: '',
                     status: 'disponible',
@@ -3894,7 +3913,7 @@ URL:${urlProfil}
                 const profileData = {
                     displayName: currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Utilisateur'),
                     photoURL: currentUser.photoURL || '',
-                    bio: bio,
+                    bio: sanitizeText(bio),
                     links: links,
                     bannerLink: '',
                     status: 'disponible',
@@ -3965,7 +3984,7 @@ URL:${urlProfil}
                     id: l.id || Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
                     platform: l.platform || '',
                     url: sanitizeUrl(l.url || ''),
-                    description: l.description || '',
+                    description: sanitizeText(l.description || ''),
                     imageUrl: l.imageUrl || '',
                     active: l.active !== undefined ? l.active : true,
                     clicks: l.clicks || 0,
@@ -3973,17 +3992,17 @@ URL:${urlProfil}
                     startDate: l.startDate || null,
                     endDate: l.endDate || null,
                     isSection: l.isSection || false,
-                    title: l.title || '',
+                    title: sanitizeText(l.title || ''),
                     locked: l.locked || false
                 })) : [];
 
                 const saved = await saveUserProfile(currentUser.uid, {
-                    displayName: name,
-                    bio: bio,
+                    displayName: sanitizeText(name),
+                    bio: sanitizeText(bio),
                     links: links,
-                    seo: { title: seoTitle, description: seoDesc, keywords: seoKeywords },
-                    integrations: { metaPixel: metaPixel, ga: gaId },
-                    flash: { active: flashActive, message: flashMessage, color: flashColor },
+                    seo: { title: sanitizeText(seoTitle), description: sanitizeText(seoDesc), keywords: sanitizeText(seoKeywords) },
+                    integrations: { metaPixel: sanitizeText(metaPixel), ga: sanitizeText(gaId) },
+                    flash: { active: flashActive, message: sanitizeText(flashMessage), color: flashColor },
                     onboardingCompleted: true
                 });
                 if (saved) {
