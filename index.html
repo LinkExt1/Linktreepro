@@ -19,7 +19,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Cloudinary Widget -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    
+    <!-- Bibliothèque TOTP pour Google Authenticator (côté client) -->
+    <script src="https://cdn.jsdelivr.net/npm/otplib@12.0.1/otplib.min.js"></script>
 
     <style>
         /* ===== VARIABLES (thème Cyberpunk par défaut) ===== */
@@ -1356,7 +1361,7 @@
             pointer-events: none;
         }
 
-        /* ===== DASHBOARD REFONDU ===== */
+        /* ===== DASHBOARD ===== */
         .dashboard-container {
             display: flex;
             flex-direction: column;
@@ -1383,7 +1388,6 @@
             font-size: 0.8rem;
         }
 
-        /* ===== MODULE DE PARTAGE DU LIEN PUBLIC ===== */
         .share-module {
             padding: 0.8rem 1.8rem;
             background: var(--card-bg);
@@ -1445,7 +1449,6 @@
             transform: scale(0.92);
         }
 
-        /* ===== BARRE DE NAVIGATION ===== */
         .dashboard-nav {
             display: flex;
             justify-content: space-around;
@@ -1494,7 +1497,6 @@
             transform: scale(0.92);
         }
 
-        /* Conteneur des onglets (Tab Content) */
         .tab-content {
             flex: 1;
             overflow-y: auto;
@@ -1525,14 +1527,18 @@
         .tab-pane .seo-section,
         .tab-pane .integrations-section,
         .tab-pane .flash-section,
-        .tab-pane .subscribers-section {
+        .tab-pane .subscribers-section,
+        .tab-pane .testimonials-section,
+        .tab-pane .schedule-section {
             border-top: 1px solid var(--border-glow);
             padding-top: 1rem;
             margin-top: 0.5rem;
         }
         .tab-pane .seo-section .input-group,
         .tab-pane .integrations-section .input-group,
-        .tab-pane .flash-section .input-group {
+        .tab-pane .flash-section .input-group,
+        .tab-pane .testimonials-section .input-group,
+        .tab-pane .schedule-section .input-group {
             margin-bottom: 0.8rem;
         }
         .tab-pane .flash-section .color-selector {
@@ -1555,6 +1561,69 @@
         .tab-pane .flash-section .color-selector .color-option.color-red { background: #ff1744; }
         .tab-pane .flash-section .color-selector .color-option.color-cyan { background: #00e5ff; }
         .tab-pane .flash-section .color-selector .color-option.color-orange { background: #ff9100; }
+
+        /* Témoignages (carrousel public) */
+        .testimonials-carousel {
+            position: relative;
+            overflow: hidden;
+            padding: 1rem 0;
+            margin: 0.5rem 0;
+        }
+        .testimonials-carousel .testimonial-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            gap: 1rem;
+        }
+        .testimonials-carousel .testimonial-item {
+            flex: 0 0 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.2rem;
+            backdrop-filter: blur(8px);
+            text-align: center;
+        }
+        .testimonials-carousel .testimonial-item .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 0.5rem auto;
+            border: 2px solid var(--cyan);
+        }
+        .testimonials-carousel .testimonial-item .testimonial-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .testimonials-carousel .testimonial-item .testimonial-message {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin: 0.3rem 0;
+        }
+        .testimonials-carousel .testimonial-item .testimonial-stars {
+            color: #f1c40f;
+            font-size: 0.9rem;
+            letter-spacing: 0.1rem;
+        }
+        .testimonials-carousel .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-top: 0.8rem;
+        }
+        .testimonials-carousel .carousel-dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            opacity: 0.3;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .testimonials-carousel .carousel-dots .dot.active {
+            opacity: 1;
+            background: var(--cyan);
+        }
 
         .subscribers-list {
             max-height: 120px;
@@ -1619,6 +1688,163 @@
             display: none;
         }
 
+        /* Modale Admin (double authentification) */
+        .admin-modal .modal-content {
+            max-width: 380px;
+        }
+        .admin-modal .modal-content input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin: 0.6rem 0;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 0.3rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .admin-modal .modal-content input:focus {
+            border-color: var(--cyan);
+        }
+        .admin-modal .modal-content .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .admin-modal .modal-content .error-msg {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+        .admin-modal .modal-content .admin-hint {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Modale Dons */
+        .donation-modal .modal-content {
+            max-width: 400px;
+        }
+        .donation-modal .modal-content .donation-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            text-align: left;
+        }
+        .donation-modal .modal-content .donation-item .donation-label {
+            font-weight: 600;
+            color: var(--cyan);
+            font-size: 0.85rem;
+        }
+        .donation-modal .modal-content .donation-item .donation-value {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            word-break: break-all;
+            margin: 0.2rem 0;
+        }
+        .donation-modal .modal-content .donation-item .donation-actions .btn {
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+        }
+        .donation-modal .modal-content .donation-item .donation-qr {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            margin-top: 0.3rem;
+        }
+
+        /* Témoignages dans le Dashboard */
+        .testimonial-item-dash {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin-bottom: 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .testimonial-item-dash .testimonial-info {
+            flex: 1;
+        }
+        .testimonial-item-dash .testimonial-info .t-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .testimonial-item-dash .testimonial-info .t-message {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .testimonial-item-dash .testimonial-actions .btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            margin-left: 0.3rem;
+        }
+
+        /* Planification du statut */
+        .schedule-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .schedule-item .schedule-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .schedule-item .schedule-info .s-status {
+            font-weight: 600;
+            color: var(--cyan);
+        }
+        .schedule-item .schedule-actions .btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            margin-left: 0.3rem;
+        }
+
+        /* ===== FONDS CYBER-MATRIX (Canvas) ===== */
+        #cyber-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none; /* Permet de cliquer à travers */
+        }
+        #view-profile-public {
+            position: relative;
+            z-index: 1;
+        }
+        #view-profile-public .glass-card {
+            backdrop-filter: blur(8px);
+            background: rgba(10, 11, 16, 0.6);
+        }
+        body.fond-unique #cyber-canvas {
+            display: none;
+        }
+        body.fond-aurora #cyber-canvas {
+            display: none;
+        }
+        body.fond-particules #cyber-canvas {
+            display: none;
+        }
+
+        /* Responsive */
         @media (max-width: 420px) {
             #view-profile-public .glass-card {
                 padding: 0 0 1rem 0;
@@ -1741,6 +1967,19 @@
             .tab-content .tab-pane h3 {
                 font-size: 0.9rem;
             }
+            .testimonials-carousel .testimonial-item {
+                padding: 0.8rem;
+            }
+            .testimonials-carousel .testimonial-item .testimonial-avatar {
+                width: 50px;
+                height: 50px;
+            }
+            .admin-modal .modal-content {
+                padding: 1.2rem;
+            }
+            .donation-modal .modal-content {
+                padding: 1.2rem;
+            }
         }
     </style>
 </head>
@@ -1841,16 +2080,16 @@
         </div>
     </div>
 
-    <!-- ========== VUE DASHBOARD (AVEC MODULE DE PARTAGE) ========== -->
+    <!-- ========== VUE DASHBOARD ========== -->
     <div id="view-dashboard" class="view">
         <div class="glass-card dashboard-container">
-            <!-- En-tête du Dashboard (fixe) -->
+            <!-- En-tête -->
             <div class="dashboard-header">
                 <div class="brand" style="font-size:1.3rem; margin:0;">DASHBOARD</div>
                 <button class="btn btn-outline logout-btn" id="logout-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
-            <!-- ===== NOUVEAU MODULE : PARTAGE DU LIEN PUBLIC ===== -->
+            <!-- Module de partage -->
             <div class="share-module" id="share-module">
                 <div class="share-link-wrapper">
                     <i class="fas fa-link"></i>
@@ -1862,12 +2101,13 @@
                 </div>
             </div>
 
-            <!-- Barre de navigation (fixe) -->
+            <!-- Barre de navigation -->
             <nav class="dashboard-nav" id="dashboard-nav">
                 <button class="nav-item active" data-tab="analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></button>
                 <button class="nav-item" data-tab="links"><i class="fas fa-link"></i><span>Liens</span></button>
                 <button class="nav-item" data-tab="profile"><i class="fas fa-user"></i><span>Profil</span></button>
                 <button class="nav-item" data-tab="advanced"><i class="fas fa-cog"></i><span>Avancé</span></button>
+                <!-- L'onglet Administration sera injecté dynamiquement si l'utilisateur est admin -->
             </nav>
 
             <!-- Contenu des onglets -->
@@ -1875,8 +2115,6 @@
                 <!-- ===== ONGLET 1 : ANALYTICS ===== -->
                 <div class="tab-pane active" id="tab-analytics">
                     <h3><i class="fas fa-chart-line"></i> Vue d'ensemble</h3>
-
-                    <!-- Statistiques avancées -->
                     <div class="stats-summary" id="stats-summary">
                         <div class="stat-card">
                             <div class="stat-number" id="stat-views">0</div>
@@ -1890,31 +2128,24 @@
                             <div class="stat-label" style="margin-bottom:0.3rem;">Répartition des clics</div>
                             <div id="stat-bars"></div>
                         </div>
-                        <!-- Bouton Export Rapport -->
                         <div style="grid-column: span 2; margin-top:0.3rem;">
                             <button class="btn btn-outline export-report-btn" id="export-report-btn" style="width:100%; padding:0.5rem; font-size:0.85rem;">
                                 <i class="fas fa-file-download"></i> Exporter le rapport (PDF)
                             </button>
                         </div>
                     </div>
-
-                    <!-- Compteur vues global et réinitialisation -->
                     <div class="flex-between" style="margin-top:0.5rem;">
                         <span class="views-counter"><i class="fas fa-eye"></i> <span id="views-count-display">0</span> vues</span>
                         <button class="btn btn-outline" id="reset-views-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
                             <i class="fas fa-redo"></i> Réinitialiser les vues
                         </button>
                     </div>
-
-                    <!-- Top 3 réseaux les plus cliqués -->
                     <div id="top-networks-container" class="top-networks"></div>
                 </div>
 
                 <!-- ===== ONGLET 2 : MES LIENS ===== -->
                 <div class="tab-pane" id="tab-links">
                     <h3><i class="fas fa-link"></i> Gestion des liens</h3>
-
-                    <!-- Redirection Unique -->
                     <div class="flex-between" style="margin-bottom:0.8rem; border-bottom:1px solid var(--border-glow); padding-bottom:0.5rem;">
                         <div class="redirect-toggle">
                             <span style="font-size:0.8rem; color:var(--text-secondary);">Redirection Unique</span>
@@ -1923,8 +2154,6 @@
                         </div>
                         <span style="font-size:0.6rem; color:var(--text-secondary);" id="redirect-hint">(nécessite 1 lien actif)</span>
                     </div>
-
-                    <!-- Liste des liens + sections -->
                     <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:0.5rem;">
                         <span style="font-family:var(--font-heading); font-size:0.9rem; color:var(--text-secondary);"><i class="fas fa-list"></i> Mes liens</span>
                         <div style="display:flex; gap:0.4rem;">
@@ -1938,8 +2167,6 @@
                 <!-- ===== ONGLET 3 : PROFIL & STYLE ===== -->
                 <div class="tab-pane" id="tab-profile">
                     <h3><i class="fas fa-user-circle"></i> Profil & Style</h3>
-
-                    <!-- Nom, bio, photo -->
                     <div class="profile-header">
                         <div class="avatar-wrapper">
                             <img id="dashboard-avatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=128" alt="avatar">
@@ -1951,14 +2178,12 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="input-group mt-1">
                         <label>Photo de profil</label>
                         <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center; padding:0.4rem;">
                             <i class="fas fa-camera"></i> Changer la photo
                         </button>
                     </div>
-
                     <div class="input-group mt-1">
                         <label>Biographie</label>
                         <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
@@ -1971,6 +2196,23 @@
                             <span class="status-option active" data-value="disponible"><span class="dot"></span> Disponible</span>
                             <span class="status-option" data-value="occupe"><span class="dot"></span> Occupé</span>
                             <span class="status-option" data-value="enlive"><span class="dot"></span> En Live</span>
+                        </div>
+                    </div>
+
+                    <!-- Planification du Statut (Nouveau) -->
+                    <div class="schedule-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-clock"></i> Planification du statut</h4>
+                        <div id="schedule-list" style="margin-bottom:0.5rem;"></div>
+                        <div class="flex-between" style="gap:0.5rem; flex-wrap:wrap;">
+                            <select id="schedule-status-select" class="input-field" style="flex:1; min-width:80px; padding:0.4rem;">
+                                <option value="disponible">Disponible</option>
+                                <option value="occupe">Occupé</option>
+                                <option value="enlive">En Live</option>
+                            </select>
+                            <input type="time" id="schedule-start" class="input-field" style="flex:1; min-width:80px; padding:0.4rem;">
+                            <span style="color:var(--text-secondary);">→</span>
+                            <input type="time" id="schedule-end" class="input-field" style="flex:1; min-width:80px; padding:0.4rem;">
+                            <button class="btn btn-outline" id="add-schedule-btn" style="padding:0.2rem 0.6rem; font-size:0.7rem;"><i class="fas fa-plus"></i></button>
                         </div>
                     </div>
 
@@ -1991,7 +2233,7 @@
                         </select>
                     </div>
 
-                    <!-- Maintenance & Theme (clair/sombre) -->
+                    <!-- Maintenance & Theme -->
                     <div class="flex-between mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.5rem;">
                         <div class="maintenance-toggle">
                             <span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span>
@@ -2060,6 +2302,33 @@
                         </div>
                     </div>
 
+                    <!-- Témoignages (Social Proof) -->
+                    <div class="testimonials-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-star"></i> Témoignages (Social Proof)</h4>
+                        <div id="testimonials-dash-list"></div>
+                        <div class="input-group">
+                            <label>Nom</label>
+                            <input type="text" class="input-field" id="testimonial-name" placeholder="Nom du client">
+                        </div>
+                        <div class="input-group">
+                            <label>Message</label>
+                            <input type="text" class="input-field" id="testimonial-message" placeholder="Votre avis...">
+                        </div>
+                        <div class="input-group">
+                            <label>Note (1-5)</label>
+                            <input type="number" class="input-field" id="testimonial-rating" min="1" max="5" value="5">
+                        </div>
+                        <div class="input-group">
+                            <label>Photo (optionnelle)</label>
+                            <button class="btn btn-outline" id="btn-upload-testimonial-image" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                                <i class="fas fa-image"></i> Téléverser une image
+                            </button>
+                            <input type="hidden" id="testimonial-image-url" value="">
+                            <img id="testimonial-image-preview" class="hidden" style="width:60px; height:60px; border-radius:50%; object-fit:cover; margin-top:0.3rem;" alt="aperçu">
+                        </div>
+                        <button class="btn btn-outline" id="add-testimonial-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem; width:100%;"><i class="fas fa-plus"></i> Ajouter un témoignage</button>
+                    </div>
+
                     <!-- Liste des abonnés -->
                     <div class="subscribers-section">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-users"></i> Liste des abonnés</h4>
@@ -2073,9 +2342,13 @@
                 </div>
             </div>
 
-            <!-- Bouton Enregistrer (fixe en bas) -->
+            <!-- Bouton Enregistrer (fixe) -->
             <div style="padding:0.8rem 1.8rem 1.2rem 1.8rem; border-top:1px solid var(--border-glow); flex-shrink:0;">
                 <button class="btn" id="save-dashboard-btn" style="width:100%; padding:0.7rem;">Enregistrer les modifications</button>
+                <!-- Bouton Soutenir la plateforme (visible pour tous les utilisateurs) -->
+                <button class="btn btn-outline" id="support-btn" style="width:100%; margin-top:0.4rem; padding:0.5rem; font-size:0.85rem;">
+                    <i class="fas fa-heart"></i> Soutenir la plateforme LinkExt
+                </button>
             </div>
         </div>
     </div>
@@ -2115,10 +2388,13 @@
         </div>
     </div>
 
-    <!-- ========== VUE PROFIL PUBLIC ========== -->
+    <!-- ========== VUE PROFIL PUBLIC (avec Cyber-Matrix Canvas) ========== -->
     <div id="view-profile-public" class="view">
+        <!-- Canvas Cyber-Matrix -->
+        <canvas id="cyber-canvas"></canvas>
+
         <div id="flash-banner-container"></div>
-        <a id="public-wrapper-link" class="public-wrapper" href="#" target="_blank" rel="noopener noreferrer" style="display:block; text-decoration:none; color:inherit; width:100%;">
+        <a id="public-wrapper-link" class="public-wrapper" href="#" target="_blank" rel="noopener noreferrer" style="display:block; text-decoration:none; color:inherit; width:100%; position:relative; z-index:1;">
             <div class="glass-card" style="text-align:center; padding-top:0; position:relative;">
                 <div class="public-header">
                     <div class="public-header-top">
@@ -2142,10 +2418,16 @@
 
                 <div class="public-links-divider"></div>
 
+                <!-- ===== CARROUSEL TÉMOIGNAGES ===== -->
+                <div id="testimonials-carousel" class="testimonials-carousel">
+                    <div class="testimonial-track" id="testimonial-track"></div>
+                    <div class="carousel-dots" id="carousel-dots"></div>
+                </div>
+
                 <div id="public-links"></div>
             </div>
         </a>
-        <p class="text-center" style="font-size:0.7rem; color:var(--text-secondary); padding:0.4rem 0;">Propulsé par LinkExt</p>
+        <p class="text-center" style="font-size:0.7rem; color:var(--text-secondary); padding:0.4rem 0; position:relative; z-index:1;">Propulsé par LinkExt</p>
     </div>
 
     <!-- ========== MODAL QR CODE ========== -->
@@ -2167,6 +2449,30 @@
             <input type="email" id="gated-email" placeholder="votre@email.com" autocomplete="email">
             <div class="error-msg" id="gated-error">Email invalide.</div>
             <button class="btn" id="gated-submit-btn">Déverrouiller et accéder</button>
+        </div>
+    </div>
+
+    <!-- ========== MODALE ADMIN (Double authentification) ========== -->
+    <div class="modal-overlay admin-modal" id="admin-modal">
+        <div class="modal-content">
+            <h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-shield-alt"></i> Accès Administration</h3>
+            <p class="admin-hint">Veuillez saisir votre code PIN et le code Google Authenticator.</p>
+            <input type="password" id="admin-pin" placeholder="PIN (6 chiffres)" maxlength="6" inputmode="numeric">
+            <input type="text" id="admin-totp" placeholder="Code Google Authenticator (6 chiffres)" maxlength="6" inputmode="numeric">
+            <div class="error-msg" id="admin-error">Code invalide.</div>
+            <button class="btn" id="admin-verify-btn">Vérifier et accéder</button>
+        </div>
+    </div>
+
+    <!-- ========== MODALE DONS ========== -->
+    <div class="modal-overlay donation-modal" id="donation-modal">
+        <div class="modal-content">
+            <h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-hand-holding-heart"></i> Soutenir LinkExt</h3>
+            <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;">
+                Merci de soutenir la plateforme ! Voici nos coordonnées de don.
+            </p>
+            <div id="donation-list"></div>
+            <button class="close-modal" id="close-donation-modal">Fermer</button>
         </div>
     </div>
 
@@ -2222,6 +2528,11 @@
         let linkImageUrl = '';
         let gatedPendingLink = null;
         let gatedPendingTarget = null;
+        let isAdmin = false;
+        let adminConfigDoc = null;
+        let scheduleInterval = null;
+        let testimonials = [];
+        let carouselInterval = null;
 
         // --- Vues ---
         const views = {
@@ -2308,6 +2619,8 @@
                     if (!userProfile.integrations) userProfile.integrations = { metaPixel: '', ga: '' };
                     if (!userProfile.flash) userProfile.flash = { active: false, message: '', color: 'red' };
                     if (!userProfile.subscribers) userProfile.subscribers = [];
+                    if (!userProfile.schedules) userProfile.schedules = [];
+                    if (!userProfile.testimonials) userProfile.testimonials = [];
                     return userProfile;
                 } else {
                     userProfile = null;
@@ -2335,7 +2648,7 @@
             }
         }
 
-        // --- Incrémentation des vues ---
+        // --- Incrémentations ---
         async function incrementViews(uid) {
             const key = 'viewCounted_' + uid;
             if (sessionStorage.getItem(key) === 'true') return;
@@ -2455,7 +2768,7 @@
             showToast(newState ? 'Redirection unique activée !' : 'Redirection unique désactivée.', 'info');
         }
 
-        // --- Statistiques avancées ---
+        // --- Statistiques ---
         function updateStats() {
             if (!userProfile) return;
             const totalClicks = userProfile.links ? userProfile.links.reduce((sum, l) => sum + (l.clicks || 0), 0) : 0;
@@ -2489,7 +2802,6 @@
             barsContainer.innerHTML = html;
         }
 
-        // --- Export Rapport ---
         function exportReport() {
             if (!userProfile) {
                 showToast('Profil non chargé.', 'error');
@@ -2529,7 +2841,307 @@
             showToast('Rapport exporté !', 'info');
         }
 
-        // --- Routage avec consentement ---
+        // --- Gestion de l'admin ---
+        async function checkAdminAccess() {
+            if (!currentUser) return false;
+            try {
+                const docRef = db.collection('admin_config').doc('security');
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    adminConfigDoc = doc.data();
+                    // Vérifier si l'UID de l'utilisateur correspond à l'admin stocké
+                    if (adminConfigDoc.adminUid === currentUser.uid) {
+                        isAdmin = true;
+                        return true;
+                    }
+                }
+                isAdmin = false;
+                return false;
+            } catch (e) {
+                isAdmin = false;
+                return false;
+            }
+        }
+
+        function injectAdminTab() {
+            const nav = document.getElementById('dashboard-nav');
+            // Vérifier si l'onglet existe déjà
+            if (document.querySelector('[data-tab="admin"]')) return;
+            const btn = document.createElement('button');
+            btn.className = 'nav-item';
+            btn.dataset.tab = 'admin';
+            btn.innerHTML = '<i class="fas fa-shield-alt"></i><span>Admin</span>';
+            btn.addEventListener('click', function() {
+                // Ouvrir la modale d'authentification admin
+                document.getElementById('admin-modal').classList.add('active');
+                document.getElementById('admin-pin').value = '';
+                document.getElementById('admin-totp').value = '';
+                document.getElementById('admin-error').style.display = 'none';
+            });
+            nav.appendChild(btn);
+        }
+
+        function injectAdminTabContent() {
+            // Ajouter le contenu de l'onglet admin dans le tab-content
+            const tabContent = document.querySelector('.tab-content');
+            const pane = document.createElement('div');
+            pane.className = 'tab-pane';
+            pane.id = 'tab-admin';
+            pane.innerHTML = `
+                <h3><i class="fas fa-shield-alt"></i> Administration - Configuration des Dons</h3>
+                <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;">
+                    Gérez ici les coordonnées de don de la plateforme. Les modifications sont instantanées.
+                </p>
+                <div class="input-group">
+                    <label>USDT (TRC-20)</label>
+                    <input type="text" class="input-field" id="admin-usdt" placeholder="Adresse USDT">
+                    <button class="btn btn-outline" id="admin-usdt-qr" style="padding:0.2rem 0.6rem; font-size:0.7rem;"><i class="fas fa-qrcode"></i> Téléverser QR Code</button>
+                    <input type="hidden" id="admin-usdt-qr-url" value="">
+                    <img id="admin-usdt-qr-preview" class="hidden" style="max-width:80px; max-height:80px; border-radius:8px; margin-top:0.3rem;" alt="QR">
+                </div>
+                <div class="input-group">
+                    <label>Tron (TRX)</label>
+                    <input type="text" class="input-field" id="admin-tron" placeholder="Adresse Tron">
+                    <button class="btn btn-outline" id="admin-tron-qr" style="padding:0.2rem 0.6rem; font-size:0.7rem;"><i class="fas fa-qrcode"></i> Téléverser QR Code</button>
+                    <input type="hidden" id="admin-tron-qr-url" value="">
+                    <img id="admin-tron-qr-preview" class="hidden" style="max-width:80px; max-height:80px; border-radius:8px; margin-top:0.3rem;" alt="QR">
+                </div>
+                <div class="input-group">
+                    <label>Bitcoin (BTC)</label>
+                    <input type="text" class="input-field" id="admin-btc" placeholder="Adresse Bitcoin">
+                    <button class="btn btn-outline" id="admin-btc-qr" style="padding:0.2rem 0.6rem; font-size:0.7rem;"><i class="fas fa-qrcode"></i> Téléverser QR Code</button>
+                    <input type="hidden" id="admin-btc-qr-url" value="">
+                    <img id="admin-btc-qr-preview" class="hidden" style="max-width:80px; max-height:80px; border-radius:8px; margin-top:0.3rem;" alt="QR">
+                </div>
+                <div class="input-group">
+                    <label>MTN Mobile Money</label>
+                    <input type="text" class="input-field" id="admin-mtn" placeholder="Numéro MTN">
+                </div>
+                <div class="input-group">
+                    <label>Moov Mobile Money</label>
+                    <input type="text" class="input-field" id="admin-moov" placeholder="Numéro Moov">
+                </div>
+                <div class="input-group">
+                    <label>Wave</label>
+                    <input type="text" class="input-field" id="admin-wave" placeholder="Numéro Wave">
+                </div>
+                <button class="btn" id="save-admin-btn" style="width:100%; margin-top:0.5rem;">Enregistrer les coordonnées de don</button>
+            `;
+            tabContent.appendChild(pane);
+        }
+
+        // --- Gestion des dons ---
+        async function loadDonations() {
+            try {
+                const docRef = db.collection('donations').doc('platform');
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    return doc.data();
+                } else {
+                    // Créer un document par défaut
+                    const defaultData = {
+                        usdt: '',
+                        usdtQR: '',
+                        tron: '',
+                        tronQR: '',
+                        btc: '',
+                        btcQR: '',
+                        mtn: '',
+                        moov: '',
+                        wave: ''
+                    };
+                    await docRef.set(defaultData);
+                    return defaultData;
+                }
+            } catch (e) {
+                console.warn('Erreur chargement dons :', e);
+                return null;
+            }
+        }
+
+        async function saveDonations(data) {
+            try {
+                const docRef = db.collection('donations').doc('platform');
+                await docRef.set(data, { merge: true });
+                return true;
+            } catch (e) {
+                console.warn('Erreur sauvegarde dons :', e);
+                return false;
+            }
+        }
+
+        // --- TOTP (Google Authenticator) ---
+        function verifyTOTP(secret, token) {
+            // Utilisation de la bibliothèque otplib
+            try {
+                const isValid = otplib.authenticator.check(token, secret);
+                return isValid;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // --- Planification du statut ---
+        function startScheduleChecker() {
+            if (scheduleInterval) clearInterval(scheduleInterval);
+            scheduleInterval = setInterval(() => {
+                if (!userProfile || !userProfile.schedules || userProfile.schedules.length === 0) return;
+                const now = new Date();
+                const currentTime = now.getHours() * 60 + now.getMinutes(); // en minutes
+                let newStatus = null;
+                for (const sched of userProfile.schedules) {
+                    const start = sched.start; // format "HH:MM"
+                    const end = sched.end;
+                    if (!start || !end) continue;
+                    const [sh, sm] = start.split(':').map(Number);
+                    const [eh, em] = end.split(':').map(Number);
+                    const startMin = sh * 60 + sm;
+                    const endMin = eh * 60 + em;
+                    if (currentTime >= startMin && currentTime < endMin) {
+                        newStatus = sched.status;
+                        break;
+                    }
+                }
+                if (newStatus && userProfile.status !== newStatus) {
+                    userProfile.status = newStatus;
+                    saveUserProfile(currentUser.uid, { status: newStatus }).catch(() => {});
+                    updateStatusUI(newStatus);
+                    // Mettre à jour le badge public si la page publique est chargée
+                    const publicBadge = document.getElementById('public-status-badge');
+                    if (publicBadge) {
+                        const statusMap = {
+                            disponible: { label: 'Disponible', class: 'disponible' },
+                            occupe: { label: 'Occupé', class: 'occupe' },
+                            enlive: { label: 'En Live', class: 'enlive' }
+                        };
+                        const st = statusMap[newStatus] || statusMap.disponible;
+                        publicBadge.className = `status-badge ${st.class}`;
+                        publicBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+                    }
+                }
+            }, 30000); // toutes les 30 secondes
+        }
+
+        // --- Gestion des témoignages ---
+        function renderTestimonialsDashboard() {
+            const container = document.getElementById('testimonials-dash-list');
+            if (!userProfile || !userProfile.testimonials || userProfile.testimonials.length === 0) {
+                container.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Aucun témoignage.</span>';
+                return;
+            }
+            let html = '';
+            userProfile.testimonials.forEach((t, index) => {
+                const stars = '★'.repeat(t.rating || 5) + '☆'.repeat(5 - (t.rating || 5));
+                html += `
+                    <div class="testimonial-item-dash">
+                        <div class="testimonial-info">
+                            <div class="t-name">${t.name || 'Anonyme'}</div>
+                            <div class="t-message">${t.message || ''}</div>
+                            <div style="color:#f1c40f; font-size:0.8rem;">${stars}</div>
+                        </div>
+                        <div class="testimonial-actions">
+                            <button class="btn btn-outline" data-index="${index}" data-action="delete-testimonial" style="padding:0.2rem 0.5rem; font-size:0.7rem;"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            container.onclick = (e) => {
+                const btn = e.target.closest('[data-action="delete-testimonial"]');
+                if (btn) {
+                    const idx = parseInt(btn.dataset.index);
+                    if (!isNaN(idx)) {
+                        if (confirm('Supprimer ce témoignage ?')) {
+                            userProfile.testimonials.splice(idx, 1);
+                            saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
+                            renderTestimonialsDashboard();
+                        }
+                    }
+                }
+            };
+        }
+
+        function renderPublicTestimonials() {
+            const track = document.getElementById('testimonial-track');
+            const dotsContainer = document.getElementById('carousel-dots');
+            if (!userProfile || !userProfile.testimonials || userProfile.testimonials.length === 0) {
+                track.innerHTML = '';
+                dotsContainer.innerHTML = '';
+                document.querySelector('.testimonials-carousel').style.display = 'none';
+                return;
+            }
+            document.querySelector('.testimonials-carousel').style.display = 'block';
+            let html = '';
+            userProfile.testimonials.forEach(t => {
+                const stars = '★'.repeat(t.rating || 5) + '☆'.repeat(5 - (t.rating || 5));
+                const avatar = t.imageUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.name || 'User') + '&background=0a0b10&color=00f2fe&size=60';
+                html += `
+                    <div class="testimonial-item">
+                        <img class="testimonial-avatar" src="${avatar}" alt="${t.name || 'Anonyme'}">
+                        <div class="testimonial-name">${t.name || 'Anonyme'}</div>
+                        <div class="testimonial-message">${t.message || ''}</div>
+                        <div class="testimonial-stars">${stars}</div>
+                    </div>
+                `;
+            });
+            track.innerHTML = html;
+
+            // Dots
+            const total = userProfile.testimonials.length;
+            let dotsHtml = '';
+            for (let i = 0; i < total; i++) {
+                dotsHtml += `<span class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`;
+            }
+            dotsContainer.innerHTML = dotsHtml;
+
+            // Gestion du carrousel
+            let currentIndex = 0;
+            const items = track.querySelectorAll('.testimonial-item');
+            const dotEls = dotsContainer.querySelectorAll('.dot');
+
+            function goTo(index) {
+                if (index < 0) index = total - 1;
+                if (index >= total) index = 0;
+                currentIndex = index;
+                track.style.transform = `translateX(-${index * 100}%)`;
+                dotEls.forEach((d, i) => d.classList.toggle('active', i === index));
+            }
+
+            if (carouselInterval) clearInterval(carouselInterval);
+            carouselInterval = setInterval(() => {
+                goTo(currentIndex + 1);
+            }, 5000);
+
+            dotEls.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    goTo(i);
+                    clearInterval(carouselInterval);
+                    carouselInterval = setInterval(() => {
+                        goTo(currentIndex + 1);
+                    }, 5000);
+                });
+            });
+
+            // Interaction tactile
+            let startX = 0;
+            track.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            });
+            track.addEventListener('touchend', (e) => {
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+                if (Math.abs(diff) > 30) {
+                    if (diff > 0) goTo(currentIndex + 1);
+                    else goTo(currentIndex - 1);
+                    clearInterval(carouselInterval);
+                    carouselInterval = setInterval(() => {
+                        goTo(currentIndex + 1);
+                    }, 5000);
+                }
+            });
+        }
+
+        // --- Routeur ---
         async function handleAuthRedirection(user) {
             if (!user) {
                 if (!isConsentGiven()) {
@@ -2557,6 +3169,8 @@
                     integrations: { metaPixel: '', ga: '' },
                     flash: { active: false, message: '', color: 'red' },
                     subscribers: [],
+                    schedules: [],
+                    testimonials: [],
                     onboardingCompleted: false
                 };
                 saveUserProfile(user.uid, defaultProfile).catch(() => {});
@@ -2572,8 +3186,18 @@
                 document.getElementById('onboarding-bio').value = profile.bio || '';
                 showView('view-onboarding');
             } else {
+                // Vérifier les droits admin
+                const adminAccess = await checkAdminAccess();
+                if (adminAccess) {
+                    injectAdminTab();
+                    injectAdminTabContent();
+                    // Charger les données admin
+                    await loadAdminData();
+                }
                 showView('view-dashboard');
                 await populateDashboard();
+                // Démarrer le planificateur
+                startScheduleChecker();
             }
         }
 
@@ -2655,11 +3279,12 @@
                     integrations: { metaPixel: '', ga: '' },
                     flash: { active: false, message: '', color: 'red' },
                     subscribers: [],
+                    schedules: [],
+                    testimonials: [],
                     onboardingCompleted: false
                 };
             }
 
-            // Remplir les champs
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
             document.getElementById('views-count-display').textContent = userProfile.views || 0;
@@ -2687,13 +3312,12 @@
             avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
             avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
 
-            // --- Mise à jour du lien public dans le module de partage ---
+            // Lien public
             const publicLink = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
             document.getElementById('public-link-display').textContent = publicLink;
-
-            // --- Boutons de partage ---
             setupShareButtons(publicLink);
 
+            // Statut
             updateStatusUI(userProfile.status || 'disponible');
             updateMaintenanceUI(userProfile.maintenance || false);
             applyThemeToPrivateUI();
@@ -2704,9 +3328,11 @@
             applyVisualTheme();
             applyBackground();
             renderSubscribers();
+            renderSchedules();
+            renderTestimonialsDashboard();
+            renderPublicTestimonials();
         }
 
-        // --- Fonctions de partage du lien ---
         function setupShareButtons(publicLink) {
             const copyBtn = document.getElementById('copy-link-btn');
             const openBtn = document.getElementById('open-link-btn');
@@ -2717,7 +3343,6 @@
                     navigator.clipboard.writeText(publicLink).then(() => {
                         showToast('Lien copié !', 'info');
                     }).catch(() => {
-                        // Fallback
                         copyFallback(publicLink);
                     });
                 } else {
@@ -3091,6 +3716,52 @@
             });
         }
 
+        // --- Upload pour témoignages ---
+        function setupTestimonialImageUpload() {
+            const btn = document.getElementById('btn-upload-testimonial-image');
+            const preview = document.getElementById('testimonial-image-preview');
+            const hiddenInput = document.getElementById('testimonial-image-url');
+
+            btn.addEventListener('click', () => {
+                openCloudinaryWidget({
+                    button: btn,
+                    onSuccess: (url) => {
+                        hiddenInput.value = url;
+                        preview.src = url;
+                        preview.classList.remove('hidden');
+                        showToast('Image téléversée !', 'info');
+                    },
+                    onError: () => {
+                        hiddenInput.value = '';
+                        preview.classList.add('hidden');
+                    }
+                });
+            });
+        }
+
+        // --- Upload pour QR codes admin ---
+        function setupAdminQRUpload(fieldId, previewId, hiddenId) {
+            const btn = document.getElementById(fieldId);
+            const preview = document.getElementById(previewId);
+            const hidden = document.getElementById(hiddenId);
+
+            btn.addEventListener('click', () => {
+                openCloudinaryWidget({
+                    button: btn,
+                    onSuccess: (url) => {
+                        hidden.value = url;
+                        preview.src = url;
+                        preview.classList.remove('hidden');
+                        showToast('QR Code téléversé !', 'info');
+                    },
+                    onError: () => {
+                        hidden.value = '';
+                        preview.classList.add('hidden');
+                    }
+                });
+            });
+        }
+
         // --- Vue Ajout de lien ---
         function renderAddLinkGrid() {
             const grid = document.getElementById('add-link-grid');
@@ -3253,6 +3924,15 @@
             const select = document.getElementById('background-select');
             const bg = select.value;
             document.body.classList.remove('fond-aurora', 'fond-particules', 'fond-unique');
+            // Gérer le canvas cyber-matrix
+            const canvas = document.getElementById('cyber-canvas');
+            if (bg === 'cyberpunk' || bg === 'uni') {
+                canvas.style.display = 'block';
+                initCyberCanvas();
+            } else {
+                canvas.style.display = 'none';
+            }
+            // Autres fonds
             const oldCanvas = document.getElementById('particles-canvas');
             if (oldCanvas) oldCanvas.remove();
             if (bg === 'aurora') {
@@ -3262,10 +3942,118 @@
                 initParticles();
             } else if (bg === 'uni') {
                 document.body.classList.add('fond-unique');
+            } else {
+                // cyberpunk par défaut : canvas cyber-matrix
+                document.body.classList.remove('fond-aurora', 'fond-particules', 'fond-unique');
             }
             localStorage.setItem('background', bg);
         }
 
+        // --- Cyber-Matrix Canvas ---
+        let cyberCanvasCtx = null;
+        let cyberParticles = [];
+        let mouseX = -1000, mouseY = -1000;
+
+        function initCyberCanvas() {
+            const canvas = document.getElementById('cyber-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            cyberCanvasCtx = ctx;
+            let width, height;
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            const count = 80;
+            cyberParticles = [];
+            for (let i = 0; i < count; i++) {
+                cyberParticles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: (Math.random() - 0.5) * 0.8,
+                    r: Math.random() * 2 + 1,
+                    color: `rgba(0,242,254,${Math.random() * 0.4 + 0.1})`
+                });
+            }
+
+            // Interactivité tactile/souris
+            canvas.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                mouseX = touch.clientX;
+                mouseY = touch.clientY;
+            });
+            canvas.addEventListener('mouseleave', () => {
+                mouseX = -1000;
+                mouseY = -1000;
+            });
+            canvas.addEventListener('touchend', () => {
+                mouseX = -1000;
+                mouseY = -1000;
+            });
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+                cyberParticles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    // Effet d'attraction/répulsion vers la souris
+                    const dx = mouseX - p.x;
+                    const dy = mouseY - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150 && dist > 0) {
+                        const force = 0.02;
+                        p.vx += (dx / dist) * force;
+                        p.vy += (dy / dist) * force;
+                        // Limiter la vitesse
+                        const maxSpeed = 2;
+                        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                        if (speed > maxSpeed) {
+                            p.vx = (p.vx / speed) * maxSpeed;
+                            p.vy = (p.vy / speed) * maxSpeed;
+                        }
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                });
+
+                // Lignes entre particules proches
+                for (let i = 0; i < cyberParticles.length; i++) {
+                    for (let j = i + 1; j < cyberParticles.length; j++) {
+                        const dx = cyberParticles[i].x - cyberParticles[j].x;
+                        const dy = cyberParticles[i].y - cyberParticles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 100) {
+                            ctx.beginPath();
+                            ctx.moveTo(cyberParticles[i].x, cyberParticles[i].y);
+                            ctx.lineTo(cyberParticles[j].x, cyberParticles[j].y);
+                            ctx.strokeStyle = `rgba(0,242,254,${0.15 * (1 - dist / 100)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // --- Particles fallback (pour fond particules) ---
         function initParticles() {
             const canvas = document.createElement('canvas');
             canvas.id = 'particles-canvas';
@@ -3325,112 +4113,183 @@
             draw();
         }
 
-        // --- Affichage des abonnés ---
-        function renderSubscribers() {
-            const container = document.getElementById('subscribers-list-container');
-            if (!userProfile || !userProfile.subscribers || userProfile.subscribers.length === 0) {
-                container.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Aucun abonné pour le moment.</span>';
+        // --- Planification (schedules) ---
+        function renderSchedules() {
+            const container = document.getElementById('schedule-list');
+            if (!userProfile || !userProfile.schedules || userProfile.schedules.length === 0) {
+                container.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Aucune planification.</span>';
                 return;
             }
             let html = '';
-            userProfile.subscribers.forEach(sub => {
+            userProfile.schedules.forEach((s, index) => {
+                const statusMap = {
+                    disponible: '🟢 Disponible',
+                    occupe: '🟠 Occupé',
+                    enlive: '🔴 En Live'
+                };
                 html += `
-                    <div class="sub-item">
-                        <span class="sub-email">${sub.email}</span>
-                        <span class="sub-date">${new Date(sub.date).toLocaleDateString()}</span>
+                    <div class="schedule-item">
+                        <div class="schedule-info">
+                            <span class="s-status">${statusMap[s.status] || s.status}</span>
+                            <span> de ${s.start || '--:--'} à ${s.end || '--:--'}</span>
+                        </div>
+                        <div class="schedule-actions">
+                            <button class="btn btn-outline" data-index="${index}" data-action="delete-schedule" style="padding:0.2rem 0.5rem; font-size:0.7rem;"><i class="fas fa-trash-alt"></i></button>
+                        </div>
                     </div>
                 `;
             });
             container.innerHTML = html;
+            container.onclick = (e) => {
+                const btn = e.target.closest('[data-action="delete-schedule"]');
+                if (btn) {
+                    const idx = parseInt(btn.dataset.index);
+                    if (!isNaN(idx)) {
+                        if (confirm('Supprimer cette planification ?')) {
+                            userProfile.schedules.splice(idx, 1);
+                            saveUserProfile(currentUser.uid, { schedules: userProfile.schedules }).catch(() => {});
+                            renderSchedules();
+                        }
+                    }
+                }
+            };
         }
 
-        function copyEmails() {
-            if (!userProfile || !userProfile.subscribers || userProfile.subscribers.length === 0) {
-                showToast('Aucun email à copier.', 'info');
+        function addSchedule() {
+            const status = document.getElementById('schedule-status-select').value;
+            const start = document.getElementById('schedule-start').value;
+            const end = document.getElementById('schedule-end').value;
+            if (!start || !end) {
+                showToast('Veuillez renseigner les heures de début et de fin.', 'error');
                 return;
             }
-            const emails = userProfile.subscribers.map(s => s.email).join(', ');
-            navigator.clipboard.writeText(emails).then(() => {
-                showToast('Emails copiés !', 'info');
-            }).catch(() => {
-                const textarea = document.createElement('textarea');
-                textarea.value = emails;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showToast('Emails copiés !', 'info');
+            if (start >= end) {
+                showToast('L\'heure de fin doit être après l\'heure de début.', 'error');
+                return;
+            }
+            if (!userProfile.schedules) userProfile.schedules = [];
+            userProfile.schedules.push({ status, start, end });
+            saveUserProfile(currentUser.uid, { schedules: userProfile.schedules }).catch(() => {});
+            renderSchedules();
+            document.getElementById('schedule-start').value = '';
+            document.getElementById('schedule-end').value = '';
+            showToast('Planification ajoutée !', 'info');
+        }
+
+        // --- Gestion Admin ---
+        async function loadAdminData() {
+            const donations = await loadDonations();
+            if (!donations) return;
+            document.getElementById('admin-usdt').value = donations.usdt || '';
+            document.getElementById('admin-tron').value = donations.tron || '';
+            document.getElementById('admin-btc').value = donations.btc || '';
+            document.getElementById('admin-mtn').value = donations.mtn || '';
+            document.getElementById('admin-moov').value = donations.moov || '';
+            document.getElementById('admin-wave').value = donations.wave || '';
+
+            // QR Codes
+            if (donations.usdtQR) {
+                document.getElementById('admin-usdt-qr-url').value = donations.usdtQR;
+                document.getElementById('admin-usdt-qr-preview').src = donations.usdtQR;
+                document.getElementById('admin-usdt-qr-preview').classList.remove('hidden');
+            }
+            if (donations.tronQR) {
+                document.getElementById('admin-tron-qr-url').value = donations.tronQR;
+                document.getElementById('admin-tron-qr-preview').src = donations.tronQR;
+                document.getElementById('admin-tron-qr-preview').classList.remove('hidden');
+            }
+            if (donations.btcQR) {
+                document.getElementById('admin-btc-qr-url').value = donations.btcQR;
+                document.getElementById('admin-btc-qr-preview').src = donations.btcQR;
+                document.getElementById('admin-btc-qr-preview').classList.remove('hidden');
+            }
+
+            // Configurer les uploads QR
+            setupAdminQRUpload('admin-usdt-qr', 'admin-usdt-qr-preview', 'admin-usdt-qr-url');
+            setupAdminQRUpload('admin-tron-qr', 'admin-tron-qr-preview', 'admin-tron-qr-url');
+            setupAdminQRUpload('admin-btc-qr', 'admin-btc-qr-preview', 'admin-btc-qr-url');
+        }
+
+        async function saveAdminData() {
+            const data = {
+                usdt: document.getElementById('admin-usdt').value.trim(),
+                usdtQR: document.getElementById('admin-usdt-qr-url').value,
+                tron: document.getElementById('admin-tron').value.trim(),
+                tronQR: document.getElementById('admin-tron-qr-url').value,
+                btc: document.getElementById('admin-btc').value.trim(),
+                btcQR: document.getElementById('admin-btc-qr-url').value,
+                mtn: document.getElementById('admin-mtn').value.trim(),
+                moov: document.getElementById('admin-moov').value.trim(),
+                wave: document.getElementById('admin-wave').value.trim()
+            };
+            const success = await saveDonations(data);
+            if (success) {
+                showToast('Coordonnées de don mises à jour !', 'info');
+            } else {
+                showToast('Erreur lors de la sauvegarde.', 'error');
+            }
+        }
+
+        // --- Affichage des dons (pour tous les utilisateurs) ---
+        async function showDonationModal() {
+            const donations = await loadDonations();
+            if (!donations) {
+                showToast('Impossible de charger les coordonnées de don.', 'error');
+                return;
+            }
+            const container = document.getElementById('donation-list');
+            let html = '';
+
+            const items = [
+                { label: 'USDT (TRC-20)', value: donations.usdt, qr: donations.usdtQR },
+                { label: 'Tron (TRX)', value: donations.tron, qr: donations.tronQR },
+                { label: 'Bitcoin (BTC)', value: donations.btc, qr: donations.btcQR },
+                { label: 'MTN Mobile Money', value: donations.mtn },
+                { label: 'Moov Mobile Money', value: donations.moov },
+                { label: 'Wave', value: donations.wave }
+            ];
+
+            let hasData = false;
+            items.forEach(item => {
+                if (!item.value) return;
+                hasData = true;
+                html += `
+                    <div class="donation-item">
+                        <div class="donation-label">${item.label}</div>
+                        <div class="donation-value">${item.value}</div>
+                        <div class="donation-actions">
+                            <button class="btn btn-outline" data-value="${item.value}" data-action="copy-donation"><i class="fas fa-copy"></i> Copier</button>
+                        </div>
+                        ${item.qr ? `<img class="donation-qr" src="${item.qr}" alt="QR ${item.label}">` : ''}
+                    </div>
+                `;
             });
+
+            if (!hasData) {
+                html = '<p style="color:var(--text-secondary);">Aucune coordonnée de don disponible pour le moment.</p>';
+            }
+
+            container.innerHTML = html;
+            container.onclick = (e) => {
+                const btn = e.target.closest('[data-action="copy-donation"]');
+                if (btn) {
+                    const value = btn.dataset.value;
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(value).then(() => {
+                            showToast('Adresse copiée !', 'info');
+                        }).catch(() => {
+                            copyFallback(value);
+                        });
+                    } else {
+                        copyFallback(value);
+                    }
+                }
+            };
+
+            document.getElementById('donation-modal').classList.add('active');
         }
 
-        // --- Injection des scripts de tracking (Meta Pixel & GA) ---
-        function injectTrackingScripts(integrations) {
-            document.querySelectorAll('[data-linkext-tracking]').forEach(el => el.remove());
-
-            if (integrations.metaPixel) {
-                const metaScript = document.createElement('script');
-                metaScript.setAttribute('data-linkext-tracking', 'meta');
-                metaScript.innerHTML = `
-                    !function(f,b,e,v,n,t,s)
-                    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                    n.queue=[];t=b.createElement(e);t.async=!0;
-                    t.src=v;s=b.getElementsByTagName(e)[0];
-                    s.parentNode.insertBefore(t,s)}(window, document,'script',
-                    'https://connect.facebook.net/en_US/fbevents.js');
-                    fbq('init', '${integrations.metaPixel}');
-                    fbq('track', 'PageView');
-                `;
-                document.head.appendChild(metaScript);
-            }
-
-            if (integrations.ga) {
-                const gaScript = document.createElement('script');
-                gaScript.setAttribute('data-linkext-tracking', 'ga');
-                gaScript.async = true;
-                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${integrations.ga}`;
-                document.head.appendChild(gaScript);
-
-                const gaInit = document.createElement('script');
-                gaInit.setAttribute('data-linkext-tracking', 'ga-init');
-                gaInit.innerHTML = `
-                    window.dataLayer = window.dataLayer || [];
-                    function gtag(){dataLayer.push(arguments);}
-                    gtag('js', new Date());
-                    gtag('config', '${integrations.ga}');
-                `;
-                document.head.appendChild(gaInit);
-            }
-        }
-
-        // --- Injection SEO ---
-        function injectSEO(seo) {
-            let titleEl = document.querySelector('title');
-            if (!titleEl) {
-                titleEl = document.createElement('title');
-                document.head.appendChild(titleEl);
-            }
-            titleEl.textContent = seo.title || 'LinkExt | Cyber Linktree';
-
-            let descEl = document.querySelector('meta[name="description"]');
-            if (!descEl) {
-                descEl = document.createElement('meta');
-                descEl.name = 'description';
-                document.head.appendChild(descEl);
-            }
-            descEl.content = seo.description || 'Centralisez vos liens et réseaux sociaux en un seul endroit.';
-
-            let kwEl = document.querySelector('meta[name="keywords"]');
-            if (!kwEl) {
-                kwEl = document.createElement('meta');
-                kwEl.name = 'keywords';
-                document.head.appendChild(kwEl);
-            }
-            kwEl.content = seo.keywords || 'linktree, réseaux sociaux, cyberpunk';
-        }
-
-        // --- Reset clicks individuels ---
+        // --- Reset ---
         async function resetLinkClicks(linkId) {
             if (!currentUser) {
                 showToast('Vous devez être connecté.', 'error');
@@ -3469,7 +4328,6 @@
             }
         }
 
-        // --- Reset vues globales ---
         async function resetViews() {
             if (!currentUser) {
                 showToast('Vous devez être connecté.', 'error');
@@ -3492,7 +4350,7 @@
             }
         }
 
-        // --- Gestion des onglets du Dashboard ---
+        // --- Tabs ---
         function setupTabs() {
             const navItems = document.querySelectorAll('#dashboard-nav .nav-item');
             const panes = document.querySelectorAll('.tab-content .tab-pane');
@@ -3509,7 +4367,7 @@
             });
         }
 
-        // --- Profil Public ---
+        // --- Public Profile ---
         async function loadPublicProfile(uid) {
             try {
                 const docRef = db.collection('users').doc(uid);
@@ -3540,6 +4398,10 @@
                     return;
                 }
 
+                // Mettre à jour les données de l'utilisateur pour le carrousel et le statut
+                userProfile = data;
+                userProfile._id = uid;
+
                 const avatar = document.getElementById('public-avatar');
                 avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
@@ -3561,7 +4423,7 @@
                 applyVisualTheme();
                 applyBackground();
 
-                // Bannière Flash
+                // Flash Banner
                 const flashContainer = document.getElementById('flash-banner-container');
                 flashContainer.innerHTML = '';
                 if (data.flash && data.flash.active && data.flash.message) {
@@ -3578,6 +4440,7 @@
                     });
                 }
 
+                // Redirection Unique
                 const wrapperLink = document.getElementById('public-wrapper-link');
                 const activeLinks = data.links ? data.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '') : [];
                 const isRedirectActive = data.redirectUnique === true && activeLinks.length === 1;
@@ -3593,6 +4456,7 @@
                     wrapperLink.style.cursor = 'default';
                 }
 
+                // Liens
                 const linksContainer = document.getElementById('public-links');
                 linksContainer.innerHTML = '';
 
@@ -3709,6 +4573,10 @@
                     });
                 }
 
+                // Témoignages (carrousel)
+                renderPublicTestimonials();
+
+                // QR Code
                 const qrImg = document.getElementById('qr-image');
                 const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
@@ -3721,6 +4589,72 @@
             } catch (err) {
                 console.error(err);
                 showToast('Erreur chargement profil public.', 'error');
+            }
+        }
+
+        // --- SEO & Tracking ---
+        function injectSEO(seo) {
+            let titleEl = document.querySelector('title');
+            if (!titleEl) {
+                titleEl = document.createElement('title');
+                document.head.appendChild(titleEl);
+            }
+            titleEl.textContent = seo.title || 'LinkExt | Cyber Linktree';
+
+            let descEl = document.querySelector('meta[name="description"]');
+            if (!descEl) {
+                descEl = document.createElement('meta');
+                descEl.name = 'description';
+                document.head.appendChild(descEl);
+            }
+            descEl.content = seo.description || 'Centralisez vos liens et réseaux sociaux en un seul endroit.';
+
+            let kwEl = document.querySelector('meta[name="keywords"]');
+            if (!kwEl) {
+                kwEl = document.createElement('meta');
+                kwEl.name = 'keywords';
+                document.head.appendChild(kwEl);
+            }
+            kwEl.content = seo.keywords || 'linktree, réseaux sociaux, cyberpunk';
+        }
+
+        function injectTrackingScripts(integrations) {
+            document.querySelectorAll('[data-linkext-tracking]').forEach(el => el.remove());
+
+            if (integrations.metaPixel) {
+                const metaScript = document.createElement('script');
+                metaScript.setAttribute('data-linkext-tracking', 'meta');
+                metaScript.innerHTML = `
+                    !function(f,b,e,v,n,t,s)
+                    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                    n.queue=[];t=b.createElement(e);t.async=!0;
+                    t.src=v;s=b.getElementsByTagName(e)[0];
+                    s.parentNode.insertBefore(t,s)}(window, document,'script',
+                    'https://connect.facebook.net/en_US/fbevents.js');
+                    fbq('init', '${integrations.metaPixel}');
+                    fbq('track', 'PageView');
+                `;
+                document.head.appendChild(metaScript);
+            }
+
+            if (integrations.ga) {
+                const gaScript = document.createElement('script');
+                gaScript.setAttribute('data-linkext-tracking', 'ga');
+                gaScript.async = true;
+                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${integrations.ga}`;
+                document.head.appendChild(gaScript);
+
+                const gaInit = document.createElement('script');
+                gaInit.setAttribute('data-linkext-tracking', 'ga-init');
+                gaInit.innerHTML = `
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', '${integrations.ga}');
+                `;
+                document.head.appendChild(gaInit);
             }
         }
 
@@ -3845,6 +4779,115 @@ URL:${urlProfil}
             });
         }
 
+        // --- Admin Modal ---
+        function setupAdminModal() {
+            const modal = document.getElementById('admin-modal');
+            const verifyBtn = document.getElementById('admin-verify-btn');
+            const pinInput = document.getElementById('admin-pin');
+            const totpInput = document.getElementById('admin-totp');
+            const errorMsg = document.getElementById('admin-error');
+
+            verifyBtn.addEventListener('click', async () => {
+                const pin = pinInput.value.trim();
+                const totp = totpInput.value.trim();
+                if (pin.length !== 6 || totp.length !== 6) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'Veuillez saisir un PIN et un code TOTP valides (6 chiffres chacun).';
+                    return;
+                }
+                errorMsg.style.display = 'none';
+
+                // Vérifier le PIN (haché en base)
+                if (!adminConfigDoc || !adminConfigDoc.pinHash) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'Configuration admin manquante.';
+                    return;
+                }
+                // Le PIN est stocké sous forme de hash SHA-256 (ou autre)
+                // Ici on suppose que le hash est en base64 ou hex. On utilise une comparaison simple pour l'exemple
+                // En production, utiliser bcrypt ou SHA-256 avec salt.
+                // Pour simplifier, on compare un hash simple (à adapter)
+                const encoder = new TextEncoder();
+                const dataBuffer = encoder.encode(pin);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                if (hashHex !== adminConfigDoc.pinHash) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'PIN incorrect.';
+                    return;
+                }
+
+                // Vérifier TOTP
+                const secret = adminConfigDoc.totpSecret;
+                if (!secret) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'Secret TOTP non configuré.';
+                    return;
+                }
+                const isValid = verifyTOTP(secret, totp);
+                if (!isValid) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'Code Google Authenticator invalide.';
+                    return;
+                }
+
+                // Succès : ouvrir l'onglet admin
+                modal.classList.remove('active');
+                // Activer l'onglet admin
+                const adminTab = document.querySelector('[data-tab="admin"]');
+                if (adminTab) {
+                    adminTab.click();
+                }
+                showToast('Authentification admin réussie !', 'info');
+            });
+
+            // Fermeture de la modale
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        // --- Abonnés ---
+        function renderSubscribers() {
+            const container = document.getElementById('subscribers-list-container');
+            if (!userProfile || !userProfile.subscribers || userProfile.subscribers.length === 0) {
+                container.innerHTML = '<span style="color:var(--text-secondary); font-size:0.8rem;">Aucun abonné pour le moment.</span>';
+                return;
+            }
+            let html = '';
+            userProfile.subscribers.forEach(sub => {
+                html += `
+                    <div class="sub-item">
+                        <span class="sub-email">${sub.email}</span>
+                        <span class="sub-date">${new Date(sub.date).toLocaleDateString()}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function copyEmails() {
+            if (!userProfile || !userProfile.subscribers || userProfile.subscribers.length === 0) {
+                showToast('Aucun email à copier.', 'info');
+                return;
+            }
+            const emails = userProfile.subscribers.map(s => s.email).join(', ');
+            navigator.clipboard.writeText(emails).then(() => {
+                showToast('Emails copiés !', 'info');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = emails;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('Emails copiés !', 'info');
+            });
+        }
+
         // --- isPublicMode ---
         function isPublicMode() {
             return new URLSearchParams(window.location.search).has('id');
@@ -3853,9 +4896,9 @@ URL:${urlProfil}
             return new URLSearchParams(window.location.search).get('id');
         }
 
-        // ==================== ATTACHEMENT GLOBAL DES ÉVÉNEMENTS ====================
+        // --- Event Listeners globaux ---
         function attachAllEventListeners() {
-            // --- Consentement ---
+            // Consentement
             document.getElementById('accept-consent-btn').addEventListener('click', function(e) {
                 e.preventDefault();
                 setConsentGiven(true);
@@ -3867,14 +4910,14 @@ URL:${urlProfil}
                 }
             });
 
-            // --- Auth tabs ---
+            // Auth tabs
             document.getElementById('auth-tabs').addEventListener('click', (e) => {
                 if (e.target.classList.contains('tab')) {
                     updateAuthUIForMode(e.target.dataset.tab);
                 }
             });
 
-            // --- Auth form ---
+            // Auth form
             document.getElementById('auth-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('auth-email').value.trim();
@@ -3913,7 +4956,7 @@ URL:${urlProfil}
                 }
             });
 
-            // --- Google Sign-In ---
+            // Google Sign-In
             document.getElementById('google-signin-btn').addEventListener('click', async () => {
                 const googleBtn = document.getElementById('google-signin-btn');
                 const googleText = document.getElementById('google-btn-text');
@@ -3945,7 +4988,7 @@ URL:${urlProfil}
                 }
             });
 
-            // --- Mot de passe oublié ---
+            // Mot de passe oublié
             document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
                 e.preventDefault();
                 const email = prompt('Entrez votre adresse email pour réinitialiser le mot de passe :');
@@ -3958,7 +5001,7 @@ URL:${urlProfil}
                 }
             });
 
-            // --- Onboarding ---
+            // Onboarding
             document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const bio = document.getElementById('onboarding-bio').value.trim();
@@ -3998,6 +5041,8 @@ URL:${urlProfil}
                     integrations: { metaPixel: '', ga: '' },
                     flash: { active: false, message: '', color: 'red' },
                     subscribers: [],
+                    schedules: [],
+                    testimonials: [],
                     onboardingCompleted: true
                 };
                 saveUserProfile(currentUser.uid, profileData).catch(() => {});
@@ -4045,6 +5090,8 @@ URL:${urlProfil}
                     integrations: { metaPixel: '', ga: '' },
                     flash: { active: false, message: '', color: 'red' },
                     subscribers: [],
+                    schedules: [],
+                    testimonials: [],
                     onboardingCompleted: true
                 };
                 const saved = await saveUserProfile(currentUser.uid, profileData);
@@ -4057,7 +5104,7 @@ URL:${urlProfil}
                 await populateDashboard();
             });
 
-            // --- Dashboard : Ajouter un lien ---
+            // Dashboard : Ajouter un lien
             document.getElementById('add-link-btn').addEventListener('click', () => {
                 selectedNetworkType = null;
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
@@ -4083,7 +5130,7 @@ URL:${urlProfil}
                 this.classList.toggle('active');
             });
 
-            // --- Dashboard : Enregistrer ---
+            // Dashboard : Enregistrer
             document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const name = document.getElementById('dashboard-name').value.trim();
@@ -4131,12 +5178,14 @@ URL:${urlProfil}
                     updateRedirectToggleState();
                     updateStats();
                     renderSubscribers();
+                    renderTestimonialsDashboard();
                 }
             });
 
-            // --- Déconnexion ---
+            // Déconnexion
             document.getElementById('logout-btn').addEventListener('click', () => {
                 setConsentGiven(false);
+                if (scheduleInterval) clearInterval(scheduleInterval);
                 auth.signOut();
                 currentUser = null;
                 userProfile = null;
@@ -4144,11 +5193,12 @@ URL:${urlProfil}
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
             });
 
-            // --- Uploads ---
+            // Uploads
             setupAvatarUpload();
             setupLinkImageUpload();
+            setupTestimonialImageUpload();
 
-            // --- Événements dashboard (statut, maintenance) ---
+            // Événements dashboard (statut, maintenance)
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
                 el.addEventListener('click', () => {
                     const value = el.dataset.value;
@@ -4169,16 +5219,16 @@ URL:${urlProfil}
 
             document.getElementById('reset-views-btn').addEventListener('click', resetViews);
 
-            // --- Thème privé ---
+            // Thème privé
             document.getElementById('theme-toggle-private').addEventListener('click', function(e) {
                 e.preventDefault();
                 toggleTheme();
             });
 
-            // --- Redirection Unique ---
+            // Redirection Unique
             document.getElementById('redirect-toggle-track').addEventListener('click', toggleRedirectUnique);
 
-            // --- Sélecteurs de thème visuel et fond ---
+            // Sélecteurs de thème visuel et fond
             document.getElementById('visual-theme-select').addEventListener('change', function() {
                 applyVisualTheme();
             });
@@ -4186,7 +5236,7 @@ URL:${urlProfil}
                 applyBackground();
             });
 
-            // --- Flash toggle et couleurs ---
+            // Flash toggle et couleurs
             document.getElementById('flash-toggle').addEventListener('click', function() {
                 this.classList.toggle('active');
             });
@@ -4197,29 +5247,71 @@ URL:${urlProfil}
                 });
             });
 
-            // --- Export Rapport ---
+            // Export Rapport
             document.getElementById('export-report-btn').addEventListener('click', exportReport);
 
-            // --- Copier les emails ---
+            // Copier les emails
             document.getElementById('copy-emails-btn').addEventListener('click', copyEmails);
 
-            // --- QR Code et Vcard ---
+            // Soutenir la plateforme
+            document.getElementById('support-btn').addEventListener('click', showDonationModal);
+
+            // Fermeture modale dons
+            document.getElementById('close-donation-modal').addEventListener('click', function() {
+                document.getElementById('donation-modal').classList.remove('active');
+            });
+            document.getElementById('donation-modal').addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('active');
+            });
+
+            // Planification du statut
+            document.getElementById('add-schedule-btn').addEventListener('click', addSchedule);
+
+            // Témoignages
+            document.getElementById('add-testimonial-btn').addEventListener('click', function() {
+                const name = document.getElementById('testimonial-name').value.trim();
+                const message = document.getElementById('testimonial-message').value.trim();
+                const rating = parseInt(document.getElementById('testimonial-rating').value) || 5;
+                const imageUrl = document.getElementById('testimonial-image-url').value;
+                if (!name || !message) {
+                    showToast('Veuillez remplir le nom et le message.', 'error');
+                    return;
+                }
+                if (!userProfile.testimonials) userProfile.testimonials = [];
+                userProfile.testimonials.push({ name, message, rating, imageUrl });
+                saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
+                renderTestimonialsDashboard();
+                document.getElementById('testimonial-name').value = '';
+                document.getElementById('testimonial-message').value = '';
+                document.getElementById('testimonial-rating').value = 5;
+                document.getElementById('testimonial-image-url').value = '';
+                document.getElementById('testimonial-image-preview').classList.add('hidden');
+                showToast('Témoignage ajouté !', 'info');
+            });
+
+            // Sauvegarde admin
+            document.getElementById('save-admin-btn').addEventListener('click', saveAdminData);
+
+            // QR Code et Vcard
             setupQRModal();
             setupVcard();
 
-            // --- Gated Modal ---
+            // Gated Modal
             setupGatedModal();
 
-            // --- Grille d'ajout ---
+            // Admin Modal
+            setupAdminModal();
+
+            // Grille d'ajout
             renderAddLinkGrid();
 
-            // --- Theme toggle public ---
+            // Theme toggle public
             document.getElementById('theme-toggle-btn').addEventListener('click', function(e) {
                 e.preventDefault();
                 toggleTheme();
             });
 
-            // --- Tabs du Dashboard ---
+            // Tabs du Dashboard
             setupTabs();
         }
 
@@ -4240,6 +5332,10 @@ URL:${urlProfil}
         // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
+            // Initialiser le canvas cyber-matrix par défaut
+            setTimeout(() => {
+                initCyberCanvas();
+            }, 100);
         });
 
     })();
