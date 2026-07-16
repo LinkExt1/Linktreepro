@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>LinkExt | Cyber Linktree</title>
 
-    <!-- ===== META SEO ===== -->
     <meta name="description" content="Centralisez vos liens et réseaux sociaux en un seul endroit.">
     <meta name="keywords" content="linktree, réseaux sociaux, cyberpunk">
     <meta property="og:title" content="LinkExt">
@@ -18,15 +17,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Cloudinary Widget -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    <!-- Bibliothèque TOTP pour Google Authenticator -->
     <script src="https://cdn.jsdelivr.net/npm/otplib@12.0.1/otplib.min.js"></script>
-    <!-- QRCode.js pour générer le QR code de configuration TOTP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        /* ===== VARIABLES (thème Cyberpunk par défaut) ===== */
+        /* ===== VARIABLES ===== */
         :root {
             --bg-deep: #0a0b10;
             --bg-card: rgba(10, 11, 16, 0.7);
@@ -52,7 +48,7 @@
             --nav-bg: rgba(10, 11, 16, 0.85);
         }
 
-        /* ===== THÈMES VISUELS ===== */
+        /* ===== THÈMES ===== */
         body.theme-minimaliste {
             --bg-deep: #f5f5f7;
             --bg-card: rgba(255,255,255,0.8);
@@ -140,7 +136,7 @@
             border-radius: 0 !important;
         }
 
-        /* ===== FONDS DYNAMIQUES ===== */
+        /* ===== FONDS ===== */
         body.fond-aurora {
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
@@ -1360,7 +1356,7 @@
             pointer-events: none;
         }
 
-        /* ===== DASHBOARD REFONDU ===== */
+        /* ===== DASHBOARD ===== */
         .dashboard-container {
             display: flex;
             flex-direction: column;
@@ -1387,7 +1383,6 @@
             font-size: 0.8rem;
         }
 
-        /* ===== MODULE DE PARTAGE DU LIEN PUBLIC ===== */
         .share-module {
             padding: 0.8rem 1.8rem;
             background: var(--card-bg);
@@ -1449,7 +1444,6 @@
             transform: scale(0.92);
         }
 
-        /* ===== BARRE DE NAVIGATION ===== */
         .dashboard-nav {
             display: flex;
             justify-content: space-around;
@@ -1498,7 +1492,6 @@
             transform: scale(0.92);
         }
 
-        /* Conteneur des onglets (Tab Content) */
         .tab-content {
             flex: 1;
             overflow-y: auto;
@@ -1594,7 +1587,6 @@
             margin-top: 0.5rem;
         }
 
-        /* Modale de collecte d'email (gated content) */
         .gated-modal .modal-content {
             max-width: 360px;
         }
@@ -1623,9 +1615,7 @@
             display: none;
         }
 
-        /* ===== NOUVEAUX STYLES : TÉMOIGNAGES, DONS, PLANIFICATEUR, ADMIN ===== */
-
-        /* Carrousel témoignages (public) */
+        /* ===== TÉMOIGNAGES, DONS, PLANIFICATEUR, ADMIN ===== */
         .testimonials-carousel {
             position: relative;
             width: 100%;
@@ -1705,7 +1695,6 @@
             color: var(--cyan);
         }
 
-        /* Gestion des témoignages (privé) */
         .testimonial-item {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -1760,7 +1749,6 @@
             color: var(--danger);
         }
 
-        /* Planificateur de statut */
         .schedule-item {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -1798,7 +1786,6 @@
             color: var(--danger);
         }
 
-        /* Admin Panel */
         .admin-panel .admin-field {
             margin-bottom: 1rem;
         }
@@ -1838,7 +1825,6 @@
             padding: 0.2rem;
         }
 
-        /* Modale Admin Gate (double authentification) */
         .admin-gate .modal-content {
             max-width: 380px;
         }
@@ -1861,7 +1847,6 @@
             color: var(--cyan);
         }
 
-        /* Bouton Don */
         .donate-btn {
             background: linear-gradient(135deg, #f7971e, #ffd200);
             color: #0a0b10;
@@ -1881,7 +1866,6 @@
             box-shadow: 0 0 30px rgba(255, 210, 0, 0.5);
         }
 
-        /* Popup Dons */
         .donation-popup .modal-content {
             max-width: 420px;
             text-align: left;
@@ -1935,184 +1919,36 @@
         }
 
         @media (max-width: 420px) {
-            #view-profile-public .glass-card {
-                padding: 0 0 1rem 0;
-            }
-            .public-header {
-                padding: 0.8rem 1rem 0.2rem 1rem;
-            }
-            .public-header-top .avatar-glow-ring {
-                width: 60px;
-                height: 60px;
-            }
-            .public-header-actions .btn {
-                padding: 0.2rem 0.6rem;
-                font-size: 0.65rem;
-            }
-            .public-name {
-                font-size: 1.2rem;
-            }
-            #public-links {
-                padding: 0 0.8rem;
-            }
-            .rich-link-card .link-description {
-                font-size: 0.75rem;
-                padding: 6px 10px;
-            }
-            .rich-link-card .link-action-bar {
-                font-size: 0.7rem;
-                padding: 6px 10px;
-            }
-            .rich-link-card .card-media-default {
-                font-size: 2.8rem;
-            }
-            .public-section-title {
-                font-size: 0.75rem;
-                padding: 0.4rem 0.5rem 0.1rem 0.5rem;
-            }
-            .top-networks {
-                font-size: 0.7rem;
-                gap: 0.8rem;
-                padding: 0.4rem 0.8rem;
-            }
-            .networks-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 0.6rem;
-            }
-            .network-card {
-                padding: 0.8rem 0.3rem;
-            }
-            .network-card i {
-                font-size: 1.8rem;
-            }
-            .link-item input {
-                min-width: 80px;
-                font-size: 0.8rem;
-                padding: 0.4rem 0.5rem;
-            }
-            .link-item .order-controls button {
-                font-size: 0.6rem;
-            }
-            .link-item .reset-clicks-btn {
-                font-size: 0.7rem;
-            }
-            .glass-card {
-                padding: 1.5rem 1rem;
-            }
-            .redirect-toggle .status-label {
-                font-size: 0.7rem;
-            }
-            .stats-summary {
-                grid-template-columns: 1fr;
-            }
-            .theme-selector select {
-                font-size: 0.7rem;
-                padding: 0.3rem 0.6rem;
-            }
-            #view-consent .consent-text {
-                font-size: 0.75rem;
-                max-height: 40vh;
-            }
-            .flash-banner {
-                font-size: 0.75rem;
-                padding: 0.4rem 0.8rem;
-            }
-            .dashboard-container {
-                height: 90vh;
-                max-height: none;
-                border-radius: 16px;
-            }
-            .dashboard-container .dashboard-header {
-                padding: 0.8rem 1rem 0.3rem 1rem;
-            }
-            .dashboard-container .dashboard-header .brand {
-                font-size: 1.1rem;
-            }
-            .share-module {
-                padding: 0.5rem 1rem;
-                gap: 0.4rem;
-            }
-            .share-module .share-link-wrapper {
-                padding: 0.1rem 0.4rem 0.1rem 0.6rem;
-            }
-            .share-module .share-link-wrapper .share-link-text {
-                font-size: 0.7rem;
-            }
-            .share-module .share-actions .btn {
-                padding: 0.2rem 0.4rem;
-                font-size: 0.6rem;
-                min-width: 30px;
-            }
-            .dashboard-nav .nav-item {
-                font-size: 0.65rem;
-                padding: 0.2rem 0.4rem;
-            }
-            .dashboard-nav .nav-item i {
-                font-size: 1.1rem;
-            }
-            .tab-content {
-                padding: 0.8rem 1rem 1rem 1rem;
-            }
-            .tab-content .tab-pane h3 {
-                font-size: 0.9rem;
-            }
-            .testimonials-carousel .testimonial-slide {
-                padding: 0.6rem;
-            }
-            .testimonial-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .testimonial-item .testimonial-actions {
-                justify-content: flex-end;
-            }
-            .schedule-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .admin-panel .qr-upload-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            /* version responsive simplifiée */
+            .glass-card { padding: 1.2rem; }
+            .public-header { padding: 0.8rem 1rem; }
+            .dashboard-container .dashboard-header { padding: 0.8rem 1rem; }
+            .share-module { padding: 0.5rem 1rem; flex-wrap: wrap; }
+            .dashboard-nav .nav-item { font-size: 0.6rem; padding: 0.2rem 0.4rem; }
+            .tab-content { padding: 0.8rem 1rem; }
+            .admin-panel .qr-upload-row { flex-direction: column; align-items: flex-start; }
+            .testimonial-item { flex-direction: column; align-items: stretch; }
+            .schedule-item { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
 <body>
 <div id="app">
 
-    <!-- ========== VUE CONSENTEMENT (CGU) ========== -->
+    <!-- ========== VUE CONSENTEMENT ========== -->
     <div id="view-consent" class="view">
         <div class="glass-card">
             <div class="brand">LINKEXT</div>
             <h2 style="font-family:var(--font-heading); font-size:1.4rem; text-align:center; margin-bottom:0.5rem;">Conditions d'utilisation</h2>
             <div class="consent-text">
                 <h3>1. Conditions Générales d'Utilisation (CGU)</h3>
-                <p><strong>1.1. Objet du service</strong><br>
-                LinkExt fournit une plateforme de centralisation de liens (micro-page de profil) permettant aux utilisateurs de regrouper leurs réseaux sociaux et canaux de communication (WhatsApp, X, Telegram, etc.) sous une URL unique et personnalisée. Le service inclut des fonctionnalités de redirection dynamique, de génération de QR code, de partage de contact via fichier Vcard, ainsi qu'un outil de suivi statistique des visites et des clics.</p>
-                <p><strong>1.2. Accessibilité et gestion des thèmes</strong><br>
-                La plateforme propose une interface adaptative disposant d'un mode sombre (Cyberpunk/Noir) et d'un mode clair. L'activation de ces thèmes s'effectue via un interrupteur dédié présent sur les espaces privé et public, modifiant instantanément l'affichage visuel sans rechargement de la page.</p>
-                <p><strong>1.3. Fonctionnalités de l'Espace Public</strong><br>
-                L'espace public généré pour chaque profil permet aux visiteurs :
-                <ul>
-                    <li>D'accéder aux liens actifs configurés par l'utilisateur.</li>
-                    <li>D'utiliser la fonctionnalité de "Redirection Unique" (si activée), transformant la page en zone cliquable globale vers l'unique lien actif, à l'exception des boutons utilitaires.</li>
-                    <li>De scanner ou télécharger le QR Code menant vers le profil public LinkExt.</li>
-                    <li>De télécharger le fichier Vcard pour enregistrer directement les coordonnées de l'utilisateur dans le répertoire du téléphone.</li>
-                </ul>
-                </p>
+                <p><strong>1.1. Objet du service</strong><br>LinkExt fournit une plateforme de centralisation de liens (micro-page de profil) permettant aux utilisateurs de regrouper leurs réseaux sociaux et canaux de communication (WhatsApp, X, Telegram, etc.) sous une URL unique et personnalisée. Le service inclut des fonctionnalités de redirection dynamique, de génération de QR code, de partage de contact via fichier Vcard, ainsi qu'un outil de suivi statistique des visites et des clics.</p>
+                <p><strong>1.2. Accessibilité et gestion des thèmes</strong><br>La plateforme propose une interface adaptative disposant d'un mode sombre (Cyberpunk/Noir) et d'un mode clair. L'activation de ces thèmes s'effectue via un interrupteur dédié présent sur les espaces privé et public, modifiant instantanément l'affichage visuel sans rechargement de la page.</p>
+                <p><strong>1.3. Fonctionnalités de l'Espace Public</strong><br>L'espace public généré pour chaque profil permet aux visiteurs :<ul><li>D'accéder aux liens actifs configurés par l'utilisateur.</li><li>D'utiliser la fonctionnalité de "Redirection Unique" (si activée), transformant la page en zone cliquable globale vers l'unique lien actif, à l'exception des boutons utilitaires.</li><li>De scanner ou télécharger le QR Code menant vers le profil public LinkExt.</li><li>De télécharger le fichier Vcard pour enregistrer directement les coordonnées de l'utilisateur dans le répertoire du téléphone.</li></ul></p>
                 <h3>2. Politique de Confidentialité</h3>
-                <p><strong>2.1. Collecte des données</strong><br>
-                Dans le cadre de l'utilisation de LinkExt, les données suivantes sont collectées et traitées :
-                <ul>
-                    <li><strong>Données de profil :</strong> Nom affiché, biographie, image de profil, et URL des réseaux sociaux renseignés par l'utilisateur.</li>
-                    <li><strong>Données techniques :</strong> Choix du thème visuel (clair/sombre) et statut de disponibilité (Disponible, Occupé, En Live).</li>
-                    <li><strong>Données analytiques anonymes :</strong> Nombre de vues du profil et statistiques de clics individuels par réseau social afin d'alimenter le Dashboard privé de l'utilisateur.</li>
-                </ul>
-                </p>
-                <p><strong>2.2. Utilisation et transmission des données</strong><br>
-                Les données collectées ont pour unique but le bon fonctionnement du service, l'affichage du profil public et la fourniture des statistiques à l'utilisateur titulaire du compte. Aucune donnée personnelle ou statistique n'est vendue, cédée ou transmise à des tiers.</p>
-                <p><strong>2.3. Sécurité et Cookies</strong><br>
-                Le site utilise des mécanismes de stockage local (localStorage ou cookies techniques) pour retenir les préférences de thème de l'utilisateur et valider l'acceptation des présentes conditions lors de la navigation. L'effacement des données de session ou la déconnexion réinitialise ce consentement, imposant une nouvelle validation lors de l'accès suivant.</p>
+                <p><strong>2.1. Collecte des données</strong><br>Dans le cadre de l'utilisation de LinkExt, les données suivantes sont collectées et traitées :<ul><li><strong>Données de profil :</strong> Nom affiché, biographie, image de profil, et URL des réseaux sociaux renseignés par l'utilisateur.</li><li><strong>Données techniques :</strong> Choix du thème visuel (clair/sombre) et statut de disponibilité (Disponible, Occupé, En Live).</li><li><strong>Données analytiques anonymes :</strong> Nombre de vues du profil et statistiques de clics individuels par réseau social afin d'alimenter le Dashboard privé de l'utilisateur.</li></ul></p>
+                <p><strong>2.2. Utilisation et transmission des données</strong><br>Les données collectées ont pour unique but le bon fonctionnement du service, l'affichage du profil public et la fourniture des statistiques à l'utilisateur titulaire du compte. Aucune donnée personnelle ou statistique n'est vendue, cédée ou transmise à des tiers.</p>
+                <p><strong>2.3. Sécurité et Cookies</strong><br>Le site utilise des mécanismes de stockage local (localStorage ou cookies techniques) pour retenir les préférences de thème de l'utilisateur et valider l'acceptation des présentes conditions lors de la navigation. L'effacement des données de session ou la déconnexion réinitialise ce consentement, imposant une nouvelle validation lors de l'accès suivant.</p>
                 <h3>3. Processus de Consentement Obligatoire</h3>
                 <p>Pour garantir la transparence, tout utilisateur se déconnectant de la plateforme verra s'afficher, lors de sa tentative de reconnexion ou d'inscription sur son téléphone ou ordinateur, un écran de contrôle bloquant. Cet écran présente les présentes CGU et Politique de Confidentialité. L'utilisateur doit obligatoirement cliquer sur le bouton "Accepter et continuer" pour être redirigé vers l'interface de connexion/inscription. Aucun accès aux serveurs privés n'est autorisé sans cette validation préalable.</p>
             </div>
@@ -2174,16 +2010,14 @@
         </div>
     </div>
 
-    <!-- ========== VUE DASHBOARD (AVEC MODULE DE PARTAGE) ========== -->
+    <!-- ========== VUE DASHBOARD ========== -->
     <div id="view-dashboard" class="view">
         <div class="glass-card dashboard-container">
-            <!-- En-tête du Dashboard (fixe) -->
             <div class="dashboard-header">
                 <div class="brand" style="font-size:1.3rem; margin:0;">DASHBOARD</div>
                 <button class="btn btn-outline logout-btn" id="logout-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
-            <!-- ===== MODULE DE PARTAGE DU LIEN PUBLIC ===== -->
             <div class="share-module" id="share-module">
                 <div class="share-link-wrapper">
                     <i class="fas fa-link"></i>
@@ -2195,50 +2029,32 @@
                 </div>
             </div>
 
-            <!-- Barre de navigation (fixe) -->
             <nav class="dashboard-nav" id="dashboard-nav">
                 <button class="nav-item active" data-tab="analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></button>
                 <button class="nav-item" data-tab="links"><i class="fas fa-link"></i><span>Liens</span></button>
                 <button class="nav-item" data-tab="profile"><i class="fas fa-user"></i><span>Profil</span></button>
                 <button class="nav-item" data-tab="advanced"><i class="fas fa-cog"></i><span>Avancé</span></button>
-                <!-- L'onglet Admin sera injecté dynamiquement -->
                 <button class="nav-item" data-tab="admin" id="admin-tab" style="display:none;"><i class="fas fa-shield-alt"></i><span>Admin</span></button>
             </nav>
 
-            <!-- Contenu des onglets -->
             <div class="tab-content">
-                <!-- ===== ONGLET 1 : ANALYTICS ===== -->
+                <!-- ===== ANALYTICS ===== -->
                 <div class="tab-pane active" id="tab-analytics">
                     <h3><i class="fas fa-chart-line"></i> Vue d'ensemble</h3>
                     <div class="stats-summary" id="stats-summary">
-                        <div class="stat-card">
-                            <div class="stat-number" id="stat-views">0</div>
-                            <div class="stat-label">Vues du profil</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="stat-total-clicks">0</div>
-                            <div class="stat-label">Clics totaux</div>
-                        </div>
-                        <div class="stat-card" style="grid-column: span 2;">
-                            <div class="stat-label" style="margin-bottom:0.3rem;">Répartition des clics</div>
-                            <div id="stat-bars"></div>
-                        </div>
-                        <div style="grid-column: span 2; margin-top:0.3rem;">
-                            <button class="btn btn-outline export-report-btn" id="export-report-btn" style="width:100%; padding:0.5rem; font-size:0.85rem;">
-                                <i class="fas fa-file-download"></i> Exporter le rapport (PDF)
-                            </button>
-                        </div>
+                        <div class="stat-card"><div class="stat-number" id="stat-views">0</div><div class="stat-label">Vues du profil</div></div>
+                        <div class="stat-card"><div class="stat-number" id="stat-total-clicks">0</div><div class="stat-label">Clics totaux</div></div>
+                        <div class="stat-card" style="grid-column: span 2;"><div class="stat-label" style="margin-bottom:0.3rem;">Répartition des clics</div><div id="stat-bars"></div></div>
+                        <div style="grid-column: span 2; margin-top:0.3rem;"><button class="btn btn-outline export-report-btn" id="export-report-btn" style="width:100%; padding:0.5rem; font-size:0.85rem;"><i class="fas fa-file-download"></i> Exporter le rapport (PDF)</button></div>
                     </div>
                     <div class="flex-between" style="margin-top:0.5rem;">
                         <span class="views-counter"><i class="fas fa-eye"></i> <span id="views-count-display">0</span> vues</span>
-                        <button class="btn btn-outline" id="reset-views-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
-                            <i class="fas fa-redo"></i> Réinitialiser les vues
-                        </button>
+                        <button class="btn btn-outline" id="reset-views-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-redo"></i> Réinitialiser les vues</button>
                     </div>
                     <div id="top-networks-container" class="top-networks"></div>
                 </div>
 
-                <!-- ===== ONGLET 2 : MES LIENS ===== -->
+                <!-- ===== LIENS ===== -->
                 <div class="tab-pane" id="tab-links">
                     <h3><i class="fas fa-link"></i> Gestion des liens</h3>
                     <div class="flex-between" style="margin-bottom:0.8rem; border-bottom:1px solid var(--border-glow); padding-bottom:0.5rem;">
@@ -2259,32 +2075,15 @@
                     <div id="dashboard-links-container" style="display:flex; flex-direction:column; gap:0.4rem; max-height:220px; overflow-y:auto; padding-right:0.3rem;"></div>
                 </div>
 
-                <!-- ===== ONGLET 3 : PROFIL & STYLE ===== -->
+                <!-- ===== PROFIL ===== -->
                 <div class="tab-pane" id="tab-profile">
                     <h3><i class="fas fa-user-circle"></i> Profil & Style</h3>
                     <div class="profile-header">
-                        <div class="avatar-wrapper">
-                            <img id="dashboard-avatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=128" alt="avatar">
-                        </div>
-                        <div style="flex:1;">
-                            <div class="input-group">
-                                <label>Nom affiché</label>
-                                <input type="text" class="input-field" id="dashboard-name" placeholder="Votre nom">
-                            </div>
-                        </div>
+                        <div class="avatar-wrapper"><img id="dashboard-avatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=128" alt="avatar"></div>
+                        <div style="flex:1;"><div class="input-group"><label>Nom affiché</label><input type="text" class="input-field" id="dashboard-name" placeholder="Votre nom"></div></div>
                     </div>
-                    <div class="input-group mt-1">
-                        <label>Photo de profil</label>
-                        <button class="btn btn-outline" id="btn-change-photo" style="justify-content: center; padding:0.4rem;">
-                            <i class="fas fa-camera"></i> Changer la photo
-                        </button>
-                    </div>
-                    <div class="input-group mt-1">
-                        <label>Biographie</label>
-                        <textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea>
-                    </div>
-
-                    <!-- Statut Flash + Planificateur -->
+                    <div class="input-group mt-1"><label>Photo de profil</label><button class="btn btn-outline" id="btn-change-photo" style="justify-content: center; padding:0.4rem;"><i class="fas fa-camera"></i> Changer la photo</button></div>
+                    <div class="input-group mt-1"><label>Biographie</label><textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea></div>
                     <div class="mt-1">
                         <label style="font-size:0.8rem; color:var(--text-secondary);">Statut Flash</label>
                         <div class="status-selector" id="status-selector">
@@ -2292,133 +2091,65 @@
                             <span class="status-option" data-value="occupe"><span class="dot"></span> Occupé</span>
                             <span class="status-option" data-value="enlive"><span class="dot"></span> En Live</span>
                         </div>
-                        <!-- Planificateur -->
                         <div style="margin-top:0.4rem; border-top:1px solid var(--border-glow); padding-top:0.4rem;">
                             <label style="font-size:0.75rem; color:var(--text-secondary);"><i class="fas fa-clock"></i> Planification automatique</label>
                             <div id="schedule-list"></div>
-                            <button class="btn btn-outline" id="add-schedule-btn" style="padding:0.2rem 0.6rem; font-size:0.7rem; margin-top:0.3rem;">
-                                <i class="fas fa-plus"></i> Ajouter une plage horaire
-                            </button>
+                            <button class="btn btn-outline" id="add-schedule-btn" style="padding:0.2rem 0.6rem; font-size:0.7rem; margin-top:0.3rem;"><i class="fas fa-plus"></i> Ajouter une plage horaire</button>
                         </div>
                     </div>
-
-                    <!-- Style visuel et fond -->
                     <div class="theme-selector mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <label><i class="fas fa-palette"></i> Style visuel</label>
-                        <select id="visual-theme-select">
-                            <option value="cyberpunk">Cyberpunk</option>
-                            <option value="minimaliste">Minimaliste Blanc</option>
-                            <option value="neo-brutaliste">Néo‑brutaliste</option>
-                        </select>
+                        <select id="visual-theme-select"><option value="cyberpunk">Cyberpunk</option><option value="minimaliste">Minimaliste Blanc</option><option value="neo-brutaliste">Néo‑brutaliste</option></select>
                         <label style="margin-left:0.5rem;"><i class="fas fa-image"></i> Fond</label>
-                        <select id="background-select">
-                            <option value="cyberpunk">Dégradé Cyberpunk</option>
-                            <option value="aurora">Dégradé Aurora</option>
-                            <option value="particules">Particules légères</option>
-                            <option value="uni">Fond uni</option>
-                        </select>
+                        <select id="background-select"><option value="cyberpunk">Dégradé Cyberpunk</option><option value="aurora">Dégradé Aurora</option><option value="particules">Particules légères</option><option value="uni">Fond uni</option></select>
                     </div>
-
-                    <!-- Maintenance & Theme -->
                     <div class="flex-between mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.5rem;">
-                        <div class="maintenance-toggle">
-                            <span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span>
-                            <div class="toggle-track" id="maintenance-toggle"></div>
-                        </div>
-                        <div class="theme-toggle-private">
-                            <i class="fas fa-sun" id="theme-private-icon"></i>
-                            <div class="toggle-track" id="theme-toggle-private"></div>
-                            <i class="fas fa-moon" id="theme-private-icon-moon"></i>
-                        </div>
+                        <div class="maintenance-toggle"><span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span><div class="toggle-track" id="maintenance-toggle"></div></div>
+                        <div class="theme-toggle-private"><i class="fas fa-sun" id="theme-private-icon"></i><div class="toggle-track" id="theme-toggle-private"></div><i class="fas fa-moon" id="theme-private-icon-moon"></i></div>
                     </div>
                 </div>
 
-                <!-- ===== ONGLET 4 : OUTILS AVANCÉS ===== -->
+                <!-- ===== AVANCÉ ===== -->
                 <div class="tab-pane" id="tab-advanced">
                     <h3><i class="fas fa-cogs"></i> Outils Avancés</h3>
-                    <div class="seo-section">
-                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-search"></i> Optimisation SEO</h4>
-                        <div class="input-group">
-                            <label>Méta-Titre (max 60 caractères)</label>
-                            <input type="text" class="input-field" id="seo-title" maxlength="60" placeholder="Titre de votre profil...">
-                        </div>
-                        <div class="input-group">
-                            <label>Méta-Description (max 160 caractères)</label>
-                            <input type="text" class="input-field" id="seo-description" maxlength="160" placeholder="Description...">
-                        </div>
-                        <div class="input-group">
-                            <label>Mots-clés (séparés par des virgules)</label>
-                            <input type="text" class="input-field" id="seo-keywords" placeholder="mot1, mot2, mot3">
-                        </div>
+                    <div class="seo-section"><h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-search"></i> Optimisation SEO</h4>
+                        <div class="input-group"><label>Méta-Titre (max 60 caractères)</label><input type="text" class="input-field" id="seo-title" maxlength="60" placeholder="Titre de votre profil..."></div>
+                        <div class="input-group"><label>Méta-Description (max 160 caractères)</label><input type="text" class="input-field" id="seo-description" maxlength="160" placeholder="Description..."></div>
+                        <div class="input-group"><label>Mots-clés (séparés par des virgules)</label><input type="text" class="input-field" id="seo-keywords" placeholder="mot1, mot2, mot3"></div>
                     </div>
-                    <div class="integrations-section">
-                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-chart-line"></i> Intégrations Marketing</h4>
-                        <div class="input-group">
-                            <label>ID Pixel Meta (Facebook)</label>
-                            <input type="text" class="input-field" id="meta-pixel-id" placeholder="123456789012345">
-                        </div>
-                        <div class="input-group">
-                            <label>ID Google Analytics (G-XXXXX)</label>
-                            <input type="text" class="input-field" id="google-analytics-id" placeholder="G-XXXXXXXXXX">
-                        </div>
+                    <div class="integrations-section"><h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-chart-line"></i> Intégrations Marketing</h4>
+                        <div class="input-group"><label>ID Pixel Meta (Facebook)</label><input type="text" class="input-field" id="meta-pixel-id" placeholder="123456789012345"></div>
+                        <div class="input-group"><label>ID Google Analytics (G-XXXXX)</label><input type="text" class="input-field" id="google-analytics-id" placeholder="G-XXXXXXXXXX"></div>
                     </div>
-                    <div class="flash-section">
-                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-bolt"></i> Alerte Flash</h4>
-                        <div class="flex-between">
-                            <span style="font-size:0.8rem; color:var(--text-secondary);">Activer la bannière</span>
-                            <div class="toggle-switch" id="flash-toggle"></div>
-                        </div>
-                        <div class="input-group">
-                            <label>Message d'alerte</label>
-                            <input type="text" class="input-field" id="flash-message" placeholder="Offre limitée !...">
-                        </div>
-                        <div>
-                            <label style="font-size:0.8rem; color:var(--text-secondary);">Couleur</label>
-                            <div class="color-selector">
-                                <span class="color-option color-red active" data-color="red" title="Rouge Électrique"></span>
-                                <span class="color-option color-cyan" data-color="cyan" title="Cyan"></span>
-                                <span class="color-option color-orange" data-color="orange" title="Orange Néon"></span>
-                            </div>
-                        </div>
+                    <div class="flash-section"><h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-bolt"></i> Alerte Flash</h4>
+                        <div class="flex-between"><span style="font-size:0.8rem; color:var(--text-secondary);">Activer la bannière</span><div class="toggle-switch" id="flash-toggle"></div></div>
+                        <div class="input-group"><label>Message d'alerte</label><input type="text" class="input-field" id="flash-message" placeholder="Offre limitée !..."></div>
+                        <div><label style="font-size:0.8rem; color:var(--text-secondary);">Couleur</label><div class="color-selector"><span class="color-option color-red active" data-color="red" title="Rouge Électrique"></span><span class="color-option color-cyan" data-color="cyan" title="Cyan"></span><span class="color-option color-orange" data-color="orange" title="Orange Néon"></span></div></div>
                     </div>
-                    <div class="subscribers-section">
-                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-users"></i> Liste des abonnés</h4>
-                        <div id="subscribers-list-container" class="subscribers-list">
-                            <span style="color:var(--text-secondary); font-size:0.8rem;">Aucun abonné pour le moment.</span>
-                        </div>
-                        <button class="btn btn-outline copy-email-btn" id="copy-emails-btn" style="margin-top:0.4rem; padding:0.2rem 0.8rem; font-size:0.7rem;">
-                            <i class="fas fa-copy"></i> Copier les emails
-                        </button>
+                    <div class="subscribers-section"><h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-users"></i> Liste des abonnés</h4>
+                        <div id="subscribers-list-container" class="subscribers-list"><span style="color:var(--text-secondary); font-size:0.8rem;">Aucun abonné pour le moment.</span></div>
+                        <button class="btn btn-outline copy-email-btn" id="copy-emails-btn" style="margin-top:0.4rem; padding:0.2rem 0.8rem; font-size:0.7rem;"><i class="fas fa-copy"></i> Copier les emails</button>
                     </div>
                 </div>
 
-                <!-- ===== ONGLET 5 : TÉMOIGNAGES (privé) ===== -->
+                <!-- ===== TÉMOIGNAGES ===== -->
                 <div class="tab-pane" id="tab-testimonials">
                     <h3><i class="fas fa-comments"></i> Témoignages</h3>
-                    <p style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:0.5rem;">
-                        Gérez jusqu'à 5 témoignages qui apparaîtront sur votre page publique.
-                    </p>
+                    <p style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:0.5rem;">Gérez jusqu'à 5 témoignages qui apparaîtront sur votre page publique.</p>
                     <div id="testimonials-list"></div>
-                    <button class="btn btn-outline" id="add-testimonial-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem; margin-top:0.5rem;">
-                        <i class="fas fa-plus"></i> Ajouter un témoignage
-                    </button>
+                    <button class="btn btn-outline" id="add-testimonial-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem; margin-top:0.5rem;"><i class="fas fa-plus"></i> Ajouter un témoignage</button>
                 </div>
 
-                <!-- ===== ONGLET 6 : ADMIN (injecté dynamiquement, invisible par défaut) ===== -->
+                <!-- ===== ADMIN ===== -->
                 <div class="tab-pane" id="tab-admin">
                     <h3><i class="fas fa-shield-alt"></i> Administration</h3>
-                    <div class="admin-panel" id="admin-panel">
-                        <!-- Les champs de configuration des dons seront chargés ici -->
-                    </div>
+                    <div class="admin-panel" id="admin-panel"></div>
                 </div>
             </div>
 
-            <!-- Bouton Enregistrer (fixe en bas) + Bouton Don -->
             <div style="padding:0.8rem 1.8rem 1.2rem 1.8rem; border-top:1px solid var(--border-glow); flex-shrink:0; display:flex; gap:0.6rem; flex-wrap:wrap;">
                 <button class="btn" id="save-dashboard-btn" style="flex:1; padding:0.7rem;">Enregistrer les modifications</button>
-                <button class="donate-btn" id="donate-btn" style="flex:1; justify-content:center;">
-                    <i class="fas fa-heart"></i> Soutenir
-                </button>
+                <button class="donate-btn" id="donate-btn" style="flex:1; justify-content:center;"><i class="fas fa-heart"></i> Soutenir</button>
             </div>
         </div>
     </div>
@@ -2434,19 +2165,11 @@
             <div class="link-input-container" id="link-input-container">
                 <input type="url" id="new-link-url" placeholder="Entrez votre lien..." autocomplete="off">
                 <div class="datetime-group">
-                    <div style="flex:1; min-width:120px;">
-                        <label>Début (optionnel)</label>
-                        <input type="datetime-local" id="new-link-start">
-                    </div>
-                    <div style="flex:1; min-width:120px;">
-                        <label>Fin (optionnel)</label>
-                        <input type="datetime-local" id="new-link-end">
-                    </div>
+                    <div style="flex:1; min-width:120px;"><label>Début (optionnel)</label><input type="datetime-local" id="new-link-start"></div>
+                    <div style="flex:1; min-width:120px;"><label>Fin (optionnel)</label><input type="datetime-local" id="new-link-end"></div>
                 </div>
                 <div class="upload-row">
-                    <button class="btn btn-outline" id="btn-upload-link-image" style="padding:0.4rem 1rem; font-size:0.85rem;">
-                        <i class="fas fa-image"></i> Ajouter une image (Optionnel)
-                    </button>
+                    <button class="btn btn-outline" id="btn-upload-link-image" style="padding:0.4rem 1rem; font-size:0.85rem;"><i class="fas fa-image"></i> Ajouter une image (Optionnel)</button>
                     <img id="link-image-preview" class="image-preview hidden" src="" alt="aperçu">
                 </div>
                 <div class="flex-between" style="margin-top:0.2rem;">
@@ -2465,94 +2188,30 @@
             <div class="glass-card" style="text-align:center; padding-top:0; position:relative;">
                 <div class="public-header">
                     <div class="public-header-top">
-                        <div class="avatar-glow-ring">
-                            <img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile">
-                        </div>
+                        <div class="avatar-glow-ring"><img id="public-avatar" class="public-avatar" src="https://ui-avatars.com/api/?name=User&background=0a0b10&color=00f2fe&size=200" alt="profile"></div>
                         <div class="public-header-actions">
-                            <button class="theme-toggle" id="theme-toggle-btn" title="Basculer le thème">
-                                <i class="fas fa-moon"></i>
-                            </button>
+                            <button class="theme-toggle" id="theme-toggle-btn" title="Basculer le thème"><i class="fas fa-moon"></i></button>
                             <button class="btn btn-outline exclude-click" id="qr-code-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-qrcode"></i></button>
                             <button class="btn btn-outline exclude-click" id="vcard-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-user-plus"></i></button>
                         </div>
                     </div>
                     <h2 id="public-name" class="public-name">Utilisateur</h2>
                     <p id="public-bio-text" class="public-bio-text">Bio du profil</p>
-                    <div class="public-status-wrap">
-                        <span id="public-status-badge" class="status-badge disponible"><span class="dot"></span> Disponible</span>
-                    </div>
+                    <div class="public-status-wrap"><span id="public-status-badge" class="status-badge disponible"><span class="dot"></span> Disponible</span></div>
                 </div>
-
                 <div class="public-links-divider"></div>
-
                 <div id="public-links"></div>
-
-                <!-- ===== SECTION TÉMOIGNAGES (carrousel) ===== -->
                 <div id="public-testimonials" style="padding:0 1rem 0.5rem 1rem; margin-top:0.5rem;"></div>
             </div>
         </a>
         <p class="text-center" style="font-size:0.7rem; color:var(--text-secondary); padding:0.4rem 0;">Propulsé par LinkExt</p>
     </div>
 
-    <!-- ========== MODAL QR CODE ========== -->
-    <div class="modal-overlay" id="qr-modal">
-        <div class="modal-content">
-            <h3 style="margin-bottom:1rem; font-family:var(--font-heading);">QR Code du profil</h3>
-            <img id="qr-image" src="" alt="QR Code">
-            <button class="close-modal" id="close-qr-modal">Fermer</button>
-        </div>
-    </div>
-
-    <!-- ========== MODALE GATED CONTENT ========== -->
-    <div class="modal-overlay gated-modal" id="gated-modal">
-        <div class="modal-content">
-            <h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-lock"></i> Accès verrouillé</h3>
-            <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">
-                Entrez votre adresse email pour accéder à ce lien.
-            </p>
-            <input type="email" id="gated-email" placeholder="votre@email.com" autocomplete="email">
-            <div class="error-msg" id="gated-error">Email invalide.</div>
-            <button class="btn" id="gated-submit-btn">Déverrouiller et accéder</button>
-        </div>
-    </div>
-
-    <!-- ========== MODALE ADMIN GATE (double authentification) ========== -->
-    <div class="modal-overlay admin-gate" id="admin-gate-modal">
-        <div class="modal-content">
-            <h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-lock"></i> Accès Administrateur</h3>
-            <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem 0;">
-                Veuillez saisir votre code PIN et le code de votre application Google Authenticator.
-            </p>
-            <div class="input-group">
-                <label>Code PIN (6 chiffres)</label>
-                <input type="password" class="input-field" id="admin-pin-input" maxlength="6" inputmode="numeric" placeholder="••••••">
-            </div>
-            <div class="input-group mt-1">
-                <label>Code Google Authenticator (6 chiffres)</label>
-                <input type="text" class="input-field" id="admin-totp-input" maxlength="6" inputmode="numeric" placeholder="••••••">
-            </div>
-            <div id="admin-gate-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.4rem; display:none;">Code invalide.</div>
-            <div class="totp-setup" id="totp-setup-area" style="display:none;">
-                <p style="font-size:0.8rem; color:var(--text-secondary);">Scannez ce QR Code avec Google Authenticator :</p>
-                <div id="totp-qr-container"></div>
-                <p style="font-size:0.7rem; margin-top:0.3rem;">Clé secrète : <span class="totp-secret" id="totp-secret-display"></span></p>
-            </div>
-            <button class="btn" id="admin-gate-submit" style="width:100%; margin-top:1rem;">Vérifier et accéder</button>
-            <button class="close-modal" id="admin-gate-close" style="margin-top:0.5rem;">Fermer</button>
-        </div>
-    </div>
-
-    <!-- ========== MODALE DONATIONS (popup) ========== -->
-    <div class="modal-overlay donation-popup" id="donation-modal">
-        <div class="modal-content">
-            <h3 style="font-family:var(--font-heading);"><i class="fas fa-hand-holding-heart"></i> Soutenir LinkExt</h3>
-            <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;">
-                Merci de soutenir la plateforme ! Voici les coordonnées de don.
-            </p>
-            <div id="donation-methods-container"></div>
-            <button class="close-modal" id="close-donation-modal">Fermer</button>
-        </div>
-    </div>
+    <!-- ========== MODALS ========== -->
+    <div class="modal-overlay" id="qr-modal"><div class="modal-content"><h3 style="margin-bottom:1rem; font-family:var(--font-heading);">QR Code du profil</h3><img id="qr-image" src="" alt="QR Code"><button class="close-modal" id="close-qr-modal">Fermer</button></div></div>
+    <div class="modal-overlay gated-modal" id="gated-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-lock"></i> Accès verrouillé</h3><p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">Entrez votre adresse email pour accéder à ce lien.</p><input type="email" id="gated-email" placeholder="votre@email.com" autocomplete="email"><div class="error-msg" id="gated-error">Email invalide.</div><button class="btn" id="gated-submit-btn">Déverrouiller et accéder</button></div></div>
+    <div class="modal-overlay admin-gate" id="admin-gate-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-lock"></i> Accès Administrateur</h3><p style="color:var(--text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem 0;">Veuillez saisir votre code PIN et le code de votre application Google Authenticator.</p><div class="input-group"><label>Code PIN (6 chiffres)</label><input type="password" class="input-field" id="admin-pin-input" maxlength="6" inputmode="numeric" placeholder="••••••"></div><div class="input-group mt-1"><label>Code Google Authenticator (6 chiffres)</label><input type="text" class="input-field" id="admin-totp-input" maxlength="6" inputmode="numeric" placeholder="••••••"></div><div id="admin-gate-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.4rem; display:none;">Code invalide.</div><div class="totp-setup" id="totp-setup-area" style="display:none;"><p style="font-size:0.8rem; color:var(--text-secondary);">Scannez ce QR Code avec Google Authenticator :</p><div id="totp-qr-container"></div><p style="font-size:0.7rem; margin-top:0.3rem;">Clé secrète : <span class="totp-secret" id="totp-secret-display"></span></p></div><button class="btn" id="admin-gate-submit" style="width:100%; margin-top:1rem;">Vérifier et accéder</button><button class="close-modal" id="admin-gate-close" style="margin-top:0.5rem;">Fermer</button></div></div>
+    <div class="modal-overlay donation-popup" id="donation-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading);"><i class="fas fa-hand-holding-heart"></i> Soutenir LinkExt</h3><p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;">Merci de soutenir la plateforme ! Voici les coordonnées de don.</p><div id="donation-methods-container"></div><button class="close-modal" id="close-donation-modal">Fermer</button></div></div>
 
 </div> <!-- fin #app -->
 
@@ -2610,7 +2269,6 @@
         let linkImageUrl = '';
         let gatedPendingLink = null;
         let gatedPendingTarget = null;
-        let isAdmin = false;
         let adminPinHash = '';
         let totpSecret = '';
         let scheduleInterval = null;
@@ -2627,9 +2285,6 @@
             publicProfile: document.getElementById('view-profile-public')
         };
 
-        // ============================================================
-        // UTILITAIRES
-        // ============================================================
         function showView(viewId) {
             const target = document.getElementById(viewId);
             if (!target) return;
@@ -2732,21 +2387,28 @@
         }
 
         // ============================================================
-        // ADMIN - VÉRIFICATION DES DROITS
+        // ADMIN - VÉRIFICATION DES DROITS (avec logs)
         // ============================================================
         async function checkIsAdmin(uid) {
-            if (!uid) return false;
+            if (!uid) {
+                console.warn('checkIsAdmin: uid manquant');
+                return false;
+            }
             try {
+                console.log('checkIsAdmin: lecture de admin_config/security pour uid', uid);
                 const docRef = db.collection('admin_config').doc('security');
                 const doc = await docRef.get();
                 if (!doc.exists) {
-                    console.warn('Document admin_config/security introuvable. Aucun administrateur défini.');
+                    console.warn('Document admin_config/security introuvable.');
                     return false;
                 }
                 const data = doc.data();
-                return data.adminUid === uid;
+                console.log('Données récupérées :', data);
+                const isAdmin = data.adminUid === uid;
+                console.log('adminUid stocké =', data.adminUid, 'uid =', uid, '=> isAdmin =', isAdmin);
+                return isAdmin;
             } catch (e) {
-                console.warn('Erreur de lecture admin_config/security :', e);
+                console.error('Erreur de lecture admin_config/security :', e);
                 return false;
             }
         }
@@ -3888,7 +3550,7 @@
         }
 
         // ============================================================
-        // DASHBOARD - PEUPLEMENT (correction principale)
+        // DASHBOARD - PEUPLEMENT (VERSION CORRIGÉE)
         // ============================================================
         async function populateDashboard() {
             if (!currentUser) return;
@@ -3955,16 +3617,19 @@
             renderSchedules();
             startScheduler();
 
-            // ===== VÉRIFICATION ADMIN AVEC TRY/CATCH =====
+            // ===== VÉRIFICATION ADMIN AVEC TRY/CATCH ET LOGS =====
             const adminTab = document.getElementById('admin-tab');
             try {
                 const admin = await checkIsAdmin(currentUser.uid);
+                console.log('Résultat checkIsAdmin :', admin);
                 if (admin) {
                     adminTab.style.display = 'flex';
                     const donationData = await loadDonationConfig();
                     renderAdminPanel(donationData);
+                    // On rend l'onglet visible mais "grisé" (opacity)
+                    // On supprime pointer-events: none pour permettre le clic
                     adminTab.style.opacity = '0.5';
-                    adminTab.style.pointerEvents = 'none';
+                    adminTab.style.pointerEvents = 'auto'; // <- CORRECTION
 
                     adminTab.onclick = async function(e) {
                         e.preventDefault();
