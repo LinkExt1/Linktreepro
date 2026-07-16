@@ -2566,8 +2566,7 @@
 <script>
     (function() {
         // ============================================================
-        // CONFIGURATION FIREBASE (exposée, mais les règles de sécurité
-        // protègent les données sensibles)
+        // CONFIGURATION FIREBASE
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
@@ -2612,7 +2611,6 @@
         let gatedPendingLink = null;
         let gatedPendingTarget = null;
         let isAdmin = false;
-        let adminGateResolve = null;
         let adminPinHash = '';
         let totpSecret = '';
         let scheduleInterval = null;
@@ -2734,19 +2732,21 @@
         }
 
         // ============================================================
-        // GESTION ADMIN - VÉRIFICATION D'ACCÈS
+        // ADMIN - VÉRIFICATION DES DROITS
         // ============================================================
         async function checkIsAdmin(uid) {
+            if (!uid) return false;
             try {
                 const docRef = db.collection('admin_config').doc('security');
                 const doc = await docRef.get();
-                if (doc.exists && doc.data().adminUid === uid) {
-                    isAdmin = true;
-                    return true;
+                if (!doc.exists) {
+                    console.warn('Document admin_config/security introuvable. Aucun administrateur défini.');
+                    return false;
                 }
-                return false;
+                const data = doc.data();
+                return data.adminUid === uid;
             } catch (e) {
-                console.warn('Accès admin refusé :', e);
+                console.warn('Erreur de lecture admin_config/security :', e);
                 return false;
             }
         }
@@ -2929,7 +2929,7 @@
         }
 
         // ============================================================
-        // PLANIFICATEUR DE STATUT (gestion des plages horaires)
+        // PLANIFICATEUR DE STATUT
         // ============================================================
         function renderSchedules() {
             const container = document.getElementById('schedule-list');
@@ -3019,7 +3019,7 @@
         }
 
         // ============================================================
-        // GESTION DES DONS (administration)
+        // GESTION DES DONS
         // ============================================================
         async function loadDonationConfig() {
             try {
@@ -3127,9 +3127,7 @@
                 const mtn = document.getElementById('admin-mtn').value.trim();
                 const moov = document.getElementById('admin-moov').value.trim();
                 const wave = document.getElementById('admin-wave').value.trim();
-                const methods = {
-                    usdt, tron, btc, mtn, moov, wave
-                };
+                const methods = { usdt, tron, btc, mtn, moov, wave };
                 const oldData = await loadDonationConfig();
                 if (oldData && oldData.methods) {
                     Object.keys(oldData.methods).forEach(k => {
@@ -3148,7 +3146,7 @@
         }
 
         // ============================================================
-        // AFFICHAGE DES DONS DANS LA POPUP (pour les utilisateurs)
+        // AFFICHAGE DES DONS DANS LA POPUP
         // ============================================================
         async function showDonationPopup() {
             const modal = document.getElementById('donation-modal');
@@ -3224,7 +3222,7 @@
         }
 
         // ============================================================
-        // CLOUDINARY WIDGET (réutilisable)
+        // CLOUDINARY WIDGET
         // ============================================================
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
@@ -3286,7 +3284,7 @@
         }
 
         // ============================================================
-        // PARTICULES CYBER-MATRIX (arrière-plan réactif)
+        // PARTICULES CYBER-MATRIX
         // ============================================================
         function initParticles() {
             const canvas = document.createElement('canvas');
@@ -3465,9 +3463,8 @@
         }
 
         // ============================================================
-        // FONCTIONS MÉTIERS PRINCIPALES
+        // FONCTIONS MÉTIERS
         // ============================================================
-
         async function incrementViews(uid) {
             const key = 'viewCounted_' + uid;
             if (sessionStorage.getItem(key) === 'true') return;
@@ -3590,7 +3587,7 @@
         }
 
         // ============================================================
-        // STATISTIQUES (dashboard)
+        // STATISTIQUES
         // ============================================================
         function updateStats() {
             if (!userProfile) return;
@@ -3891,7 +3888,7 @@
         }
 
         // ============================================================
-        // DASHBOARD - PEUPLEMENT
+        // DASHBOARD - PEUPLEMENT (correction principale)
         // ============================================================
         async function populateDashboard() {
             if (!currentUser) return;
@@ -3917,6 +3914,7 @@
                 };
             }
 
+            // Remplir les champs
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
             document.getElementById('views-count-display').textContent = userProfile.views || 0;
@@ -3953,55 +3951,45 @@
             applyVisualTheme();
             applyBackground();
             renderSubscribers();
-
             renderTestimonialsPrivate();
             renderSchedules();
             startScheduler();
 
-            // --- Gestion admin avec try/catch ---
-            let admin = false;
-            try {
-                admin = await checkIsAdmin(currentUser.uid);
-            } catch (err) {
-                console.error('Erreur lors de la vérification admin :', err);
-                admin = false;
-            }
-
+            // ===== VÉRIFICATION ADMIN AVEC TRY/CATCH =====
             const adminTab = document.getElementById('admin-tab');
-            if (admin) {
-                adminTab.style.display = 'flex';
-                let donationData = null;
-                try {
-                    donationData = await loadDonationConfig();
-                } catch (e) {
-                    console.warn('Impossible de charger les données de donation :', e);
-                }
-                renderAdminPanel(donationData);
-                adminTab.style.opacity = '0.5';
-                adminTab.style.pointerEvents = 'none';
-                adminTab.onclick = async function(e) {
-                    e.preventDefault();
-                    const granted = await openAdminGate();
-                    if (granted) {
-                        adminTab.style.opacity = '1';
-                        adminTab.style.pointerEvents = 'auto';
-                        try {
+            try {
+                const admin = await checkIsAdmin(currentUser.uid);
+                if (admin) {
+                    adminTab.style.display = 'flex';
+                    const donationData = await loadDonationConfig();
+                    renderAdminPanel(donationData);
+                    adminTab.style.opacity = '0.5';
+                    adminTab.style.pointerEvents = 'none';
+
+                    adminTab.onclick = async function(e) {
+                        e.preventDefault();
+                        const granted = await openAdminGate();
+                        if (granted) {
+                            adminTab.style.opacity = '1';
+                            adminTab.style.pointerEvents = 'auto';
                             const data = await loadDonationConfig();
                             renderAdminPanel(data);
-                        } catch (e) {
-                            showToast('Erreur lors du chargement des dons.', 'error');
+                            document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
+                            document.querySelectorAll('.tab-content .tab-pane').forEach(p => p.classList.remove('active'));
+                            adminTab.classList.add('active');
+                            document.getElementById('tab-admin').classList.add('active');
+                            showToast('Accès administrateur accordé.', 'info');
+                        } else {
+                            showToast('Accès refusé.', 'error');
                         }
-                        document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
-                        document.querySelectorAll('.tab-content .tab-pane').forEach(p => p.classList.remove('active'));
-                        adminTab.classList.add('active');
-                        document.getElementById('tab-admin').classList.add('active');
-                        showToast('Accès administrateur accordé.', 'info');
-                    } else {
-                        showToast('Accès refusé.', 'error');
-                    }
-                };
-            } else {
+                    };
+                } else {
+                    adminTab.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erreur lors de la vérification des droits admin :', error);
                 adminTab.style.display = 'none';
+                showToast('Impossible de vérifier les droits administrateur.', 'error');
             }
         }
 
@@ -5081,7 +5069,7 @@
         }
 
         // ============================================================
-        // DÉTAILS DES FONCTIONS MANQUANTES (upload avatar, link image, etc.)
+        // DÉTAILS DES FONCTIONS MANQUANTES
         // ============================================================
         function setupAvatarUpload() {
             const btn = document.getElementById('btn-change-photo');
