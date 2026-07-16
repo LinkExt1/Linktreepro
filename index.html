@@ -1825,8 +1825,14 @@
             padding: 0.2rem;
         }
 
-        .admin-gate .modal-content {
-            max-width: 380px;
+        /* Modale Admin : on distingue les deux modes (setup / login) */
+        .admin-gate .modal-content .setup-section,
+        .admin-gate .modal-content .login-section {
+            display: none;
+        }
+        .admin-gate .modal-content .setup-section.active,
+        .admin-gate .modal-content .login-section.active {
+            display: block;
         }
         .admin-gate .modal-content .totp-setup {
             margin: 1rem 0;
@@ -1919,7 +1925,6 @@
         }
 
         @media (max-width: 420px) {
-            /* version responsive simplifiée */
             .glass-card { padding: 1.2rem; }
             .public-header { padding: 0.8rem 1rem; }
             .dashboard-container .dashboard-header { padding: 0.8rem 1rem; }
@@ -2210,7 +2215,46 @@
     <!-- ========== MODALS ========== -->
     <div class="modal-overlay" id="qr-modal"><div class="modal-content"><h3 style="margin-bottom:1rem; font-family:var(--font-heading);">QR Code du profil</h3><img id="qr-image" src="" alt="QR Code"><button class="close-modal" id="close-qr-modal">Fermer</button></div></div>
     <div class="modal-overlay gated-modal" id="gated-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-lock"></i> Accès verrouillé</h3><p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">Entrez votre adresse email pour accéder à ce lien.</p><input type="email" id="gated-email" placeholder="votre@email.com" autocomplete="email"><div class="error-msg" id="gated-error">Email invalide.</div><button class="btn" id="gated-submit-btn">Déverrouiller et accéder</button></div></div>
-    <div class="modal-overlay admin-gate" id="admin-gate-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-lock"></i> Accès Administrateur</h3><p style="color:var(--text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem 0;">Veuillez saisir votre code PIN et le code de votre application Google Authenticator.</p><div class="input-group"><label>Code PIN (6 chiffres)</label><input type="password" class="input-field" id="admin-pin-input" maxlength="6" inputmode="numeric" placeholder="••••••"></div><div class="input-group mt-1"><label>Code Google Authenticator (6 chiffres)</label><input type="text" class="input-field" id="admin-totp-input" maxlength="6" inputmode="numeric" placeholder="••••••"></div><div id="admin-gate-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.4rem; display:none;">Code invalide.</div><div class="totp-setup" id="totp-setup-area" style="display:none;"><p style="font-size:0.8rem; color:var(--text-secondary);">Scannez ce QR Code avec Google Authenticator :</p><div id="totp-qr-container"></div><p style="font-size:0.7rem; margin-top:0.3rem;">Clé secrète : <span class="totp-secret" id="totp-secret-display"></span></p></div><button class="btn" id="admin-gate-submit" style="width:100%; margin-top:1rem;">Vérifier et accéder</button><button class="close-modal" id="admin-gate-close" style="margin-top:0.5rem;">Fermer</button></div></div>
+
+    <!-- ===== MODALE ADMIN (avec deux modes) ===== -->
+    <div class="modal-overlay admin-gate" id="admin-gate-modal">
+        <div class="modal-content">
+            <h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-lock"></i> <span id="admin-gate-title">Accès Administrateur</span></h3>
+            <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem 0;" id="admin-gate-subtitle">Veuillez vous authentifier.</p>
+
+            <!-- Section : Premier démarrage (Setup) -->
+            <div class="setup-section" id="admin-setup-section">
+                <div class="totp-setup">
+                    <p style="font-size:0.8rem; color:var(--text-secondary);">Scannez ce QR Code avec Google Authenticator :</p>
+                    <div id="totp-qr-container-setup"></div>
+                    <p style="font-size:0.7rem; margin-top:0.3rem;">Clé secrète : <span class="totp-secret" id="totp-secret-display-setup"></span></p>
+                </div>
+                <div class="input-group mt-1">
+                    <label>Créer votre code PIN (6 chiffres)</label>
+                    <input type="password" class="input-field" id="admin-pin-create" maxlength="6" inputmode="numeric" placeholder="••••••">
+                </div>
+                <div id="admin-setup-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.4rem; display:none;">Veuillez saisir 6 chiffres.</div>
+                <button class="btn" id="admin-setup-finalize" style="width:100%; margin-top:0.5rem;">Finaliser la configuration</button>
+            </div>
+
+            <!-- Section : Connexion normale (Login) -->
+            <div class="login-section" id="admin-login-section">
+                <div class="input-group">
+                    <label>Code PIN (6 chiffres)</label>
+                    <input type="password" class="input-field" id="admin-pin-input" maxlength="6" inputmode="numeric" placeholder="••••••">
+                </div>
+                <div class="input-group mt-1">
+                    <label>Code Google Authenticator (6 chiffres)</label>
+                    <input type="text" class="input-field" id="admin-totp-input" maxlength="6" inputmode="numeric" placeholder="••••••">
+                </div>
+                <div id="admin-gate-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.4rem; display:none;">Code invalide.</div>
+                <button class="btn" id="admin-gate-submit" style="width:100%; margin-top:1rem;">Vérifier et accéder</button>
+            </div>
+
+            <button class="close-modal" id="admin-gate-close" style="margin-top:0.5rem;">Fermer</button>
+        </div>
+    </div>
+
     <div class="modal-overlay donation-popup" id="donation-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading);"><i class="fas fa-hand-holding-heart"></i> Soutenir LinkExt</h3><p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;">Merci de soutenir la plateforme ! Voici les coordonnées de don.</p><div id="donation-methods-container"></div><button class="close-modal" id="close-donation-modal">Fermer</button></div></div>
 
 </div> <!-- fin #app -->
@@ -2414,97 +2458,169 @@
         }
 
         // ============================================================
-        // DOUBLE AUTHENTIFICATION ADMIN (PIN + TOTP)
+        // DOUBLE AUTHENTIFICATION ADMIN (PIN + TOTP) avec SETUP WIZARD
         // ============================================================
         async function openAdminGate() {
             return new Promise((resolve) => {
                 const modal = document.getElementById('admin-gate-modal');
+                const setupSection = document.getElementById('admin-setup-section');
+                const loginSection = document.getElementById('admin-login-section');
+                const setupError = document.getElementById('admin-setup-error');
+                const loginError = document.getElementById('admin-gate-error');
+                const pinCreate = document.getElementById('admin-pin-create');
                 const pinInput = document.getElementById('admin-pin-input');
                 const totpInput = document.getElementById('admin-totp-input');
-                const errorDiv = document.getElementById('admin-gate-error');
                 const submitBtn = document.getElementById('admin-gate-submit');
                 const closeBtn = document.getElementById('admin-gate-close');
-                const setupArea = document.getElementById('totp-setup-area');
-                const qrContainer = document.getElementById('totp-qr-container');
-                const secretDisplay = document.getElementById('totp-secret-display');
+                const finalizeBtn = document.getElementById('admin-setup-finalize');
+                const title = document.getElementById('admin-gate-title');
+                const subtitle = document.getElementById('admin-gate-subtitle');
 
+                // Réinitialiser
                 pinInput.value = '';
                 totpInput.value = '';
-                errorDiv.style.display = 'none';
-                setupArea.style.display = 'none';
+                pinCreate.value = '';
+                setupError.style.display = 'none';
+                loginError.style.display = 'none';
+                setupSection.classList.remove('active');
+                loginSection.classList.remove('active');
+
                 modal.classList.add('active');
 
+                // Charger la configuration admin
                 db.collection('admin_config').doc('security').get().then(async (doc) => {
                     if (!doc.exists) {
-                        errorDiv.textContent = 'Configuration admin manquante.';
-                        errorDiv.style.display = 'block';
+                        // Si le document n'existe pas, on le crée en mode setup
+                        console.log('Document admin_config/security inexistant -> mode setup');
+                        showSetupMode();
                         return;
                     }
                     const data = doc.data();
                     adminPinHash = data.pinHash || '';
                     totpSecret = data.totpSecret || '';
 
-                    if (!totpSecret) {
-                        const secret = otplib.authenticator.generateSecret();
-                        totpSecret = secret;
-                        await db.collection('admin_config').doc('security').set({ totpSecret: secret }, { merge: true });
-                        const otpAuth = otplib.authenticator.keyuri('LinkExtAdmin', 'LinkExt', secret);
-                        qrContainer.innerHTML = '';
-                        new QRCode(qrContainer, {
-                            text: otpAuth,
-                            width: 180,
-                            height: 180,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
-                        secretDisplay.textContent = secret;
-                        setupArea.style.display = 'block';
+                    // Vérifier si les deux champs sont vides (ou inexistants) -> mode setup
+                    if (!adminPinHash || !totpSecret) {
+                        console.log('pinHash ou totpSecret manquant -> mode setup');
+                        showSetupMode();
                     } else {
-                        setupArea.style.display = 'none';
+                        // Mode connexion normale
+                        console.log('Mode login');
+                        title.textContent = 'Accès Administrateur';
+                        subtitle.textContent = 'Veuillez saisir votre code PIN et le code de votre application Google Authenticator.';
+                        loginSection.classList.add('active');
                     }
                 }).catch(err => {
-                    errorDiv.textContent = 'Erreur de chargement des secrets.';
-                    errorDiv.style.display = 'block';
-                    console.error(err);
+                    console.error('Erreur de chargement des secrets :', err);
+                    showToast('Erreur de chargement des secrets.', 'error');
+                    modal.classList.remove('active');
+                    resolve(false);
                 });
 
-                async function validateGate() {
+                // Fonction pour afficher le mode Setup
+                function showSetupMode() {
+                    title.textContent = '🔐 Configuration initiale';
+                    subtitle.textContent = 'Scannez le QR Code avec Google Authenticator et créez votre code PIN.';
+                    setupSection.classList.add('active');
+
+                    // Générer un nouveau secret TOTP
+                    const secret = otplib.authenticator.generateSecret();
+                    const otpAuth = otplib.authenticator.keyuri('LinkExtAdmin', 'LinkExt', secret);
+                    // Afficher QR Code
+                    const qrContainer = document.getElementById('totp-qr-container-setup');
+                    qrContainer.innerHTML = '';
+                    new QRCode(qrContainer, {
+                        text: otpAuth,
+                        width: 180,
+                        height: 180,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    document.getElementById('totp-secret-display-setup').textContent = secret;
+                    // Stocker le secret pour la sauvegarde
+                    window._setupSecret = secret;
+                }
+
+                // Finaliser la configuration (setup)
+                finalizeBtn.onclick = async function() {
+                    const pin = pinCreate.value.trim();
+                    if (pin.length !== 6) {
+                        setupError.textContent = 'Le PIN doit contenir exactement 6 chiffres.';
+                        setupError.style.display = 'block';
+                        return;
+                    }
+                    setupError.style.display = 'none';
+                    const secret = window._setupSecret;
+                    if (!secret) {
+                        showToast('Erreur : secret TOTP non généré.', 'error');
+                        return;
+                    }
+                    try {
+                        // Hasher le PIN
+                        const pinHash = await sha256(pin);
+                        // Sauvegarder dans Firestore
+                        await db.collection('admin_config').doc('security').set({
+                            adminUid: currentUser.uid,
+                            pinHash: pinHash,
+                            totpSecret: secret
+                        }, { merge: true });
+                        // Mettre à jour les variables globales
+                        adminPinHash = pinHash;
+                        totpSecret = secret;
+                        showToast('Configuration administrateur enregistrée !', 'info');
+                        modal.classList.remove('active');
+                        resolve(true);
+                    } catch (err) {
+                        console.error('Erreur lors de la sauvegarde :', err);
+                        setupError.textContent = 'Erreur lors de la sauvegarde. Réessayez.';
+                        setupError.style.display = 'block';
+                        showToast('Erreur de sauvegarde.', 'error');
+                    }
+                };
+
+                // Connexion normale
+                async function validateLogin() {
                     const pin = pinInput.value.trim();
                     const totp = totpInput.value.trim();
                     if (pin.length !== 6 || totp.length !== 6) {
-                        errorDiv.textContent = 'Veuillez saisir 6 chiffres pour chaque champ.';
-                        errorDiv.style.display = 'block';
+                        loginError.textContent = 'Veuillez saisir 6 chiffres pour chaque champ.';
+                        loginError.style.display = 'block';
                         return;
                     }
+                    // Vérifier le PIN (hash)
                     const pinHash = await sha256(pin);
                     if (pinHash !== adminPinHash) {
-                        errorDiv.textContent = 'PIN incorrect.';
-                        errorDiv.style.display = 'block';
+                        loginError.textContent = 'PIN incorrect.';
+                        loginError.style.display = 'block';
                         return;
                     }
+                    // Vérifier TOTP
                     if (!totpSecret) {
-                        errorDiv.textContent = 'Secret TOTP non configuré.';
-                        errorDiv.style.display = 'block';
+                        loginError.textContent = 'Secret TOTP non configuré.';
+                        loginError.style.display = 'block';
                         return;
                     }
                     const isValid = otplib.authenticator.check(totp, totpSecret);
                     if (!isValid) {
-                        errorDiv.textContent = 'Code Google Authenticator invalide.';
-                        errorDiv.style.display = 'block';
+                        loginError.textContent = 'Code Google Authenticator invalide.';
+                        loginError.style.display = 'block';
                         return;
                     }
+                    // Succès
                     modal.classList.remove('active');
                     resolve(true);
                 }
 
-                submitBtn.onclick = validateGate;
+                submitBtn.onclick = validateLogin;
                 closeBtn.onclick = () => {
                     modal.classList.remove('active');
                     resolve(false);
                 };
-                pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validateGate(); });
-                totpInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validateGate(); });
+                // Support de la touche Entrée
+                pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validateLogin(); });
+                totpInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validateLogin(); });
+                pinCreate.addEventListener('keydown', (e) => { if (e.key === 'Enter') finalizeBtn.click(); });
             });
         }
 
@@ -3550,7 +3666,7 @@
         }
 
         // ============================================================
-        // DASHBOARD - PEUPLEMENT (VERSION CORRIGÉE)
+        // DASHBOARD - PEUPLEMENT (version avec gestion admin)
         // ============================================================
         async function populateDashboard() {
             if (!currentUser) return;
@@ -3617,7 +3733,7 @@
             renderSchedules();
             startScheduler();
 
-            // ===== VÉRIFICATION ADMIN AVEC TRY/CATCH ET LOGS =====
+            // ===== VÉRIFICATION ADMIN =====
             const adminTab = document.getElementById('admin-tab');
             try {
                 const admin = await checkIsAdmin(currentUser.uid);
@@ -3626,10 +3742,8 @@
                     adminTab.style.display = 'flex';
                     const donationData = await loadDonationConfig();
                     renderAdminPanel(donationData);
-                    // On rend l'onglet visible mais "grisé" (opacity)
-                    // On supprime pointer-events: none pour permettre le clic
                     adminTab.style.opacity = '0.5';
-                    adminTab.style.pointerEvents = 'auto'; // <- CORRECTION
+                    adminTab.style.pointerEvents = 'auto'; // cliquable
 
                     adminTab.onclick = async function(e) {
                         e.preventDefault();
