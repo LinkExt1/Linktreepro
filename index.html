@@ -1356,7 +1356,7 @@
             pointer-events: none;
         }
 
-        /* ===== DASHBOARD REFONDU (TABS + NAVBAR FIXE) ===== */
+        /* ===== DASHBOARD REFONDU ===== */
         .dashboard-container {
             display: flex;
             flex-direction: column;
@@ -1383,7 +1383,69 @@
             font-size: 0.8rem;
         }
 
-        /* Barre de navigation (Navbar) */
+        /* ===== MODULE DE PARTAGE DU LIEN PUBLIC ===== */
+        .share-module {
+            padding: 0.8rem 1.8rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-glow);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .share-module .share-link-wrapper {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.04);
+            border-radius: 30px;
+            padding: 0.2rem 0.6rem 0.2rem 0.8rem;
+            border: 1px solid var(--card-border);
+        }
+        .share-module .share-link-wrapper i {
+            color: var(--cyan);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .share-module .share-link-wrapper .share-link-text {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0.3rem 0;
+            flex: 1;
+            min-width: 0;
+        }
+        .share-module .share-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+        }
+        .share-module .share-actions .btn {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            border-radius: 30px;
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            min-width: 36px;
+        }
+        .share-module .share-actions .btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(0,242,254,0.05);
+        }
+        .share-module .share-actions .btn:active {
+            transform: scale(0.92);
+        }
+
+        /* ===== BARRE DE NAVIGATION ===== */
         .dashboard-nav {
             display: flex;
             justify-content: space-around;
@@ -1447,7 +1509,6 @@
             display: block;
         }
 
-        /* Sous-titres dans les onglets */
         .tab-pane h3 {
             font-family: var(--font-heading);
             font-size: 1rem;
@@ -1461,7 +1522,6 @@
             font-size: 1.2rem;
         }
 
-        /* Ajustements pour les sections existantes */
         .tab-pane .seo-section,
         .tab-pane .integrations-section,
         .tab-pane .flash-section,
@@ -1653,6 +1713,21 @@
             .dashboard-container .dashboard-header .brand {
                 font-size: 1.1rem;
             }
+            .share-module {
+                padding: 0.5rem 1rem;
+                gap: 0.4rem;
+            }
+            .share-module .share-link-wrapper {
+                padding: 0.1rem 0.4rem 0.1rem 0.6rem;
+            }
+            .share-module .share-link-wrapper .share-link-text {
+                font-size: 0.7rem;
+            }
+            .share-module .share-actions .btn {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.6rem;
+                min-width: 30px;
+            }
             .dashboard-nav .nav-item {
                 font-size: 0.65rem;
                 padding: 0.2rem 0.4rem;
@@ -1766,13 +1841,25 @@
         </div>
     </div>
 
-    <!-- ========== VUE DASHBOARD (REFONDU) ========== -->
+    <!-- ========== VUE DASHBOARD (AVEC MODULE DE PARTAGE) ========== -->
     <div id="view-dashboard" class="view">
         <div class="glass-card dashboard-container">
             <!-- En-tête du Dashboard (fixe) -->
             <div class="dashboard-header">
                 <div class="brand" style="font-size:1.3rem; margin:0;">DASHBOARD</div>
                 <button class="btn btn-outline logout-btn" id="logout-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+
+            <!-- ===== NOUVEAU MODULE : PARTAGE DU LIEN PUBLIC ===== -->
+            <div class="share-module" id="share-module">
+                <div class="share-link-wrapper">
+                    <i class="fas fa-link"></i>
+                    <span class="share-link-text" id="public-link-display">Chargement...</span>
+                </div>
+                <div class="share-actions">
+                    <button class="btn" id="copy-link-btn" title="Copier le lien"><i class="fas fa-copy"></i></button>
+                    <button class="btn" id="open-link-btn" title="Ouvrir le profil public"><i class="fas fa-external-link-alt"></i></button>
+                </div>
             </div>
 
             <!-- Barre de navigation (fixe) -->
@@ -2600,6 +2687,13 @@
             avatarImg.src = userProfile.photoURL || generateAvatarUrl(userProfile.displayName || 'User');
             avatarImg.onerror = () => { avatarImg.src = generateAvatarUrl('User'); };
 
+            // --- Mise à jour du lien public dans le module de partage ---
+            const publicLink = window.location.origin + window.location.pathname + '?id=' + currentUser.uid;
+            document.getElementById('public-link-display').textContent = publicLink;
+
+            // --- Boutons de partage ---
+            setupShareButtons(publicLink);
+
             updateStatusUI(userProfile.status || 'disponible');
             updateMaintenanceUI(userProfile.maintenance || false);
             applyThemeToPrivateUI();
@@ -2610,6 +2704,45 @@
             applyVisualTheme();
             applyBackground();
             renderSubscribers();
+        }
+
+        // --- Fonctions de partage du lien ---
+        function setupShareButtons(publicLink) {
+            const copyBtn = document.getElementById('copy-link-btn');
+            const openBtn = document.getElementById('open-link-btn');
+
+            copyBtn.onclick = function(e) {
+                e.preventDefault();
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(publicLink).then(() => {
+                        showToast('Lien copié !', 'info');
+                    }).catch(() => {
+                        // Fallback
+                        copyFallback(publicLink);
+                    });
+                } else {
+                    copyFallback(publicLink);
+                }
+            };
+
+            openBtn.onclick = function(e) {
+                e.preventDefault();
+                window.open(publicLink, '_blank');
+            };
+        }
+
+        function copyFallback(text) {
+            const input = document.createElement('input');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            try {
+                document.execCommand('copy');
+                showToast('Lien copié !', 'info');
+            } catch (err) {
+                showToast('Erreur lors de la copie.', 'error');
+            }
+            document.body.removeChild(input);
         }
 
         function renderTopNetworks() {
@@ -3297,6 +3430,85 @@
             kwEl.content = seo.keywords || 'linktree, réseaux sociaux, cyberpunk';
         }
 
+        // --- Reset clicks individuels ---
+        async function resetLinkClicks(linkId) {
+            if (!currentUser) {
+                showToast('Vous devez être connecté.', 'error');
+                return;
+            }
+            if (!userProfile || !userProfile.links) {
+                showToast('Profil non chargé.', 'error');
+                return;
+            }
+            const linkIndex = userProfile.links.findIndex(l => l.id === linkId);
+            if (linkIndex === -1) {
+                showToast('Lien introuvable.', 'error');
+                return;
+            }
+            if (userProfile.links[linkIndex].isSection) {
+                showToast('Une section ne peut pas avoir de clics.', 'info');
+                return;
+            }
+            try {
+                const updatedLinks = userProfile.links.map(l => {
+                    if (l.id === linkId) {
+                        return { ...l, clicks: 0 };
+                    }
+                    return l;
+                });
+                const docRef = db.collection('users').doc(currentUser.uid);
+                await docRef.update({ links: updatedLinks });
+                userProfile.links = updatedLinks;
+                renderDashboardLinks();
+                renderTopNetworks();
+                updateStats();
+                showToast('Clics du lien réinitialisés !', 'info');
+            } catch (error) {
+                console.error('Erreur lors de la réinitialisation du lien :', error);
+                showToast('Erreur lors de la réinitialisation.', 'error');
+            }
+        }
+
+        // --- Reset vues globales ---
+        async function resetViews() {
+            if (!currentUser) {
+                showToast('Vous devez être connecté.', 'error');
+                return;
+            }
+            if (!userProfile) {
+                showToast('Profil non chargé.', 'error');
+                return;
+            }
+            try {
+                const docRef = db.collection('users').doc(currentUser.uid);
+                await docRef.update({ views: 0 });
+                userProfile.views = 0;
+                document.getElementById('views-count-display').textContent = '0';
+                updateStats();
+                showToast('Vues globales réinitialisées !', 'info');
+            } catch (error) {
+                console.error('Erreur lors de la réinitialisation :', error);
+                showToast('Erreur lors de la réinitialisation.', 'error');
+            }
+        }
+
+        // --- Gestion des onglets du Dashboard ---
+        function setupTabs() {
+            const navItems = document.querySelectorAll('#dashboard-nav .nav-item');
+            const panes = document.querySelectorAll('.tab-content .tab-pane');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    navItems.forEach(n => n.classList.remove('active'));
+                    panes.forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    const targetPane = document.getElementById('tab-' + tabId);
+                    if (targetPane) targetPane.classList.add('active');
+                });
+            });
+        }
+
         // --- Profil Public ---
         async function loadPublicProfile(uid) {
             try {
@@ -3633,85 +3845,12 @@ URL:${urlProfil}
             });
         }
 
-        // --- Reset clicks individuels ---
-        async function resetLinkClicks(linkId) {
-            if (!currentUser) {
-                showToast('Vous devez être connecté.', 'error');
-                return;
-            }
-            if (!userProfile || !userProfile.links) {
-                showToast('Profil non chargé.', 'error');
-                return;
-            }
-            const linkIndex = userProfile.links.findIndex(l => l.id === linkId);
-            if (linkIndex === -1) {
-                showToast('Lien introuvable.', 'error');
-                return;
-            }
-            if (userProfile.links[linkIndex].isSection) {
-                showToast('Une section ne peut pas avoir de clics.', 'info');
-                return;
-            }
-            try {
-                const updatedLinks = userProfile.links.map(l => {
-                    if (l.id === linkId) {
-                        return { ...l, clicks: 0 };
-                    }
-                    return l;
-                });
-                const docRef = db.collection('users').doc(currentUser.uid);
-                await docRef.update({ links: updatedLinks });
-                userProfile.links = updatedLinks;
-                renderDashboardLinks();
-                renderTopNetworks();
-                updateStats();
-                showToast('Clics du lien réinitialisés !', 'info');
-            } catch (error) {
-                console.error('Erreur lors de la réinitialisation du lien :', error);
-                showToast('Erreur lors de la réinitialisation.', 'error');
-            }
+        // --- isPublicMode ---
+        function isPublicMode() {
+            return new URLSearchParams(window.location.search).has('id');
         }
-
-        // --- Reset vues globales ---
-        async function resetViews() {
-            if (!currentUser) {
-                showToast('Vous devez être connecté.', 'error');
-                return;
-            }
-            if (!userProfile) {
-                showToast('Profil non chargé.', 'error');
-                return;
-            }
-            try {
-                const docRef = db.collection('users').doc(currentUser.uid);
-                await docRef.update({ views: 0 });
-                userProfile.views = 0;
-                document.getElementById('views-count-display').textContent = '0';
-                updateStats();
-                showToast('Vues globales réinitialisées !', 'info');
-            } catch (error) {
-                console.error('Erreur lors de la réinitialisation :', error);
-                showToast('Erreur lors de la réinitialisation.', 'error');
-            }
-        }
-
-        // --- Gestion des onglets du Dashboard ---
-        function setupTabs() {
-            const navItems = document.querySelectorAll('#dashboard-nav .nav-item');
-            const panes = document.querySelectorAll('.tab-content .tab-pane');
-
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const tabId = this.dataset.tab;
-                    // Désactiver tous les items et panes
-                    navItems.forEach(n => n.classList.remove('active'));
-                    panes.forEach(p => p.classList.remove('active'));
-                    // Activer le bon
-                    this.classList.add('active');
-                    const targetPane = document.getElementById('tab-' + tabId);
-                    if (targetPane) targetPane.classList.add('active');
-                });
-            });
+        function getPublicUid() {
+            return new URLSearchParams(window.location.search).get('id');
         }
 
         // ==================== ATTACHEMENT GLOBAL DES ÉVÉNEMENTS ====================
@@ -4097,14 +4236,6 @@ URL:${urlProfil}
             currentUser = user;
             await handleAuthRedirection(user);
         });
-
-        // --- isPublicMode ---
-        function isPublicMode() {
-            return new URLSearchParams(window.location.search).has('id');
-        }
-        function getPublicUid() {
-            return new URLSearchParams(window.location.search).get('id');
-        }
 
         // --- Init ---
         window.addEventListener('DOMContentLoaded', () => {
