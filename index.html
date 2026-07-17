@@ -2203,11 +2203,11 @@
 
             <div class="input-group">
                 <label>Code PIN (6 chiffres)</label>
-                <input type="password" class="input-field" id="admin-pin-input" maxlength="6" inputmode="numeric" placeholder="••••••">
+                <input type="password" class="input-field" id="admin-pin-input" maxlength="6" inputmode="numeric" placeholder="••••••" autocomplete="off">
             </div>
             <div class="input-group mt-1">
                 <label>Clé d'accès Admin (backup)</label>
-                <input type="password" class="input-field" id="admin-backup-input" placeholder="••••••••••••••••">
+                <input type="password" class="input-field" id="admin-backup-input" placeholder="••••••••••••••••" autocomplete="off">
             </div>
             <div id="admin-gate-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.4rem; display:none;">Code invalide.</div>
             <button class="btn" id="admin-gate-submit" style="width:100%; margin-top:1rem;">Vérifier et accéder</button>
@@ -2418,18 +2418,19 @@
         }
 
         // ============================================================
-        // MODALE ADMIN - VÉRIFICATION PIN + BACKUP CODE (avec logs)
+        // MODALE ADMIN - VÉRIFICATION PIN + BACKUP CODE (CORRIGÉE)
         // ============================================================
         async function openAdminGate() {
             return new Promise((resolve) => {
                 const modal = document.getElementById('admin-gate-modal');
+                // Récupération des éléments à chaque appel de la fonction, pas avant.
                 const pinInput = document.getElementById('admin-pin-input');
                 const backupInput = document.getElementById('admin-backup-input');
                 const errorDiv = document.getElementById('admin-gate-error');
                 const submitBtn = document.getElementById('admin-gate-submit');
                 const closeBtn = document.getElementById('admin-gate-close');
 
-                // Réinitialiser
+                // Réinitialiser les champs
                 pinInput.value = '';
                 backupInput.value = '';
                 errorDiv.style.display = 'none';
@@ -2458,8 +2459,12 @@
                     });
 
                 async function validate() {
+                    // Récupération de la valeur en temps réel depuis l'input
                     const pin = pinInput.value.trim();
                     const backup = backupInput.value.trim();
+                    
+                    console.log('🔹 Valeur brute saisie dans le champ PIN :', pin);
+                    
                     if (pin.length !== 6 || backup.length < 8) {
                         errorDiv.textContent = 'PIN (6 chiffres) et clé (8+ caractères) requis.';
                         errorDiv.style.display = 'block';
@@ -2489,18 +2494,20 @@
                     }
                 }
 
+                // Nettoyer les anciens écouteurs en les remplaçant
                 submitBtn.onclick = validate;
                 closeBtn.onclick = () => {
                     modal.classList.remove('active');
                     resolve(false);
                 };
-                pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validate(); });
-                backupInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validate(); });
+                // Support de la touche Entrée
+                pinInput.onkeydown = (e) => { if (e.key === 'Enter') validate(); };
+                backupInput.onkeydown = (e) => { if (e.key === 'Enter') validate(); };
             });
         }
 
         // ============================================================
-        // GESTION DES TÉMOIGNAGES (CRUD)
+        // GESTION DES TÉMOIGNAGES (CRUD) – inchangée
         // ============================================================
         function renderTestimonialsPrivate() {
             const container = document.getElementById('testimonials-list');
@@ -2582,7 +2589,7 @@
         }
 
         // ============================================================
-        // PLANIFICATEUR DE STATUT
+        // PLANIFICATEUR DE STATUT – inchangé
         // ============================================================
         function renderSchedules() {
             const container = document.getElementById('schedule-list');
@@ -2672,7 +2679,7 @@
         }
 
         // ============================================================
-        // GESTION DES DONS
+        // GESTION DES DONS – inchangée
         // ============================================================
         async function loadDonationConfig() {
             try {
@@ -2799,7 +2806,7 @@
         }
 
         // ============================================================
-        // AFFICHAGE DES DONS DANS LA POPUP
+        // AFFICHAGE DES DONS DANS LA POPUP – inchangé
         // ============================================================
         async function showDonationPopup() {
             const modal = document.getElementById('donation-modal');
@@ -2875,7 +2882,7 @@
         }
 
         // ============================================================
-        // CLOUDINARY WIDGET
+        // CLOUDINARY WIDGET – inchangé
         // ============================================================
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
@@ -2937,7 +2944,7 @@
         }
 
         // ============================================================
-        // PARTICULES CYBER-MATRIX
+        // PARTICULES CYBER-MATRIX – inchangé
         // ============================================================
         function initParticles() {
             const canvas = document.createElement('canvas');
@@ -3050,7 +3057,7 @@
         }
 
         // ============================================================
-        // CARROUSEL TÉMOIGNAGES (public)
+        // CARROUSEL TÉMOIGNAGES (public) – inchangé
         // ============================================================
         function renderPublicTestimonials(testimonials) {
             const container = document.getElementById('public-testimonials');
@@ -3116,7 +3123,7 @@
         }
 
         // ============================================================
-        // FONCTIONS MÉTIERS
+        // FONCTIONS MÉTIERS – inchangées
         // ============================================================
         async function incrementViews(uid) {
             const key = 'viewCounted_' + uid;
@@ -3183,7 +3190,7 @@
         }
 
         // ============================================================
-        // REDIRECTION UNIQUE
+        // REDIRECTION UNIQUE – inchangé
         // ============================================================
         function updateRedirectToggleState() {
             const track = document.getElementById('redirect-toggle-track');
@@ -3240,7 +3247,7 @@
         }
 
         // ============================================================
-        // STATISTIQUES
+        // STATISTIQUES – inchangées
         // ============================================================
         function updateStats() {
             if (!userProfile) return;
@@ -3307,7 +3314,7 @@
         }
 
         // ============================================================
-        // AFFICHAGE DES LIENS DANS LE DASHBOARD
+        // AFFICHAGE DES LIENS DANS LE DASHBOARD – inchangé
         // ============================================================
         function renderDashboardLinks() {
             const container = document.getElementById('dashboard-links-container');
@@ -3488,7 +3495,7 @@
         }
 
         // ============================================================
-        // ONBOARDING
+        // ONBOARDING – inchangé
         // ============================================================
         function renderOnboardingGrid() {
             const grid = document.getElementById('onboarding-grid');
@@ -3541,7 +3548,7 @@
         }
 
         // ============================================================
-        // DASHBOARD - PEUPLEMENT
+        // DASHBOARD - PEUPLEMENT (avec la gestion admin)
         // ============================================================
         async function populateDashboard() {
             if (!currentUser) return;
@@ -3685,7 +3692,7 @@
         }
 
         // ============================================================
-        // GESTION DU STATUT (UI)
+        // GESTION DU STATUT (UI) – inchangée
         // ============================================================
         function updateStatusUI(status) {
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
@@ -3699,7 +3706,7 @@
         }
 
         // ============================================================
-        // AFFICHAGE DES ABONNÉS
+        // AFFICHAGE DES ABONNÉS – inchangé
         // ============================================================
         function renderSubscribers() {
             const container = document.getElementById('subscribers-list-container');
@@ -3739,7 +3746,7 @@
         }
 
         // ============================================================
-        // THÈMES (clair/sombre, visuel, fond)
+        // THÈMES (clair/sombre, visuel, fond) – inchangés
         // ============================================================
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
@@ -3817,7 +3824,7 @@
         }
 
         // ============================================================
-        // INJECTION SEO & TRACKING
+        // INJECTION SEO & TRACKING – inchangés
         // ============================================================
         function injectSEO(seo) {
             let titleEl = document.querySelector('title');
@@ -3885,7 +3892,7 @@
         }
 
         // ============================================================
-        // ROUTAGE PUBLIC
+        // ROUTAGE PUBLIC – inchangé
         // ============================================================
         async function loadPublicProfile(uid) {
             try {
@@ -4104,7 +4111,7 @@
         }
 
         // ============================================================
-        // RESET CLICS
+        // RESET CLICS – inchangé
         // ============================================================
         async function resetLinkClicks(linkId) {
             if (!currentUser) {
@@ -4167,7 +4174,7 @@
         }
 
         // ============================================================
-        // EXPORT RAPPORT
+        // EXPORT RAPPORT – inchangé
         // ============================================================
         function exportReport() {
             if (!userProfile) {
@@ -4209,7 +4216,7 @@
         }
 
         // ============================================================
-        // GESTION DES ONGLETS DASHBOARD
+        // GESTION DES ONGLETS DASHBOARD – inchangée
         // ============================================================
         function setupTabs() {
             const navItems = document.querySelectorAll('#dashboard-nav .nav-item');
@@ -4228,7 +4235,7 @@
         }
 
         // ============================================================
-        // ROUTAGE PRINCIPAL
+        // ROUTAGE PRINCIPAL – inchangé
         // ============================================================
         async function handleAuthRedirection(user) {
             if (!user) {
@@ -4306,7 +4313,7 @@
         }
 
         // ============================================================
-        // ATTACHEMENT DES ÉVÉNEMENTS
+        // ATTACHEMENT DES ÉVÉNEMENTS – inchangé
         // ============================================================
         function attachAllEventListeners() {
             // --- Consentement ---
@@ -4889,7 +4896,7 @@
         }
 
         // ============================================================
-        // QR MODAL & VCARD
+        // QR MODAL & VCARD – inchangé
         // ============================================================
         function setupQRModal() {
             const modal = document.getElementById('qr-modal');
@@ -5010,7 +5017,7 @@ URL:${urlProfil}
         }
 
         // ============================================================
-        // AUTH STATE
+        // AUTH STATE – inchangé
         // ============================================================
         auth.onAuthStateChanged(async (user) => {
             if (authRedirectInProgress) return;
@@ -5026,7 +5033,7 @@ URL:${urlProfil}
         });
 
         // ============================================================
-        // INIT
+        // INIT – inchangé
         // ============================================================
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
