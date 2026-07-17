@@ -18,7 +18,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* ===== VARIABLES ===== */
@@ -1614,7 +1613,7 @@
             display: none;
         }
 
-        /* ===== TÉMOIGNAGES, DONS, PLANIFICATEUR, ADMIN ===== */
+        /* ===== TÉMOIGNAGES, DONS, PLANIFICATEUR ===== */
         .testimonials-carousel {
             position: relative;
             width: 100%;
@@ -1785,6 +1784,7 @@
             color: var(--danger);
         }
 
+        /* ---- Admin Panel ---- */
         .admin-panel .admin-field {
             margin-bottom: 1rem;
         }
@@ -1824,20 +1824,9 @@
             padding: 0.2rem;
         }
 
-        /* === MODALE ADMIN (TOTP + Backup) === */
+        /* === MODALE ADMIN (uniquement Backup) === */
         .admin-gate .modal-content {
             max-width: 380px;
-        }
-        .admin-gate .modal-content .admin-setup-info {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-        .admin-gate .modal-content .totp-setup #totp-qr-container-setup {
-            display: inline-block;
-            background: white;
-            padding: 0.5rem;
-            border-radius: 8px;
         }
 
         .donate-btn {
@@ -2026,6 +2015,7 @@
                 <button class="nav-item" data-tab="links"><i class="fas fa-link"></i><span>Liens</span></button>
                 <button class="nav-item" data-tab="profile"><i class="fas fa-user"></i><span>Profil</span></button>
                 <button class="nav-item" data-tab="advanced"><i class="fas fa-cog"></i><span>Avancé</span></button>
+                <!-- L'onglet Admin est masqué par défaut, affiché uniquement si l'utilisateur est admin et après validation -->
                 <button class="nav-item" data-tab="admin" id="admin-tab" style="display:none;"><i class="fas fa-shield-alt"></i><span>Admin</span></button>
             </nav>
 
@@ -2132,10 +2122,12 @@
                     <button class="btn btn-outline" id="add-testimonial-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem; margin-top:0.5rem;"><i class="fas fa-plus"></i> Ajouter un témoignage</button>
                 </div>
 
-                <!-- ===== ADMIN ===== -->
+                <!-- ===== ADMIN (caché tant que non validé) ===== -->
                 <div class="tab-pane" id="tab-admin">
                     <h3><i class="fas fa-shield-alt"></i> Administration</h3>
-                    <div class="admin-panel" id="admin-panel"></div>
+                    <div class="admin-panel" id="admin-panel">
+                        <!-- Le contenu est chargé dynamiquement après validation -->
+                    </div>
                 </div>
             </div>
 
@@ -2203,17 +2195,13 @@
     <div class="modal-overlay" id="qr-modal"><div class="modal-content"><h3 style="margin-bottom:1rem; font-family:var(--font-heading);">QR Code du profil</h3><img id="qr-image" src="" alt="QR Code"><button class="close-modal" id="close-qr-modal">Fermer</button></div></div>
     <div class="modal-overlay gated-modal" id="gated-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-lock"></i> Accès verrouillé</h3><p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">Entrez votre adresse email pour accéder à ce lien.</p><input type="email" id="gated-email" placeholder="votre@email.com" autocomplete="email"><div class="error-msg" id="gated-error">Email invalide.</div><button class="btn" id="gated-submit-btn">Déverrouiller et accéder</button></div></div>
 
-    <!-- ===== MODALE ADMIN (TOTP + Backup) ===== -->
+    <!-- ===== MODALE ADMIN (uniquement Backup) ===== -->
     <div class="modal-overlay admin-gate" id="admin-gate-modal">
         <div class="modal-content">
             <h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-lock"></i> Accès Administrateur</h3>
-            <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem 0;">Veuillez saisir votre code Google Authenticator ou votre clé de secours.</p>
+            <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem 0;">Veuillez saisir votre clé de secours.</p>
 
             <div class="input-group">
-                <label>Code Google Authenticator (6 chiffres)</label>
-                <input type="text" class="input-field" id="admin-totp-input" maxlength="6" inputmode="numeric" placeholder="••••••" autocomplete="off">
-            </div>
-            <div class="input-group mt-1">
                 <label>Clé de secours (Backup)</label>
                 <input type="password" class="input-field" id="admin-backup-input" placeholder="••••••••••••••••" autocomplete="off">
             </div>
@@ -2223,7 +2211,15 @@
         </div>
     </div>
 
-    <div class="modal-overlay donation-popup" id="donation-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading);"><i class="fas fa-hand-holding-heart"></i> Soutenir LinkExt</h3><p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;">Merci de soutenir la plateforme ! Voici les coordonnées de don.</p><div id="donation-methods-container"></div><button class="close-modal" id="close-donation-modal">Fermer</button></div></div>
+    <!-- ===== POPUP DONATIONS (lecture en temps réel) ===== -->
+    <div class="modal-overlay donation-popup" id="donation-modal">
+        <div class="modal-content">
+            <h3 style="font-family:var(--font-heading);"><i class="fas fa-hand-holding-heart"></i> Soutenir LinkExt</h3>
+            <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;">Merci de soutenir la plateforme ! Voici les coordonnées de don.</p>
+            <div id="donation-methods-container"><span class="spinner"></span> Chargement...</div>
+            <button class="close-modal" id="close-donation-modal">Fermer</button>
+        </div>
+    </div>
 
 </div> <!-- fin #app -->
 
@@ -2281,107 +2277,9 @@
         let linkImageUrl = '';
         let gatedPendingLink = null;
         let gatedPendingTarget = null;
-        let totpSecret = '';
         let backupCode = '';
         let scheduleInterval = null;
-
-        // ============================================================
-        // FONCTIONS TOTP NATIVES (sans otplib)
-        // ============================================================
-        // Convertir une chaîne Base32 en Uint8Array
-        function base32ToBytes(base32) {
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-            let bits = '';
-            let bytes = [];
-            for (let i = 0; i < base32.length; i++) {
-                const val = alphabet.indexOf(base32[i].toUpperCase());
-                if (val === -1) continue;
-                bits += val.toString(2).padStart(5, '0');
-                while (bits.length >= 8) {
-                    bytes.push(parseInt(bits.slice(0, 8), 2));
-                    bits = bits.slice(8);
-                }
-            }
-            return new Uint8Array(bytes);
-        }
-
-        // Générer un secret TOTP (Base32 aléatoire, 20 octets)
-        function generateTotpSecret() {
-            const bytes = new Uint8Array(20);
-            crypto.getRandomValues(bytes);
-            // Encodage Base32 simple (RFC 4648)
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-            let base32 = '';
-            let bits = 0;
-            let bitCount = 0;
-            for (let i = 0; i < bytes.length; i++) {
-                bits = (bits << 8) | bytes[i];
-                bitCount += 8;
-                while (bitCount >= 5) {
-                    const index = (bits >> (bitCount - 5)) & 31;
-                    base32 += alphabet[index];
-                    bitCount -= 5;
-                }
-            }
-            if (bitCount > 0) {
-                const index = (bits << (5 - bitCount)) & 31;
-                base32 += alphabet[index];
-            }
-            // Padding éventuel pour faire un multiple de 8
-            while (base32.length % 8 !== 0) base32 += '=';
-            return base32;
-        }
-
-        // Calculer HMAC-SHA1 avec l'API Web Crypto
-        async function hmacSha1(key, message) {
-            const keyData = typeof key === 'string' ? new TextEncoder().encode(key) : key;
-            const msgData = new TextEncoder().encode(message);
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw',
-                keyData,
-                { name: 'HMAC', hash: { name: 'SHA-1' } },
-                false,
-                ['sign']
-            );
-            const signature = await crypto.subtle.sign('HMAC', cryptoKey, msgData);
-            return new Uint8Array(signature);
-        }
-
-        // Générer le code TOTP pour un timestamp donné (en secondes)
-        async function generateTOTP(secret, timestamp) {
-            // Étape 1 : décoder le secret en bytes
-            const keyBytes = base32ToBytes(secret);
-            // Étape 2 : construire le message (counter sur 8 octets en big-endian)
-            const counter = Math.floor(timestamp / 30);
-            const counterBytes = new Uint8Array(8);
-            for (let i = 7; i >= 0; i--) {
-                counterBytes[i] = counter & 0xff;
-                counter >>= 8;
-            }
-            // Étape 3 : HMAC-SHA1
-            const hmac = await hmacSha1(keyBytes, counterBytes);
-            // Étape 4 : dynamic truncation
-            const offset = hmac[19] & 0x0f;
-            const binary = ((hmac[offset] & 0x7f) << 24) |
-                          ((hmac[offset + 1] & 0xff) << 16) |
-                          ((hmac[offset + 2] & 0xff) << 8) |
-                          (hmac[offset + 3] & 0xff);
-            const otp = binary % 1000000;
-            return otp.toString().padStart(6, '0');
-        }
-
-        // Vérifier un code TOTP avec fenêtre de tolérance (window = 1 => ±30s)
-        async function verifyTOTP(token, secret, window = 1) {
-            if (!token || token.length !== 6) return false;
-            if (!secret || secret.length < 16) return false;
-            const now = Math.floor(Date.now() / 1000);
-            for (let i = -window; i <= window; i++) {
-                const time = now + i * 30;
-                const code = await generateTOTP(secret, time);
-                if (code === token) return true;
-            }
-            return false;
-        }
+        let donationUnsubscribe = null; // pour la désinscription du listener
 
         // ============================================================
         // VUES
@@ -2427,13 +2325,6 @@
             return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
         }
 
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
         // ============================================================
         // FIRESTORE - LECTURE / ÉCRITURE
         // ============================================================
@@ -2468,7 +2359,6 @@
                     if (!userProfile.subscribers) userProfile.subscribers = [];
                     if (!userProfile.testimonials) userProfile.testimonials = [];
                     if (!userProfile.schedules) userProfile.schedules = [];
-                    if (!userProfile.donationMethods) userProfile.donationMethods = {};
                     return userProfile;
                 } else {
                     userProfile = null;
@@ -2524,66 +2414,32 @@
         }
 
         // ============================================================
-        // GESTION DE LA COLLECTION donations (initialisation automatique)
+        // MODALE ADMIN - UNIQUEMENT BACKUP CODE
         // ============================================================
-        async function loadDonationConfig() {
-            try {
-                let docRef = db.collection('donations').doc('config');
-                let doc = await docRef.get();
-                if (!doc.exists) {
-                    // Création automatique d'un document par défaut
-                    const defaultData = { methods: { usdt: '', tron: '', btc: '', mtn: '', moov: '', wave: '' } };
-                    await docRef.set(defaultData);
-                    doc = await docRef.get();
-                }
-                return doc.data();
-            } catch (e) {
-                console.warn('Erreur chargement/initialisation donations :', e);
-                return null;
-            }
-        }
-
-        async function saveDonationConfig(data) {
-            try {
-                await db.collection('donations').doc('config').set(data, { merge: true });
-                return true;
-            } catch (e) {
-                console.warn('Erreur sauvegarde donations :', e);
-                return false;
-            }
-        }
-
-        // ============================================================
-        // MODALE ADMIN - VALIDATION TOTP + BACKUP (sans otplib)
-        // ============================================================
-        async function openAdminGate() {
+        function openAdminGate() {
             return new Promise((resolve) => {
                 const modal = document.getElementById('admin-gate-modal');
-                const totpInput = document.getElementById('admin-totp-input');
                 const backupInput = document.getElementById('admin-backup-input');
                 const errorDiv = document.getElementById('admin-gate-error');
                 const submitBtn = document.getElementById('admin-gate-submit');
                 const closeBtn = document.getElementById('admin-gate-close');
 
-                // Réinitialiser
-                totpInput.value = '';
                 backupInput.value = '';
                 errorDiv.style.display = 'none';
                 modal.classList.add('active');
 
-                // Charger les secrets
+                // Charger le backupCode
                 db.collection('admin_config').doc('security').get()
-                    .then(async (doc) => {
+                    .then((doc) => {
                         if (!doc.exists) {
                             errorDiv.textContent = 'Configuration admin manquante. Contactez le support.';
                             errorDiv.style.display = 'block';
                             return;
                         }
                         const data = doc.data();
-                        totpSecret = data.totpSecret || '';
                         backupCode = data.backupCode || '';
-                        if (!totpSecret && !backupCode) {
-                            errorDiv.textContent = 'Le compte admin n\'est pas configuré.';
+                        if (!backupCode) {
+                            errorDiv.textContent = 'Clé de secours non configurée.';
                             errorDiv.style.display = 'block';
                         }
                     })
@@ -2593,65 +2449,21 @@
                         errorDiv.style.display = 'block';
                     });
 
-                async function validate() {
-                    const totp = totpInput.value.trim();
-                    const backup = backupInput.value.trim();
-
-                    // Au moins un des deux champs doit être rempli
-                    if (!totp && !backup) {
-                        errorDiv.textContent = 'Veuillez saisir un code TOTP ou la clé de secours.';
+                function validate() {
+                    const input = backupInput.value.trim();
+                    if (!input) {
+                        errorDiv.textContent = 'Veuillez saisir la clé de secours.';
                         errorDiv.style.display = 'block';
                         return;
                     }
-
-                    try {
-                        // Scénario A : TOTP
-                        if (totp) {
-                            if (!totpSecret) {
-                                errorDiv.textContent = 'Secret TOTP non configuré. Utilisez la clé de secours.';
-                                errorDiv.style.display = 'block';
-                                return;
-                            }
-                            // Vérification avec notre fonction native (tolérance ±1 intervalle)
-                            const isValid = await verifyTOTP(totp, totpSecret, 1);
-                            if (isValid) {
-                                modal.classList.remove('active');
-                                resolve(true);
-                                return;
-                            } else {
-                                errorDiv.textContent = 'Code TOTP invalide. Vérifiez l\'heure de votre appareil.';
-                                errorDiv.style.display = 'block';
-                                return;
-                            }
-                        }
-
-                        // Scénario B : Backup
-                        if (backup) {
-                            if (!backupCode) {
-                                errorDiv.textContent = 'Clé de secours non configurée.';
-                                errorDiv.style.display = 'block';
-                                return;
-                            }
-                            if (backup === backupCode) {
-                                modal.classList.remove('active');
-                                resolve(true);
-                                return;
-                            } else {
-                                errorDiv.textContent = 'Clé de secours incorrecte.';
-                                errorDiv.style.display = 'block';
-                                return;
-                            }
-                        }
-
-                        // Si aucun des deux n'a fonctionné (normalement déjà couvert)
-                        errorDiv.textContent = 'Échec de l\'authentification.';
+                    if (input !== backupCode) {
+                        errorDiv.textContent = 'Clé de secours incorrecte.';
                         errorDiv.style.display = 'block';
-
-                    } catch (err) {
-                        console.error('Erreur validation :', err);
-                        errorDiv.textContent = 'Erreur technique.';
-                        errorDiv.style.display = 'block';
+                        return;
                     }
+                    // Succès
+                    modal.classList.remove('active');
+                    resolve(true);
                 }
 
                 submitBtn.onclick = validate;
@@ -2659,10 +2471,270 @@
                     modal.classList.remove('active');
                     resolve(false);
                 };
-                totpInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validate(); });
-                backupInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validate(); });
+                backupInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') validate();
+                });
             });
         }
+
+        // ============================================================
+        // GESTION DES DONS - ADMIN (écriture) et UTILISATEUR (lecture temps réel)
+        // ============================================================
+        // Chemin : donations/payment_details
+        const DONATIONS_DOC_PATH = 'donations/payment_details';
+
+        async function loadDonationConfig() {
+            try {
+                const docRef = db.collection('donations').doc('payment_details');
+                const doc = await docRef.get();
+                if (!doc.exists) {
+                    // Créer un document par défaut
+                    const defaultData = {
+                        methods: {
+                            usdt: '', tron: '', btc: '',
+                            mtn: '', moov: '', wave: ''
+                        }
+                    };
+                    await docRef.set(defaultData);
+                    return defaultData;
+                }
+                return doc.data();
+            } catch (e) {
+                console.warn('Erreur chargement donations :', e);
+                return null;
+            }
+        }
+
+        async function saveDonationConfig(data) {
+            try {
+                await db.collection('donations').doc('payment_details').set(data, { merge: true });
+                return true;
+            } catch (e) {
+                console.warn('Erreur sauvegarde donations :', e);
+                return false;
+            }
+        }
+
+        function renderAdminPanel(donationData) {
+            const panel = document.getElementById('admin-panel');
+            if (!donationData) {
+                panel.innerHTML = '<p style="color:var(--text-secondary);">Aucune donnée de don configurée.</p>';
+                return;
+            }
+            const methods = donationData.methods || {};
+            let html = `
+                <div class="admin-field">
+                    <label><i class="fas fa-coins"></i> Crypto-monnaies</label>
+                    <div style="margin-bottom:0.5rem;">
+                        <label style="font-size:0.75rem;">USDT (TRC-20)</label>
+                        <input type="text" id="admin-usdt" value="${methods.usdt || ''}" placeholder="Adresse USDT">
+                        <div class="qr-upload-row">
+                            <button class="btn btn-outline admin-upload-qr" data-field="usdtQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                                <i class="fas fa-qrcode"></i> QR Code
+                            </button>
+                            ${methods.usdtQR ? `<img src="${methods.usdtQR}" alt="QR">` : ''}
+                        </div>
+                    </div>
+                    <div style="margin-bottom:0.5rem;">
+                        <label style="font-size:0.75rem;">Tron (TRX)</label>
+                        <input type="text" id="admin-tron" value="${methods.tron || ''}" placeholder="Adresse Tron">
+                        <div class="qr-upload-row">
+                            <button class="btn btn-outline admin-upload-qr" data-field="tronQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                                <i class="fas fa-qrcode"></i> QR Code
+                            </button>
+                            ${methods.tronQR ? `<img src="${methods.tronQR}" alt="QR">` : ''}
+                        </div>
+                    </div>
+                    <div style="margin-bottom:0.5rem;">
+                        <label style="font-size:0.75rem;">Bitcoin (BTC)</label>
+                        <input type="text" id="admin-btc" value="${methods.btc || ''}" placeholder="Adresse Bitcoin">
+                        <div class="qr-upload-row">
+                            <button class="btn btn-outline admin-upload-qr" data-field="btcQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                                <i class="fas fa-qrcode"></i> QR Code
+                            </button>
+                            ${methods.btcQR ? `<img src="${methods.btcQR}" alt="QR">` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="admin-field">
+                    <label><i class="fas fa-mobile-alt"></i> Mobile Money</label>
+                    <div style="margin-bottom:0.5rem;">
+                        <label style="font-size:0.75rem;">MTN Mobile Money</label>
+                        <input type="text" id="admin-mtn" value="${methods.mtn || ''}" placeholder="Numéro MTN">
+                    </div>
+                    <div style="margin-bottom:0.5rem;">
+                        <label style="font-size:0.75rem;">Moov</label>
+                        <input type="text" id="admin-moov" value="${methods.moov || ''}" placeholder="Numéro Moov">
+                    </div>
+                    <div style="margin-bottom:0.5rem;">
+                        <label style="font-size:0.75rem;">Wave</label>
+                        <input type="text" id="admin-wave" value="${methods.wave || ''}" placeholder="Numéro Wave">
+                    </div>
+                </div>
+                <button class="btn" id="save-admin-donations" style="margin-top:0.5rem;">Mettre à jour les coordonnées</button>
+            `;
+            panel.innerHTML = html;
+
+            // Upload QR
+            panel.querySelectorAll('.admin-upload-qr').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const field = this.dataset.field;
+                    openCloudinaryWidget({
+                        button: this,
+                        onSuccess: (url) => {
+                            const data = { methods: { [field]: url } };
+                            saveDonationConfig(data).then(() => {
+                                showToast('QR Code téléversé !', 'info');
+                                loadDonationConfig().then(d => renderAdminPanel(d));
+                            });
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('save-admin-donations').addEventListener('click', async function() {
+                const usdt = document.getElementById('admin-usdt').value.trim();
+                const tron = document.getElementById('admin-tron').value.trim();
+                const btc = document.getElementById('admin-btc').value.trim();
+                const mtn = document.getElementById('admin-mtn').value.trim();
+                const moov = document.getElementById('admin-moov').value.trim();
+                const wave = document.getElementById('admin-wave').value.trim();
+                const methods = { usdt, tron, btc, mtn, moov, wave };
+                const oldData = await loadDonationConfig();
+                if (oldData && oldData.methods) {
+                    Object.keys(oldData.methods).forEach(k => {
+                        if (k.endsWith('QR') && !methods[k]) {
+                            methods[k] = oldData.methods[k];
+                        }
+                    });
+                }
+                const success = await saveDonationConfig({ methods });
+                if (success) {
+                    showToast('Coordonnées de don mises à jour !', 'info');
+                } else {
+                    showToast('Erreur lors de la mise à jour.', 'error');
+                }
+            });
+        }
+
+        // ============================================================
+        // AFFICHAGE DES DONS DANS LA POPUP (lecture en temps réel)
+        // ============================================================
+        function setupDonationListener() {
+            // Si un listener existe déjà, le désactiver
+            if (donationUnsubscribe) {
+                donationUnsubscribe();
+                donationUnsubscribe = null;
+            }
+            const container = document.getElementById('donation-methods-container');
+            // On n'écoute que si la modale est ouverte pour économiser les appels
+            // On peut l'initialiser au moment de l'ouverture
+        }
+
+        function showDonationPopup() {
+            const modal = document.getElementById('donation-modal');
+            const container = document.getElementById('donation-methods-container');
+            container.innerHTML = '<span class="spinner"></span> Chargement...';
+            modal.classList.add('active');
+
+            // Désabonner précédent listener
+            if (donationUnsubscribe) {
+                donationUnsubscribe();
+                donationUnsubscribe = null;
+            }
+
+            // Écouter en temps réel
+            donationUnsubscribe = db.collection('donations').doc('payment_details')
+                .onSnapshot((doc) => {
+                    if (!doc.exists) {
+                        container.innerHTML = '<p style="color:var(--text-secondary);">Aucune méthode de don configurée.</p>';
+                        return;
+                    }
+                    const data = doc.data();
+                    const methods = data.methods || {};
+                    let html = '';
+                    const cryptoItems = [
+                        { key: 'usdt', label: 'USDT (TRC-20)', addr: methods.usdt, qr: methods.usdtQR },
+                        { key: 'tron', label: 'Tron (TRX)', addr: methods.tron, qr: methods.tronQR },
+                        { key: 'btc', label: 'Bitcoin (BTC)', addr: methods.btc, qr: methods.btcQR }
+                    ];
+                    cryptoItems.forEach(item => {
+                        if (item.addr) {
+                            html += `
+                                <div class="donation-method">
+                                    <div class="method-label"><i class="fab fa-bitcoin"></i> ${item.label}</div>
+                                    <div class="method-detail">
+                                        <span>${item.addr}</span>
+                                        <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
+                                        ${item.qr ? `<img class="qr-thumb" src="${item.qr}" alt="QR">` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                    const mobileItems = [
+                        { key: 'mtn', label: 'MTN Mobile Money', addr: methods.mtn },
+                        { key: 'moov', label: 'Moov', addr: methods.moov },
+                        { key: 'wave', label: 'Wave', addr: methods.wave }
+                    ];
+                    mobileItems.forEach(item => {
+                        if (item.addr) {
+                            html += `
+                                <div class="donation-method">
+                                    <div class="method-label"><i class="fas fa-mobile-alt"></i> ${item.label}</div>
+                                    <div class="method-detail">
+                                        <span>${item.addr}</span>
+                                        <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                    if (html === '') {
+                        html = '<p style="color:var(--text-secondary);">Aucune méthode de don configurée.</p>';
+                    }
+                    container.innerHTML = html;
+
+                    // Gestion des copieurs
+                    container.querySelectorAll('.copy-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const text = this.dataset.text;
+                            navigator.clipboard.writeText(text).then(() => {
+                                showToast('Adresse copiée !', 'info');
+                            }).catch(() => {
+                                const input = document.createElement('input');
+                                input.value = text;
+                                document.body.appendChild(input);
+                                input.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(input);
+                                showToast('Adresse copiée !', 'info');
+                            });
+                        });
+                    });
+                }, (err) => {
+                    console.error('Erreur listener donations:', err);
+                    container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des dons.</p>';
+                });
+        }
+
+        // Fermeture de la popup : on désabonne le listener
+        document.getElementById('close-donation-modal').addEventListener('click', () => {
+            document.getElementById('donation-modal').classList.remove('active');
+            if (donationUnsubscribe) {
+                donationUnsubscribe();
+                donationUnsubscribe = null;
+            }
+        });
+        document.getElementById('donation-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                e.currentTarget.classList.remove('active');
+                if (donationUnsubscribe) {
+                    donationUnsubscribe();
+                    donationUnsubscribe = null;
+                }
+            }
+        });
 
         // ============================================================
         // GESTION DES TÉMOIGNAGES (CRUD)
@@ -2834,186 +2906,6 @@
                 updateScheduledStatus();
             }, 30000);
             updateScheduledStatus();
-        }
-
-        // ============================================================
-        // ADMIN PANEL (donations)
-        // ============================================================
-        function renderAdminPanel(donationData) {
-            const panel = document.getElementById('admin-panel');
-            if (!donationData) {
-                panel.innerHTML = '<p style="color:var(--text-secondary);">Aucune donnée de don configurée.</p>';
-                return;
-            }
-            const methods = donationData.methods || {};
-            let html = `
-                <div class="admin-field">
-                    <label><i class="fas fa-coins"></i> Crypto-monnaies</label>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">USDT (TRC-20)</label>
-                        <input type="text" id="admin-usdt" value="${methods.usdt || ''}" placeholder="Adresse USDT">
-                        <div class="qr-upload-row">
-                            <button class="btn btn-outline admin-upload-qr" data-field="usdtQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
-                                <i class="fas fa-qrcode"></i> QR Code
-                            </button>
-                            ${methods.usdtQR ? `<img src="${methods.usdtQR}" alt="QR">` : ''}
-                        </div>
-                    </div>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">Tron (TRX)</label>
-                        <input type="text" id="admin-tron" value="${methods.tron || ''}" placeholder="Adresse Tron">
-                        <div class="qr-upload-row">
-                            <button class="btn btn-outline admin-upload-qr" data-field="tronQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
-                                <i class="fas fa-qrcode"></i> QR Code
-                            </button>
-                            ${methods.tronQR ? `<img src="${methods.tronQR}" alt="QR">` : ''}
-                        </div>
-                    </div>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">Bitcoin (BTC)</label>
-                        <input type="text" id="admin-btc" value="${methods.btc || ''}" placeholder="Adresse Bitcoin">
-                        <div class="qr-upload-row">
-                            <button class="btn btn-outline admin-upload-qr" data-field="btcQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
-                                <i class="fas fa-qrcode"></i> QR Code
-                            </button>
-                            ${methods.btcQR ? `<img src="${methods.btcQR}" alt="QR">` : ''}
-                        </div>
-                    </div>
-                </div>
-                <div class="admin-field">
-                    <label><i class="fas fa-mobile-alt"></i> Mobile Money</label>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">MTN Mobile Money</label>
-                        <input type="text" id="admin-mtn" value="${methods.mtn || ''}" placeholder="Numéro MTN">
-                    </div>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">Moov</label>
-                        <input type="text" id="admin-moov" value="${methods.moov || ''}" placeholder="Numéro Moov">
-                    </div>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">Wave</label>
-                        <input type="text" id="admin-wave" value="${methods.wave || ''}" placeholder="Numéro Wave">
-                    </div>
-                </div>
-                <button class="btn" id="save-admin-donations" style="margin-top:0.5rem;">Enregistrer les coordonnées de don</button>
-            `;
-            panel.innerHTML = html;
-
-            panel.querySelectorAll('.admin-upload-qr').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const field = this.dataset.field;
-                    openCloudinaryWidget({
-                        button: this,
-                        onSuccess: (url) => {
-                            const data = { methods: { [field]: url } };
-                            saveDonationConfig(data).then(() => {
-                                showToast('QR Code téléversé !', 'info');
-                                loadDonationConfig().then(d => renderAdminPanel(d));
-                            });
-                        }
-                    });
-                });
-            });
-
-            document.getElementById('save-admin-donations').addEventListener('click', async function() {
-                const usdt = document.getElementById('admin-usdt').value.trim();
-                const tron = document.getElementById('admin-tron').value.trim();
-                const btc = document.getElementById('admin-btc').value.trim();
-                const mtn = document.getElementById('admin-mtn').value.trim();
-                const moov = document.getElementById('admin-moov').value.trim();
-                const wave = document.getElementById('admin-wave').value.trim();
-                const methods = { usdt, tron, btc, mtn, moov, wave };
-                const oldData = await loadDonationConfig();
-                if (oldData && oldData.methods) {
-                    Object.keys(oldData.methods).forEach(k => {
-                        if (k.endsWith('QR') && !methods[k]) {
-                            methods[k] = oldData.methods[k];
-                        }
-                    });
-                }
-                const success = await saveDonationConfig({ methods });
-                if (success) {
-                    showToast('Coordonnées de don enregistrées !', 'info');
-                } else {
-                    showToast('Erreur lors de l\'enregistrement.', 'error');
-                }
-            });
-        }
-
-        // ============================================================
-        // AFFICHAGE DES DONS DANS LA POPUP
-        // ============================================================
-        async function showDonationPopup() {
-            const modal = document.getElementById('donation-modal');
-            const container = document.getElementById('donation-methods-container');
-            container.innerHTML = '<span class="spinner"></span> Chargement...';
-            modal.classList.add('active');
-
-            const data = await loadDonationConfig();
-            if (!data || !data.methods) {
-                container.innerHTML = '<p style="color:var(--text-secondary);">Aucune méthode de don disponible.</p>';
-                return;
-            }
-            const methods = data.methods;
-            let html = '';
-            const cryptoItems = [
-                { key: 'usdt', label: 'USDT (TRC-20)', addr: methods.usdt, qr: methods.usdtQR },
-                { key: 'tron', label: 'Tron (TRX)', addr: methods.tron, qr: methods.tronQR },
-                { key: 'btc', label: 'Bitcoin (BTC)', addr: methods.btc, qr: methods.btcQR }
-            ];
-            cryptoItems.forEach(item => {
-                if (item.addr) {
-                    html += `
-                        <div class="donation-method">
-                            <div class="method-label"><i class="fab fa-bitcoin"></i> ${item.label}</div>
-                            <div class="method-detail">
-                                <span>${item.addr}</span>
-                                <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
-                                ${item.qr ? `<img class="qr-thumb" src="${item.qr}" alt="QR">` : ''}
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            const mobileItems = [
-                { key: 'mtn', label: 'MTN Mobile Money', addr: methods.mtn },
-                { key: 'moov', label: 'Moov', addr: methods.moov },
-                { key: 'wave', label: 'Wave', addr: methods.wave }
-            ];
-            mobileItems.forEach(item => {
-                if (item.addr) {
-                    html += `
-                        <div class="donation-method">
-                            <div class="method-label"><i class="fas fa-mobile-alt"></i> ${item.label}</div>
-                            <div class="method-detail">
-                                <span>${item.addr}</span>
-                                <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            if (html === '') {
-                html = '<p style="color:var(--text-secondary);">Aucune méthode de don configurée.</p>';
-            }
-            container.innerHTML = html;
-
-            container.querySelectorAll('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const text = this.dataset.text;
-                    navigator.clipboard.writeText(text).then(() => {
-                        showToast('Adresse copiée !', 'info');
-                    }).catch(() => {
-                        const input = document.createElement('input');
-                        input.value = text;
-                        document.body.appendChild(input);
-                        input.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(input);
-                        showToast('Adresse copiée !', 'info');
-                    });
-                });
-            });
         }
 
         // ============================================================
@@ -3683,7 +3575,7 @@
         }
 
         // ============================================================
-        // DASHBOARD - PEUPLEMENT
+        // DASHBOARD - PEUPLEMENT (avec gestion admin)
         // ============================================================
         async function populateDashboard() {
             if (!currentUser) return;
@@ -3705,7 +3597,6 @@
                     subscribers: [],
                     testimonials: [],
                     schedules: [],
-                    donationMethods: {}
                 };
             }
 
@@ -3750,36 +3641,50 @@
             renderSchedules();
             startScheduler();
 
-            // ===== VÉRIFICATION ADMIN =====
+            // ===== VÉRIFICATION ADMIN ET GESTION DE L'ONGLET =====
             const adminTab = document.getElementById('admin-tab');
             try {
                 const admin = await checkIsAdmin(currentUser.uid);
                 console.log('Résultat checkIsAdmin :', admin);
                 if (admin) {
+                    // L'utilisateur est admin, on affiche l'onglet mais il est désactivé tant que la clé n'est pas validée
                     adminTab.style.display = 'flex';
-                    const donationData = await loadDonationConfig();
-                    renderAdminPanel(donationData);
                     adminTab.style.opacity = '0.5';
-                    adminTab.style.pointerEvents = 'auto';
+                    adminTab.style.pointerEvents = 'auto'; // permet de cliquer
 
                     adminTab.onclick = async function(e) {
                         e.preventDefault();
+                        // Ouvrir la modale de backup
                         const granted = await openAdminGate();
                         if (granted) {
+                            // Succès : activer l'onglet et charger les données
                             adminTab.style.opacity = '1';
                             adminTab.style.pointerEvents = 'auto';
-                            const data = await loadDonationConfig();
-                            renderAdminPanel(data);
+                            // Charger les donations
+                            const donationData = await loadDonationConfig();
+                            renderAdminPanel(donationData);
+                            // Activer l'onglet
                             document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
                             document.querySelectorAll('.tab-content .tab-pane').forEach(p => p.classList.remove('active'));
                             adminTab.classList.add('active');
                             document.getElementById('tab-admin').classList.add('active');
                             showToast('Accès administrateur accordé.', 'info');
                         } else {
-                            showToast('Accès refusé.', 'error');
+                            // Échec ou fermeture : masquer l'onglet Admin et basculer vers l'onglet Profil
+                            adminTab.style.display = 'none'; // le cacher
+                            // Basculer vers l'onglet Profil
+                            document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
+                            document.querySelectorAll('.tab-content .tab-pane').forEach(p => p.classList.remove('active'));
+                            const profileNav = document.querySelector('#dashboard-nav .nav-item[data-tab="profile"]');
+                            if (profileNav) {
+                                profileNav.classList.add('active');
+                                document.getElementById('tab-profile').classList.add('active');
+                            }
+                            showToast('Accès refusé. Vous avez été redirigé vers le profil.', 'error');
                         }
                     };
                 } else {
+                    // L'utilisateur n'est pas admin : on cache définitivement l'onglet
                     adminTab.style.display = 'none';
                 }
             } catch (error) {
@@ -3789,6 +3694,9 @@
             }
         }
 
+        // ============================================================
+        // FONCTIONS UTILITAIRES
+        // ============================================================
         function setupShareButtons(publicLink) {
             const copyBtn = document.getElementById('copy-link-btn');
             const openBtn = document.getElementById('open-link-btn');
@@ -4360,6 +4268,10 @@
             navItems.forEach(item => {
                 item.addEventListener('click', function() {
                     const tabId = this.dataset.tab;
+                    // Ne pas permettre de cliquer sur Admin si non activé
+                    if (tabId === 'admin' && this.style.display !== 'flex') {
+                        return;
+                    }
                     navItems.forEach(n => n.classList.remove('active'));
                     panes.forEach(p => p.classList.remove('active'));
                     this.classList.add('active');
@@ -4741,6 +4653,10 @@
                 currentUser = null;
                 userProfile = null;
                 if (scheduleInterval) clearInterval(scheduleInterval);
+                if (donationUnsubscribe) {
+                    donationUnsubscribe();
+                    donationUnsubscribe = null;
+                }
                 showView('view-consent');
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
             });
@@ -4851,16 +4767,12 @@
 
             // --- Bouton Don ---
             document.getElementById('donate-btn').addEventListener('click', showDonationPopup);
-            document.getElementById('close-donation-modal').addEventListener('click', () => {
-                document.getElementById('donation-modal').classList.remove('active');
-            });
-            document.getElementById('donation-modal').addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
-            });
 
-            // --- Admin gate close ---
+            // --- Admin gate close (gérée dans openAdminGate) mais on prévoit la fermeture manuelle
             document.getElementById('admin-gate-close').addEventListener('click', () => {
-                document.getElementById('admin-gate-modal').classList.remove('active');
+                // Déjà géré dans la promesse, mais on s'assure que la modale se ferme
+                const modal = document.getElementById('admin-gate-modal');
+                modal.classList.remove('active');
             });
         }
 
