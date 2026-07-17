@@ -20,7 +20,7 @@
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
     <style>
-        /* ===== VARIABLES ===== */
+        /* ===== VARIABLES (surchargées dynamiquement par le thème) ===== */
         :root {
             --bg-deep: #0a0b10;
             --bg-card: rgba(10, 11, 16, 0.7);
@@ -44,146 +44,70 @@
             --flash-bg: #ff1744;
             --flash-text: #fff;
             --nav-bg: rgba(10, 11, 16, 0.85);
+            --theme-primary-color: #00f2fe;
+            --theme-background-image: none;
         }
 
-        /* ===== THÈMES ===== */
-        body.theme-minimaliste {
-            --bg-deep: #f5f5f7;
-            --bg-card: rgba(255,255,255,0.8);
-            --border-glow: rgba(0,0,0,0.1);
-            --cyan: #0071e3;
-            --violet: #5856d6;
-            --text-primary: #1d1d1f;
-            --text-secondary: #6e6e73;
-            --card-bg: rgba(0,0,0,0.02);
-            --card-border: rgba(0,0,0,0.06);
-            --input-bg: rgba(0,0,0,0.04);
-            --input-border: rgba(0,0,0,0.12);
-            --shadow-color: rgba(0,0,0,0.08);
-            --bg-deep-image: none;
-            font-family: 'Inter', sans-serif;
-            --nav-bg: rgba(245, 245, 247, 0.85);
+        /* ===== APPLICATION DYNAMIQUE DU THÈME ===== */
+        body {
+            background-color: var(--bg-deep);
+            background-image: var(--bg-deep-image), var(--theme-background-image);
+            color: var(--text-primary);
         }
-        body.theme-minimaliste .brand {
-            background: linear-gradient(135deg, #0071e3, #5856d6);
+        .brand, .public-name {
+            background: linear-gradient(135deg, var(--theme-primary-color), var(--violet));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        body.theme-minimaliste .btn {
-            background: linear-gradient(135deg, #0071e3, #5856d6);
-            color: #fff;
+        .btn {
+            background: linear-gradient(135deg, var(--theme-primary-color), var(--violet));
+            color: #0a0b10;
         }
-        body.theme-minimaliste .btn-outline {
-            border-color: #0071e3;
-            color: #0071e3;
+        .btn-outline {
+            border-color: var(--theme-primary-color);
+            color: var(--theme-primary-color);
         }
-        body.theme-minimaliste .status-badge {
-            background: rgba(0,0,0,0.05);
-            border-color: rgba(0,0,0,0.1);
-            color: var(--text-secondary);
+        .status-badge.disponible .dot { background: #2ecc71; }
+        .status-badge.occupe .dot { background: #f39c12; }
+        .status-badge.enlive .dot { background: #e74c3c; }
+        .status-selector .status-option.active {
+            border-color: var(--theme-primary-color);
+            background: rgba(0,242,254,0.15);
+            color: white;
         }
-        body.theme-minimaliste .glass-card {
-            backdrop-filter: blur(8px);
-            background: var(--bg-card);
+        .toggle-switch.active { background: var(--theme-primary-color); }
+        .views-counter {
+            background: rgba(0,242,254,0.1);
+            border-color: var(--theme-primary-color);
+            color: var(--theme-primary-color);
         }
-
-        body.theme-neo-brutaliste {
-            --bg-deep: #faf3e0;
-            --bg-card: #ffffff;
-            --border-glow: #ff6b6b;
-            --cyan: #ff6b6b;
-            --violet: #feca57;
-            --text-primary: #1a1a2e;
-            --text-secondary: #2d2d44;
-            --card-bg: #ffffff;
-            --card-border: #1a1a2e;
-            --input-bg: #f0f0f0;
-            --input-border: #1a1a2e;
-            --shadow-color: rgba(0,0,0,0.15);
-            --bg-deep-image: none;
-            border-radius: 0 !important;
-            font-family: 'Inter', sans-serif;
-            --nav-bg: #faf3e0;
+        .stats-summary .stat-card .stat-number { color: var(--theme-primary-color); }
+        .stats-summary .stat-card .stat-bar .fill { background: var(--theme-primary-color); }
+        .link-item .platform-icon { color: var(--theme-primary-color); }
+        .rich-link-card .link-action-bar i { color: var(--theme-primary-color); }
+        .border-glow-pulse { border-color: var(--theme-primary-color) !important; }
+        .card-highlight .highlight-badge { background: var(--theme-primary-color); }
+        .theme-toggle:hover { color: var(--theme-primary-color); }
+        .top-networks .rank-item .rank-num { color: var(--theme-primary-color); }
+        .top-networks .rank-item i { color: var(--theme-primary-color); }
+        .donate-btn {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #0a0b10;
         }
-        body.theme-neo-brutaliste .glass-card {
-            border: 4px solid #1a1a2e;
-            border-radius: 0 !important;
-            background: #ffffff;
-            box-shadow: 8px 8px 0 #1a1a2e;
-        }
-        body.theme-neo-brutaliste .brand {
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        body.theme-neo-brutaliste .btn {
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
-            color: #1a1a2e;
-            border-radius: 0 !important;
-            border: 3px solid #1a1a2e;
-            box-shadow: 4px 4px 0 #1a1a2e;
-        }
-        body.theme-neo-brutaliste .btn-outline {
-            border: 3px solid #1a1a2e;
-            color: #1a1a2e;
-            background: transparent;
-            border-radius: 0 !important;
-            box-shadow: 4px 4px 0 #1a1a2e;
-        }
-        body.theme-neo-brutaliste .nav-item {
-            border-radius: 0 !important;
+        .donation-popup .modal-content .donation-method .method-label { color: var(--theme-primary-color); }
+        .admin-panel .admin-field input:focus, .admin-panel .admin-field textarea:focus { border-color: var(--theme-primary-color); }
+        .admin-panel .admin-field label { color: var(--text-secondary); }
+        .admin-panel .admin-field input, .admin-panel .admin-field textarea {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
         }
 
-        /* ===== FONDS ===== */
-        body.fond-aurora {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: aurora 12s ease infinite;
-        }
-        @keyframes aurora {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        body.fond-aurora .glass-card {
-            backdrop-filter: blur(14px);
-            background: rgba(0,0,0,0.3);
-            border-color: rgba(255,255,255,0.15);
-        }
-
-        body.fond-particules {
-            background: var(--bg-deep);
-            position: relative;
-        }
-        body.fond-particules #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-        body.fond-particules #app {
-            position: relative;
-            z-index: 1;
-        }
-        body.fond-particules .glass-card {
-            backdrop-filter: blur(6px);
-            background: rgba(10, 11, 16, 0.6);
-        }
-
-        body.fond-unique {
-            background: var(--bg-deep);
-        }
-
-        /* ===== STYLES GÉNÉRAUX ===== */
+        /* ===== STYLES GÉNÉRAUX (inchangés) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: var(--bg-deep);
-            background-image: var(--bg-deep-image);
             font-family: var(--font-body);
-            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -192,10 +116,6 @@
             padding: 1.5rem;
             margin: 0;
             transition: background 0.5s ease, color 0.3s;
-        }
-        body.theme-minimaliste,
-        body.theme-neo-brutaliste {
-            background-image: none;
         }
         #app {
             width: 100%;
@@ -231,10 +151,6 @@
             font-size: 2.2rem;
             font-weight: 700;
             letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--cyan), var(--violet));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
             text-align: center;
             margin-bottom: 0.5rem;
         }
@@ -270,13 +186,11 @@
         }
         .input-field::placeholder { color: rgba(255,255,255,0.35); }
         .btn {
-            background: linear-gradient(135deg, var(--cyan), var(--violet));
             border: none;
             border-radius: 14px;
             padding: 0.9rem 1.5rem;
             font-weight: 600;
             font-size: 1rem;
-            color: #0a0b10;
             cursor: pointer;
             transition: all var(--transition);
             font-family: var(--font-body);
@@ -303,7 +217,6 @@
         .btn-outline {
             background: transparent;
             border: 1px solid var(--cyan);
-            color: var(--cyan);
             background: rgba(0,242,254,0.05);
         }
         .btn-outline:hover:not(:disabled) {
@@ -563,7 +476,7 @@
             gap: 0.5rem;
         }
 
-        /* ===== ÉCRAN DE CONSENTEMENT (CGU) ===== */
+        /* ===== ÉCRAN DE CONSENTEMENT ===== */
         #view-consent .glass-card {
             max-height: 90vh;
             overflow-y: auto;
@@ -616,9 +529,6 @@
             border-radius: 50%;
             display: inline-block;
         }
-        .status-badge.disponible .dot { background: #2ecc71; }
-        .status-badge.occupe .dot { background: #f39c12; }
-        .status-badge.enlive .dot { background: #e74c3c; }
         .status-selector {
             display: flex;
             gap: 0.5rem;
@@ -634,11 +544,6 @@
             border: 1px solid rgba(255,255,255,0.1);
             transition: var(--transition);
             color: var(--text-secondary);
-        }
-        .status-selector .status-option.active {
-            border-color: var(--cyan);
-            background: rgba(0,242,254,0.15);
-            color: white;
         }
         .status-selector .status-option .dot {
             width: 8px;
@@ -797,7 +702,6 @@
             border-radius: 30px;
             padding: 0.3rem 1rem;
             font-size: 0.9rem;
-            color: var(--cyan);
         }
         .views-counter i { font-size: 1rem; }
 
@@ -817,7 +721,6 @@
         .stats-summary .stat-card .stat-number {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--cyan);
             font-family: var(--font-heading);
         }
         .stats-summary .stat-card .stat-label {
@@ -836,7 +739,6 @@
         }
         .stats-summary .stat-card .stat-bar .fill {
             height: 100%;
-            background: var(--cyan);
             border-radius: 4px;
             transition: width 0.6s ease;
         }
@@ -1118,10 +1020,6 @@
             text-align: center;
             margin: 0.2rem 0 0.05rem 0;
             letter-spacing: 0.5px;
-            background: linear-gradient(135deg, #fff, var(--cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         .public-bio-text {
             color: var(--text-secondary);
@@ -1131,7 +1029,6 @@
             font-style: italic;
             font-weight: 300;
             line-height: 1.4;
-            -webkit-text-fill-color: var(--text-secondary);
             margin: 0.1rem 0;
         }
         .public-status-wrap {
@@ -1229,7 +1126,6 @@
         }
         .rich-link-card .link-action-bar i {
             font-size: 1.2rem;
-            color: var(--cyan);
         }
         .rich-link-card .link-action-bar span {
             opacity: 0.8;
@@ -1337,11 +1233,9 @@
         }
         .top-networks .rank-item .rank-num {
             font-weight: 700;
-            color: var(--cyan);
         }
         .top-networks .rank-item i {
             font-size: 1rem;
-            color: var(--cyan);
         }
 
         #particles-canvas {
@@ -1613,7 +1507,7 @@
             display: none;
         }
 
-        /* ===== TÉMOIGNAGES, DONS, PLANIFICATEUR ===== */
+        /* ===== TÉMOIGNAGES, DONS, PLANIFICATEUR, ADMIN ===== */
         .testimonials-carousel {
             position: relative;
             width: 100%;
@@ -1823,6 +1717,132 @@
             background: white;
             padding: 0.2rem;
         }
+        .admin-panel .btn-remove-qr {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        .admin-panel .btn-remove-qr:hover {
+            color: #ff2040;
+            transform: scale(1.1);
+        }
+
+        /* ---- Lightbox pour QR Code ---- */
+        .qr-lightbox .modal-content {
+            max-width: 500px;
+            background: rgba(0,0,0,0.9);
+            border: none;
+        }
+        .qr-lightbox .modal-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* ---- Gestionnaire de liens (Admin) ---- */
+        .admin-link-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 0.6rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .admin-link-item input,
+        .admin-link-item select {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            padding: 0.3rem 0.6rem;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            outline: none;
+            flex: 1;
+            min-width: 80px;
+        }
+        .admin-link-item input:focus,
+        .admin-link-item select:focus {
+            border-color: var(--cyan);
+        }
+        .admin-link-item .link-actions button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .admin-link-item .link-actions button:hover {
+            color: var(--cyan);
+        }
+        .admin-link-item .link-actions .delete-btn:hover {
+            color: var(--danger);
+        }
+
+        /* ---- Journal d'activité ---- */
+        .admin-log-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0.2rem;
+            border-bottom: 1px solid var(--border-glow);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .admin-log-entry .log-time {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .admin-log-entry .log-action {
+            color: var(--text-secondary);
+        }
+
+        /* ---- Gestionnaire de thème ---- */
+        .theme-manager .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .theme-manager .color-picker-row input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+            padding: 0;
+        }
+        .theme-manager .color-picker-row input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .theme-manager .color-picker-row input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+        }
+        .theme-manager .upload-bg-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .theme-manager .upload-bg-row .bg-preview {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--card-border);
+            background: var(--bg-deep);
+        }
 
         /* === MODALE ADMIN (uniquement Backup) === */
         .admin-gate .modal-content {
@@ -1861,7 +1881,6 @@
         }
         .donation-popup .modal-content .donation-method .method-label {
             font-weight: 600;
-            color: var(--cyan);
             font-size: 0.9rem;
             display: flex;
             align-items: center;
@@ -1898,6 +1917,12 @@
             border-radius: 6px;
             background: white;
             padding: 0.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .donation-popup .modal-content .donation-method .method-detail img.qr-thumb:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,242,254,0.3);
         }
 
         @media (max-width: 420px) {
@@ -1910,6 +1935,8 @@
             .admin-panel .qr-upload-row { flex-direction: column; align-items: flex-start; }
             .testimonial-item { flex-direction: column; align-items: stretch; }
             .schedule-item { flex-direction: column; align-items: stretch; }
+            .admin-link-item { flex-direction: column; align-items: stretch; }
+            .theme-manager .color-picker-row { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -2015,7 +2042,6 @@
                 <button class="nav-item" data-tab="links"><i class="fas fa-link"></i><span>Liens</span></button>
                 <button class="nav-item" data-tab="profile"><i class="fas fa-user"></i><span>Profil</span></button>
                 <button class="nav-item" data-tab="advanced"><i class="fas fa-cog"></i><span>Avancé</span></button>
-                <!-- L'onglet Admin est masqué par défaut, affiché uniquement si l'utilisateur est admin et après validation -->
                 <button class="nav-item" data-tab="admin" id="admin-tab" style="display:none;"><i class="fas fa-shield-alt"></i><span>Admin</span></button>
             </nav>
 
@@ -2122,11 +2148,11 @@
                     <button class="btn btn-outline" id="add-testimonial-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem; margin-top:0.5rem;"><i class="fas fa-plus"></i> Ajouter un témoignage</button>
                 </div>
 
-                <!-- ===== ADMIN (caché tant que non validé) ===== -->
+                <!-- ===== ADMIN (caché par défaut) ===== -->
                 <div class="tab-pane" id="tab-admin">
                     <h3><i class="fas fa-shield-alt"></i> Administration</h3>
-                    <div class="admin-panel" id="admin-panel">
-                        <!-- Le contenu est chargé dynamiquement après validation -->
+                    <div id="admin-panel-container">
+                        <!-- Contenu chargé dynamiquement après validation -->
                     </div>
                 </div>
             </div>
@@ -2221,6 +2247,14 @@
         </div>
     </div>
 
+    <!-- ===== LIGHTBOX POUR QR CODES ===== -->
+    <div class="modal-overlay qr-lightbox" id="qr-lightbox">
+        <div class="modal-content">
+            <img id="qr-lightbox-img" src="" alt="QR Code agrandi">
+            <button class="close-modal" id="close-qr-lightbox">Fermer</button>
+        </div>
+    </div>
+
 </div> <!-- fin #app -->
 
 <div id="toast-container"></div>
@@ -2279,7 +2313,9 @@
         let gatedPendingTarget = null;
         let backupCode = '';
         let scheduleInterval = null;
-        let donationUnsubscribe = null; // pour la désinscription du listener
+        let donationUnsubscribe = null;
+        let adminLinksUnsubscribe = null;
+        let adminLogsUnsubscribe = null;
 
         // ============================================================
         // VUES
@@ -2480,7 +2516,6 @@
         // ============================================================
         // GESTION DES DONS - ADMIN (écriture) et UTILISATEUR (lecture temps réel)
         // ============================================================
-        // Chemin : donations/payment_details
         const DONATIONS_DOC_PATH = 'donations/payment_details';
 
         async function loadDonationConfig() {
@@ -2488,11 +2523,11 @@
                 const docRef = db.collection('donations').doc('payment_details');
                 const doc = await docRef.get();
                 if (!doc.exists) {
-                    // Créer un document par défaut
                     const defaultData = {
                         methods: {
                             usdt: '', tron: '', btc: '',
-                            mtn: '', moov: '', wave: ''
+                            mtn: '', moov: '', wave: '',
+                            usdtQR: '', tronQR: '', btcQR: ''
                         }
                     };
                     await docRef.set(defaultData);
@@ -2515,135 +2550,20 @@
             }
         }
 
-        function renderAdminPanel(donationData) {
-            const panel = document.getElementById('admin-panel');
-            if (!donationData) {
-                panel.innerHTML = '<p style="color:var(--text-secondary);">Aucune donnée de don configurée.</p>';
-                return;
-            }
-            const methods = donationData.methods || {};
-            let html = `
-                <div class="admin-field">
-                    <label><i class="fas fa-coins"></i> Crypto-monnaies</label>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">USDT (TRC-20)</label>
-                        <input type="text" id="admin-usdt" value="${methods.usdt || ''}" placeholder="Adresse USDT">
-                        <div class="qr-upload-row">
-                            <button class="btn btn-outline admin-upload-qr" data-field="usdtQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
-                                <i class="fas fa-qrcode"></i> QR Code
-                            </button>
-                            ${methods.usdtQR ? `<img src="${methods.usdtQR}" alt="QR">` : ''}
-                        </div>
-                    </div>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">Tron (TRX)</label>
-                        <input type="text" id="admin-tron" value="${methods.tron || ''}" placeholder="Adresse Tron">
-                        <div class="qr-upload-row">
-                            <button class="btn btn-outline admin-upload-qr" data-field="tronQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
-                                <i class="fas fa-qrcode"></i> QR Code
-                            </button>
-                            ${methods.tronQR ? `<img src="${methods.tronQR}" alt="QR">` : ''}
-                        </div>
-                    </div>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">Bitcoin (BTC)</label>
-                        <input type="text" id="admin-btc" value="${methods.btc || ''}" placeholder="Adresse Bitcoin">
-                        <div class="qr-upload-row">
-                            <button class="btn btn-outline admin-upload-qr" data-field="btcQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
-                                <i class="fas fa-qrcode"></i> QR Code
-                            </button>
-                            ${methods.btcQR ? `<img src="${methods.btcQR}" alt="QR">` : ''}
-                        </div>
-                    </div>
-                </div>
-                <div class="admin-field">
-                    <label><i class="fas fa-mobile-alt"></i> Mobile Money</label>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">MTN Mobile Money</label>
-                        <input type="text" id="admin-mtn" value="${methods.mtn || ''}" placeholder="Numéro MTN">
-                    </div>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">Moov</label>
-                        <input type="text" id="admin-moov" value="${methods.moov || ''}" placeholder="Numéro Moov">
-                    </div>
-                    <div style="margin-bottom:0.5rem;">
-                        <label style="font-size:0.75rem;">Wave</label>
-                        <input type="text" id="admin-wave" value="${methods.wave || ''}" placeholder="Numéro Wave">
-                    </div>
-                </div>
-                <button class="btn" id="save-admin-donations" style="margin-top:0.5rem;">Mettre à jour les coordonnées</button>
-            `;
-            panel.innerHTML = html;
-
-            // Upload QR
-            panel.querySelectorAll('.admin-upload-qr').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const field = this.dataset.field;
-                    openCloudinaryWidget({
-                        button: this,
-                        onSuccess: (url) => {
-                            const data = { methods: { [field]: url } };
-                            saveDonationConfig(data).then(() => {
-                                showToast('QR Code téléversé !', 'info');
-                                loadDonationConfig().then(d => renderAdminPanel(d));
-                            });
-                        }
-                    });
-                });
-            });
-
-            document.getElementById('save-admin-donations').addEventListener('click', async function() {
-                const usdt = document.getElementById('admin-usdt').value.trim();
-                const tron = document.getElementById('admin-tron').value.trim();
-                const btc = document.getElementById('admin-btc').value.trim();
-                const mtn = document.getElementById('admin-mtn').value.trim();
-                const moov = document.getElementById('admin-moov').value.trim();
-                const wave = document.getElementById('admin-wave').value.trim();
-                const methods = { usdt, tron, btc, mtn, moov, wave };
-                const oldData = await loadDonationConfig();
-                if (oldData && oldData.methods) {
-                    Object.keys(oldData.methods).forEach(k => {
-                        if (k.endsWith('QR') && !methods[k]) {
-                            methods[k] = oldData.methods[k];
-                        }
-                    });
-                }
-                const success = await saveDonationConfig({ methods });
-                if (success) {
-                    showToast('Coordonnées de don mises à jour !', 'info');
-                } else {
-                    showToast('Erreur lors de la mise à jour.', 'error');
-                }
-            });
-        }
-
         // ============================================================
         // AFFICHAGE DES DONS DANS LA POPUP (lecture en temps réel)
         // ============================================================
-        function setupDonationListener() {
-            // Si un listener existe déjà, le désactiver
-            if (donationUnsubscribe) {
-                donationUnsubscribe();
-                donationUnsubscribe = null;
-            }
-            const container = document.getElementById('donation-methods-container');
-            // On n'écoute que si la modale est ouverte pour économiser les appels
-            // On peut l'initialiser au moment de l'ouverture
-        }
-
         function showDonationPopup() {
             const modal = document.getElementById('donation-modal');
             const container = document.getElementById('donation-methods-container');
             container.innerHTML = '<span class="spinner"></span> Chargement...';
             modal.classList.add('active');
 
-            // Désabonner précédent listener
             if (donationUnsubscribe) {
                 donationUnsubscribe();
                 donationUnsubscribe = null;
             }
 
-            // Écouter en temps réel
             donationUnsubscribe = db.collection('donations').doc('payment_details')
                 .onSnapshot((doc) => {
                     if (!doc.exists) {
@@ -2666,7 +2586,7 @@
                                     <div class="method-detail">
                                         <span>${item.addr}</span>
                                         <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
-                                        ${item.qr ? `<img class="qr-thumb" src="${item.qr}" alt="QR">` : ''}
+                                        ${item.qr ? `<img class="qr-thumb" src="${item.qr}" alt="QR" data-qr="${item.qr}">` : ''}
                                     </div>
                                 </div>
                             `;
@@ -2695,7 +2615,7 @@
                     }
                     container.innerHTML = html;
 
-                    // Gestion des copieurs
+                    // Copieurs
                     container.querySelectorAll('.copy-btn').forEach(btn => {
                         btn.addEventListener('click', function() {
                             const text = this.dataset.text;
@@ -2712,13 +2632,23 @@
                             });
                         });
                     });
+
+                    // Lightbox pour QR Code
+                    container.querySelectorAll('.qr-thumb').forEach(img => {
+                        img.addEventListener('click', function() {
+                            const lightbox = document.getElementById('qr-lightbox');
+                            const lightboxImg = document.getElementById('qr-lightbox-img');
+                            lightboxImg.src = this.dataset.qr;
+                            lightbox.classList.add('active');
+                        });
+                    });
                 }, (err) => {
                     console.error('Erreur listener donations:', err);
                     container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des dons.</p>';
                 });
         }
 
-        // Fermeture de la popup : on désabonne le listener
+        // Fermeture de la popup et lightbox
         document.getElementById('close-donation-modal').addEventListener('click', () => {
             document.getElementById('donation-modal').classList.remove('active');
             if (donationUnsubscribe) {
@@ -2735,6 +2665,282 @@
                 }
             }
         });
+        document.getElementById('close-qr-lightbox').addEventListener('click', () => {
+            document.getElementById('qr-lightbox').classList.remove('active');
+        });
+        document.getElementById('qr-lightbox').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                e.currentTarget.classList.remove('active');
+            }
+        });
+
+        // ============================================================
+        // NOUVELLES FONCTIONNALITÉS ADMIN
+        // ============================================================
+
+        // 1. Gestionnaire de liens (collection "links")
+        function renderAdminLinks() {
+            const container = document.getElementById('admin-links-container');
+            if (!container) return;
+            container.innerHTML = '<span class="spinner"></span> Chargement des liens...';
+
+            if (adminLinksUnsubscribe) {
+                adminLinksUnsubscribe();
+                adminLinksUnsubscribe = null;
+            }
+
+            adminLinksUnsubscribe = db.collection('links')
+                .orderBy('order', 'asc')
+                .onSnapshot((snapshot) => {
+                    let html = '';
+                    if (snapshot.empty) {
+                        html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucun lien configuré.</p>';
+                    } else {
+                        snapshot.forEach((doc, index) => {
+                            const data = doc.data();
+                            const id = doc.id;
+                            html += `
+                                <div class="admin-link-item" data-id="${id}">
+                                    <input type="text" class="admin-link-label" value="${data.label || ''}" placeholder="Label">
+                                    <input type="text" class="admin-link-url" value="${data.url || ''}" placeholder="URL">
+                                    <select class="admin-link-icon">
+                                        ${PLATFORMS.map(p => `<option value="${p.icon}" ${data.icon === p.icon ? 'selected' : ''}>${p.name}</option>`).join('')}
+                                    </select>
+                                    <div class="link-actions">
+                                        <button class="save-link-btn" title="Sauvegarder"><i class="fas fa-save"></i></button>
+                                        <button class="delete-link-btn" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    html += `
+                        <div style="margin-top:0.5rem;">
+                            <button class="btn btn-outline" id="add-admin-link-btn" style="padding:0.2rem 0.8rem; font-size:0.8rem;">
+                                <i class="fas fa-plus"></i> Ajouter un lien
+                            </button>
+                        </div>
+                    `;
+                    container.innerHTML = html;
+
+                    // Événements sur les liens
+                    container.querySelectorAll('.save-link-btn').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            const item = this.closest('.admin-link-item');
+                            const id = item.dataset.id;
+                            const label = item.querySelector('.admin-link-label').value.trim();
+                            const url = item.querySelector('.admin-link-url').value.trim();
+                            const icon = item.querySelector('.admin-link-icon').value;
+                            if (!label || !url) {
+                                showToast('Label et URL requis.', 'error');
+                                return;
+                            }
+                            try {
+                                await db.collection('links').doc(id).update({ label, url, icon });
+                                showToast('Lien mis à jour !', 'info');
+                            } catch (e) {
+                                console.error(e);
+                                showToast('Erreur de mise à jour.', 'error');
+                            }
+                        });
+                    });
+                    container.querySelectorAll('.delete-link-btn').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            if (!confirm('Supprimer ce lien ?')) return;
+                            const id = this.closest('.admin-link-item').dataset.id;
+                            try {
+                                await db.collection('links').doc(id).delete();
+                                showToast('Lien supprimé.', 'info');
+                            } catch (e) {
+                                console.error(e);
+                                showToast('Erreur de suppression.', 'error');
+                            }
+                        });
+                    });
+                    document.getElementById('add-admin-link-btn')?.addEventListener('click', async function() {
+                        try {
+                            const snapshot = await db.collection('links').get();
+                            const order = snapshot.size;
+                            await db.collection('links').add({
+                                label: 'Nouveau lien',
+                                url: 'https://exemple.com',
+                                icon: 'fab fa-link',
+                                order: order
+                            });
+                            showToast('Lien ajouté.', 'info');
+                        } catch (e) {
+                            console.error(e);
+                            showToast('Erreur d\'ajout.', 'error');
+                        }
+                    });
+                }, (err) => {
+                    console.error('Erreur listener links:', err);
+                    container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des liens.</p>';
+                });
+        }
+
+        // 2. Journal d'activité (collection "admin_logs")
+        function renderAdminLogs() {
+            const container = document.getElementById('admin-logs-container');
+            if (!container) return;
+            container.innerHTML = '<span class="spinner"></span> Chargement...';
+
+            if (adminLogsUnsubscribe) {
+                adminLogsUnsubscribe();
+                adminLogsUnsubscribe = null;
+            }
+
+            adminLogsUnsubscribe = db.collection('admin_logs')
+                .orderBy('timestamp', 'desc')
+                .limit(20)
+                .onSnapshot((snapshot) => {
+                    let html = '';
+                    if (snapshot.empty) {
+                        html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucune activité enregistrée.</p>';
+                    } else {
+                        snapshot.forEach((doc) => {
+                            const data = doc.data();
+                            const date = data.timestamp?.toDate?.() || new Date(data.timestamp);
+                            const timeStr = date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                            html += `
+                                <div class="admin-log-entry">
+                                    <span class="log-time">${timeStr}</span>
+                                    <span class="log-action">${data.action || 'Action'}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                    container.innerHTML = html;
+                }, (err) => {
+                    console.error('Erreur listener logs:', err);
+                    container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des logs.</p>';
+                });
+        }
+
+        // Ajouter une entrée dans le journal
+        async function addAdminLog(action) {
+            try {
+                await db.collection('admin_logs').add({
+                    action: action,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (e) {
+                console.warn('Impossible d\'ajouter un log :', e);
+            }
+        }
+
+        // 3. Gestionnaire de thème (document "config/theme")
+        function renderThemeManager() {
+            const container = document.getElementById('theme-manager-container');
+            if (!container) return;
+
+            db.collection('config').doc('theme').get().then((doc) => {
+                const data = doc.data() || {};
+                const primaryColor = data.primaryColor || '#00f2fe';
+                const bgImage = data.backgroundImage || '';
+                container.innerHTML = `
+                    <div class="theme-manager">
+                        <div class="admin-field">
+                            <label>Couleur principale</label>
+                            <div class="color-picker-row">
+                                <input type="color" id="theme-primary-color" value="${primaryColor}">
+                                <span style="font-size:0.8rem; color:var(--text-secondary);">Choisissez une couleur</span>
+                            </div>
+                        </div>
+                        <div class="admin-field">
+                            <label>Image de fond (upload Cloudinary)</label>
+                            <div class="upload-bg-row">
+                                <button class="btn btn-outline" id="btn-upload-bg" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                                    <i class="fas fa-image"></i> Changer l'image
+                                </button>
+                                ${bgImage ? `<img class="bg-preview" src="${bgImage}" alt="Fond">` : ''}
+                                ${bgImage ? `<button class="btn btn-outline btn-remove-bg" style="padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);"><i class="fas fa-times"></i> Supprimer</button>` : ''}
+                            </div>
+                        </div>
+                        <button class="btn" id="save-theme-btn" style="margin-top:0.5rem;">Enregistrer le thème</button>
+                    </div>
+                `;
+
+                // Upload de fond
+                document.getElementById('btn-upload-bg')?.addEventListener('click', function() {
+                    openCloudinaryWidget({
+                        button: this,
+                        onSuccess: (url) => {
+                            const preview = container.querySelector('.bg-preview');
+                            if (preview) preview.src = url;
+                            else {
+                                const row = container.querySelector('.upload-bg-row');
+                                const img = document.createElement('img');
+                                img.className = 'bg-preview';
+                                img.src = url;
+                                row.appendChild(img);
+                                const removeBtn = document.createElement('button');
+                                removeBtn.className = 'btn btn-outline btn-remove-bg';
+                                removeBtn.style.cssText = 'padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);';
+                                removeBtn.innerHTML = '<i class="fas fa-times"></i> Supprimer';
+                                row.appendChild(removeBtn);
+                                removeBtn.addEventListener('click', function() {
+                                    const field = 'backgroundImage';
+                                    const data = { [field]: '' };
+                                    db.collection('config').doc('theme').set(data, { merge: true }).then(() => {
+                                        showToast('Image de fond supprimée.', 'info');
+                                        renderThemeManager();
+                                        applyThemeToSite();
+                                    });
+                                });
+                            }
+                            showToast('Image de fond téléversée.', 'info');
+                        }
+                    });
+                });
+
+                // Suppression de l'image (géré via le bouton dynamique)
+                container.querySelector('.btn-remove-bg')?.addEventListener('click', function() {
+                    const data = { backgroundImage: '' };
+                    db.collection('config').doc('theme').set(data, { merge: true }).then(() => {
+                        showToast('Image de fond supprimée.', 'info');
+                        renderThemeManager();
+                        applyThemeToSite();
+                    });
+                });
+
+                // Sauvegarde du thème
+                document.getElementById('save-theme-btn')?.addEventListener('click', async function() {
+                    const color = document.getElementById('theme-primary-color').value;
+                    const bgImg = container.querySelector('.bg-preview')?.src || '';
+                    try {
+                        await db.collection('config').doc('theme').set({
+                            primaryColor: color,
+                            backgroundImage: bgImg
+                        }, { merge: true });
+                        showToast('Thème enregistré !', 'info');
+                        applyThemeToSite();
+                        addAdminLog('Mise à jour du thème');
+                    } catch (e) {
+                        console.error(e);
+                        showToast('Erreur d\'enregistrement.', 'error');
+                    }
+                });
+            }).catch(err => {
+                console.error(err);
+                container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement du thème.</p>';
+            });
+        }
+
+        // Appliquer le thème au site
+        function applyThemeToSite() {
+            db.collection('config').doc('theme').get().then((doc) => {
+                const data = doc.data() || {};
+                const primaryColor = data.primaryColor || '#00f2fe';
+                const bgImage = data.backgroundImage || '';
+                document.documentElement.style.setProperty('--theme-primary-color', primaryColor);
+                if (bgImage) {
+                    document.documentElement.style.setProperty('--theme-background-image', `url(${bgImage})`);
+                } else {
+                    document.documentElement.style.setProperty('--theme-background-image', 'none');
+                }
+            }).catch(() => {});
+        }
 
         // ============================================================
         // GESTION DES TÉMOIGNAGES (CRUD)
@@ -2906,6 +3112,171 @@
                 updateScheduledStatus();
             }, 30000);
             updateScheduledStatus();
+        }
+
+        // ============================================================
+        // ADMIN PANEL - RENDU COMPLET
+        // ============================================================
+        function renderFullAdminPanel() {
+            const container = document.getElementById('admin-panel-container');
+            container.innerHTML = `
+                <div class="admin-panel">
+                    <!-- Donations -->
+                    <div class="admin-field" id="admin-donations-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-coins"></i> Coordonnées de paiement</h4>
+                        <div id="admin-donations-container"></div>
+                    </div>
+
+                    <!-- Gestionnaire de liens -->
+                    <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-link"></i> Liens du Dashboard</h4>
+                        <div id="admin-links-container"></div>
+                    </div>
+
+                    <!-- Journal d'activité -->
+                    <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-history"></i> Journal d'activité</h4>
+                        <div id="admin-logs-container"></div>
+                    </div>
+
+                    <!-- Gestionnaire de thème -->
+                    <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-palette"></i> Gestionnaire de thème</h4>
+                        <div id="theme-manager-container"></div>
+                    </div>
+                </div>
+            `;
+
+            // Charger chaque sous-section
+            loadDonationAdminPanel();
+            renderAdminLinks();
+            renderAdminLogs();
+            renderThemeManager();
+        }
+
+        // Sous-section Donations (Admin)
+        function loadDonationAdminPanel() {
+            const container = document.getElementById('admin-donations-container');
+            loadDonationConfig().then((data) => {
+                if (!data) {
+                    container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement.</p>';
+                    return;
+                }
+                const methods = data.methods || {};
+                let html = `
+                    <div class="admin-field">
+                        <label><i class="fas fa-coins"></i> Crypto-monnaies</label>
+                        <div style="margin-bottom:0.5rem;">
+                            <label style="font-size:0.75rem;">USDT (TRC-20)</label>
+                            <input type="text" id="admin-usdt" value="${methods.usdt || ''}" placeholder="Adresse USDT">
+                            <div class="qr-upload-row">
+                                <button class="btn btn-outline admin-upload-qr" data-field="usdtQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                                    <i class="fas fa-qrcode"></i> QR Code
+                                </button>
+                                ${methods.usdtQR ? `<img src="${methods.usdtQR}" alt="QR"> <button class="btn-remove-qr" data-field="usdtQR"><i class="fas fa-times"></i></button>` : ''}
+                            </div>
+                        </div>
+                        <div style="margin-bottom:0.5rem;">
+                            <label style="font-size:0.75rem;">Tron (TRX)</label>
+                            <input type="text" id="admin-tron" value="${methods.tron || ''}" placeholder="Adresse Tron">
+                            <div class="qr-upload-row">
+                                <button class="btn btn-outline admin-upload-qr" data-field="tronQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                                    <i class="fas fa-qrcode"></i> QR Code
+                                </button>
+                                ${methods.tronQR ? `<img src="${methods.tronQR}" alt="QR"> <button class="btn-remove-qr" data-field="tronQR"><i class="fas fa-times"></i></button>` : ''}
+                            </div>
+                        </div>
+                        <div style="margin-bottom:0.5rem;">
+                            <label style="font-size:0.75rem;">Bitcoin (BTC)</label>
+                            <input type="text" id="admin-btc" value="${methods.btc || ''}" placeholder="Adresse Bitcoin">
+                            <div class="qr-upload-row">
+                                <button class="btn btn-outline admin-upload-qr" data-field="btcQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                                    <i class="fas fa-qrcode"></i> QR Code
+                                </button>
+                                ${methods.btcQR ? `<img src="${methods.btcQR}" alt="QR"> <button class="btn-remove-qr" data-field="btcQR"><i class="fas fa-times"></i></button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="admin-field">
+                        <label><i class="fas fa-mobile-alt"></i> Mobile Money</label>
+                        <div style="margin-bottom:0.5rem;">
+                            <label style="font-size:0.75rem;">MTN Mobile Money</label>
+                            <input type="text" id="admin-mtn" value="${methods.mtn || ''}" placeholder="Numéro MTN">
+                        </div>
+                        <div style="margin-bottom:0.5rem;">
+                            <label style="font-size:0.75rem;">Moov</label>
+                            <input type="text" id="admin-moov" value="${methods.moov || ''}" placeholder="Numéro Moov">
+                        </div>
+                        <div style="margin-bottom:0.5rem;">
+                            <label style="font-size:0.75rem;">Wave</label>
+                            <input type="text" id="admin-wave" value="${methods.wave || ''}" placeholder="Numéro Wave">
+                        </div>
+                    </div>
+                    <button class="btn" id="save-admin-donations" style="margin-top:0.5rem;">Mettre à jour les coordonnées</button>
+                `;
+                container.innerHTML = html;
+
+                // Upload QR
+                container.querySelectorAll('.admin-upload-qr').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const field = this.dataset.field;
+                        openCloudinaryWidget({
+                            button: this,
+                            onSuccess: (url) => {
+                                const data = { methods: { [field]: url } };
+                                saveDonationConfig(data).then(() => {
+                                    showToast('QR Code téléversé !', 'info');
+                                    loadDonationAdminPanel();
+                                    addAdminLog('Mise à jour du QR Code');
+                                });
+                            }
+                        });
+                    });
+                });
+
+                // Suppression QR
+                container.querySelectorAll('.btn-remove-qr').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const field = this.dataset.field;
+                        if (!confirm('Supprimer ce QR Code ?')) return;
+                        const data = { methods: { [field]: '' } };
+                        saveDonationConfig(data).then(() => {
+                            showToast('QR Code supprimé.', 'info');
+                            loadDonationAdminPanel();
+                            addAdminLog('Suppression du QR Code');
+                        });
+                    });
+                });
+
+                // Sauvegarde des coordonnées
+                document.getElementById('save-admin-donations').addEventListener('click', async function() {
+                    const usdt = document.getElementById('admin-usdt').value.trim();
+                    const tron = document.getElementById('admin-tron').value.trim();
+                    const btc = document.getElementById('admin-btc').value.trim();
+                    const mtn = document.getElementById('admin-mtn').value.trim();
+                    const moov = document.getElementById('admin-moov').value.trim();
+                    const wave = document.getElementById('admin-wave').value.trim();
+                    const methods = { usdt, tron, btc, mtn, moov, wave };
+                    const oldData = await loadDonationConfig();
+                    if (oldData && oldData.methods) {
+                        Object.keys(oldData.methods).forEach(k => {
+                            if (k.endsWith('QR') && !methods[k]) {
+                                methods[k] = oldData.methods[k];
+                            }
+                        });
+                    }
+                    const success = await saveDonationConfig({ methods });
+                    if (success) {
+                        showToast('Coordonnées de don mises à jour !', 'info');
+                        addAdminLog('Mise à jour des coordonnées de don');
+                    } else {
+                        showToast('Erreur lors de la mise à jour.', 'error');
+                    }
+                });
+            }).catch(err => {
+                console.error(err);
+                container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement.</p>';
+            });
         }
 
         // ============================================================
@@ -3641,38 +4012,38 @@
             renderSchedules();
             startScheduler();
 
-            // ===== VÉRIFICATION ADMIN ET GESTION DE L'ONGLET =====
+            // Appliquer le thème global
+            applyThemeToSite();
+
+            // ===== GESTION ADMIN =====
             const adminTab = document.getElementById('admin-tab');
             try {
                 const admin = await checkIsAdmin(currentUser.uid);
                 console.log('Résultat checkIsAdmin :', admin);
                 if (admin) {
-                    // L'utilisateur est admin, on affiche l'onglet mais il est désactivé tant que la clé n'est pas validée
                     adminTab.style.display = 'flex';
                     adminTab.style.opacity = '0.5';
-                    adminTab.style.pointerEvents = 'auto'; // permet de cliquer
+                    adminTab.style.pointerEvents = 'auto';
 
                     adminTab.onclick = async function(e) {
                         e.preventDefault();
-                        // Ouvrir la modale de backup
                         const granted = await openAdminGate();
                         if (granted) {
-                            // Succès : activer l'onglet et charger les données
                             adminTab.style.opacity = '1';
                             adminTab.style.pointerEvents = 'auto';
-                            // Charger les donations
-                            const donationData = await loadDonationConfig();
-                            renderAdminPanel(donationData);
-                            // Activer l'onglet
+                            // Charger tout l'Admin Panel
+                            renderFullAdminPanel();
+                            // Ajouter un log
+                            addAdminLog('Connexion Admin réussie');
+                            // Basculer sur l'onglet Admin
                             document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
                             document.querySelectorAll('.tab-content .tab-pane').forEach(p => p.classList.remove('active'));
                             adminTab.classList.add('active');
                             document.getElementById('tab-admin').classList.add('active');
                             showToast('Accès administrateur accordé.', 'info');
                         } else {
-                            // Échec ou fermeture : masquer l'onglet Admin et basculer vers l'onglet Profil
-                            adminTab.style.display = 'none'; // le cacher
-                            // Basculer vers l'onglet Profil
+                            // Échec ou fermeture : cacher l'onglet et rediriger vers Profil
+                            adminTab.style.display = 'none';
                             document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
                             document.querySelectorAll('.tab-content .tab-pane').forEach(p => p.classList.remove('active'));
                             const profileNav = document.querySelector('#dashboard-nav .nav-item[data-tab="profile"]');
@@ -3680,11 +4051,10 @@
                                 profileNav.classList.add('active');
                                 document.getElementById('tab-profile').classList.add('active');
                             }
-                            showToast('Accès refusé. Vous avez été redirigé vers le profil.', 'error');
+                            showToast('Accès refusé. Redirection vers le profil.', 'error');
                         }
                     };
                 } else {
-                    // L'utilisateur n'est pas admin : on cache définitivement l'onglet
                     adminTab.style.display = 'none';
                 }
             } catch (error) {
@@ -3694,9 +4064,6 @@
             }
         }
 
-        // ============================================================
-        // FONCTIONS UTILITAIRES
-        // ============================================================
         function setupShareButtons(publicLink) {
             const copyBtn = document.getElementById('copy-link-btn');
             const openBtn = document.getElementById('open-link-btn');
@@ -4268,7 +4635,6 @@
             navItems.forEach(item => {
                 item.addEventListener('click', function() {
                     const tabId = this.dataset.tab;
-                    // Ne pas permettre de cliquer sur Admin si non activé
                     if (tabId === 'admin' && this.style.display !== 'flex') {
                         return;
                     }
@@ -4657,6 +5023,14 @@
                     donationUnsubscribe();
                     donationUnsubscribe = null;
                 }
+                if (adminLinksUnsubscribe) {
+                    adminLinksUnsubscribe();
+                    adminLinksUnsubscribe = null;
+                }
+                if (adminLogsUnsubscribe) {
+                    adminLogsUnsubscribe();
+                    adminLogsUnsubscribe = null;
+                }
                 showView('view-consent');
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
             });
@@ -4770,7 +5144,6 @@
 
             // --- Admin gate close (gérée dans openAdminGate) mais on prévoit la fermeture manuelle
             document.getElementById('admin-gate-close').addEventListener('click', () => {
-                // Déjà géré dans la promesse, mais on s'assure que la modale se ferme
                 const modal = document.getElementById('admin-gate-modal');
                 modal.classList.remove('active');
             });
