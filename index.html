@@ -48,69 +48,12 @@
             --theme-background-image: none;
         }
 
-        /* ===== APPLICATION DYNAMIQUE DU THÈME (via localStorage) ===== */
-        body {
-            background-color: var(--bg-deep);
-            background-image: var(--bg-deep-image), var(--theme-background-image);
-            color: var(--text-primary);
-        }
-        .brand, .public-name {
-            background: linear-gradient(135deg, var(--theme-primary-color), var(--violet));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .btn {
-            background: linear-gradient(135deg, var(--theme-primary-color), var(--violet));
-            color: #0a0b10;
-        }
-        .btn-outline {
-            border-color: var(--theme-primary-color);
-            color: var(--theme-primary-color);
-        }
-        .status-badge.disponible .dot { background: #2ecc71; }
-        .status-badge.occupe .dot { background: #f39c12; }
-        .status-badge.enlive .dot { background: #e74c3c; }
-        .status-selector .status-option.active {
-            border-color: var(--theme-primary-color);
-            background: rgba(0,242,254,0.15);
-            color: white;
-        }
-        .toggle-switch.active { background: var(--theme-primary-color); }
-        .views-counter {
-            background: rgba(0,242,254,0.1);
-            border-color: var(--theme-primary-color);
-            color: var(--theme-primary-color);
-        }
-        .stats-summary .stat-card .stat-number { color: var(--theme-primary-color); }
-        .stats-summary .stat-card .stat-bar .fill { background: var(--theme-primary-color); }
-        .link-item .platform-icon { color: var(--theme-primary-color); }
-        .rich-link-card .link-action-bar i { color: var(--theme-primary-color); }
-        .border-glow-pulse { border-color: var(--theme-primary-color) !important; }
-        .card-highlight .highlight-badge { background: var(--theme-primary-color); }
-        .theme-toggle:hover { color: var(--theme-primary-color); }
-        .top-networks .rank-item .rank-num { color: var(--theme-primary-color); }
-        .top-networks .rank-item i { color: var(--theme-primary-color); }
-        .donate-btn {
-            background: linear-gradient(135deg, #f7971e, #ffd200);
-            color: #0a0b10;
-        }
-        .donation-popup .modal-content .donation-method .method-label { color: var(--theme-primary-color); }
-        .admin-panel .admin-field input:focus, .admin-panel .admin-field textarea:focus { border-color: var(--theme-primary-color); }
-        .admin-panel .admin-field label { color: var(--text-secondary); }
-        .admin-panel .admin-field input, .admin-panel .admin-field textarea {
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            color: var(--text-primary);
-        }
-
-        /* ===== STYLES GÉNÉRAUX PLEIN ÉCRAN ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        /* ===== CORPS ET CONTENEUR PRINCIPAL ===== */
         html, body {
             width: 100vw;
-            height: 100dvh;
-            overflow: hidden;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
             margin: 0;
             padding: 0;
             font-family: var(--font-body);
@@ -123,7 +66,9 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
             position: relative;
+            min-height: 100vh;
         }
 
         .view {
@@ -133,8 +78,8 @@
             align-items: center;
             justify-content: center;
             padding: 1rem;
-            animation: fadeSlideIn 0.4s ease-out;
             overflow-y: auto;
+            animation: fadeSlideIn 0.4s ease-out;
             width: 100%;
             height: 100%;
         }
@@ -147,6 +92,126 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ===== PARTICULES ===== */
+        #particles-canvas {
+            pointer-events: none !important;
+            z-index: -1 !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* ===== THÈMES VISUELS ===== */
+        /* Minimaliste (clair) */
+        .theme-minimaliste {
+            --bg-deep: #f5f5f5;
+            --bg-card: rgba(255,255,255,0.85);
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --border-glow: rgba(0,0,0,0.1);
+            --card-bg: rgba(255,255,255,0.5);
+            --card-border: rgba(0,0,0,0.08);
+            --input-bg: rgba(0,0,0,0.05);
+            --input-border: rgba(0,0,0,0.2);
+            --shadow-color: rgba(0,0,0,0.15);
+            --nav-bg: rgba(255,255,255,0.9);
+            --bg-deep-image: none;
+            background-color: #f5f5f5 !important;
+            color: #1a1a1a !important;
+        }
+        .theme-minimaliste .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(6px);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .theme-minimaliste .brand,
+        .theme-minimaliste .public-name {
+            background: linear-gradient(135deg, #222, #555);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .theme-minimaliste .btn {
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .theme-minimaliste .btn-outline {
+            border-color: #1a1a1a;
+            color: #1a1a1a;
+        }
+        .theme-minimaliste .input-field {
+            background: #fff;
+            border-color: #ccc;
+            color: #1a1a1a;
+        }
+
+        /* Néo‑brutaliste */
+        .theme-neo-brutaliste {
+            --bg-deep: #ffe600;
+            --bg-card: rgba(255,255,255,0.95);
+            --text-primary: #000;
+            --text-secondary: #333;
+            --border-glow: #000;
+            --card-bg: #fff;
+            --card-border: #000;
+            --input-bg: #fff;
+            --input-border: #000;
+            --shadow-color: rgba(0,0,0,0.5);
+            --nav-bg: #ffe600;
+            --bg-deep-image: none;
+            background-color: #ffe600 !important;
+            color: #000 !important;
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+        }
+        .theme-neo-brutaliste .glass-card {
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            border-radius: 0 !important;
+            background: #fff;
+        }
+        .theme-neo-brutaliste .btn {
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0 #000;
+            border-radius: 0 !important;
+            background: #fff;
+            color: #000;
+        }
+        .theme-neo-brutaliste .btn-outline {
+            border-color: #000;
+            color: #000;
+            background: transparent;
+        }
+        .theme-neo-brutaliste .input-field {
+            border: 2px solid #000;
+            background: #fff;
+            color: #000;
+            border-radius: 0;
+        }
+        .theme-neo-brutaliste .toggle-switch {
+            background: #000;
+        }
+        .theme-neo-brutaliste .toggle-switch::after {
+            background: #ffe600;
+        }
+
+        /* ===== FONDS ===== */
+        .fond-aurora {
+            background-image: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%) !important;
+            background-attachment: fixed !important;
+        }
+        .fond-unique {
+            background-color: #1a1a2e !important;
+            background-image: none !important;
+        }
+        .fond-particules {
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+
+        /* ===== GLASS CARD ET AUTRES STYLES ===== */
         .glass-card {
             background: var(--bg-card);
             backdrop-filter: blur(14px);
@@ -165,117 +230,7 @@
             flex-direction: column;
         }
 
-        /* Ajustements pour le dashboard (plein écran) */
-        .dashboard-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            max-height: 100%;
-            padding: 0;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .dashboard-container .dashboard-header {
-            padding: 1.2rem 1.8rem 0.5rem 1.8rem;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-glow);
-        }
-
-        .dashboard-container .dashboard-header .brand {
-            font-size: 1.3rem;
-            margin: 0;
-        }
-
-        .dashboard-nav {
-            display: flex;
-            justify-content: space-around;
-            padding: 0.5rem 0.8rem;
-            background: var(--nav-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            flex-shrink: 0;
-            flex-wrap: wrap;
-            gap: 0.2rem;
-        }
-
-        .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem 1.8rem 1.8rem 1.8rem;
-            scroll-behavior: smooth;
-        }
-
-        .share-module {
-            padding: 0.8rem 1.8rem;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-glow);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            flex-shrink: 0;
-        }
-
-        /* Ajustements public */
-        .public-wrapper .glass-card {
-            max-width: 600px;
-            padding: 0 0 1.2rem 0;
-            overflow: visible;
-            border-radius: 20px;
-            position: relative;
-        }
-
-        /* Modales */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            padding: 1.5rem;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: var(--bg-deep);
-            border: 1px solid var(--cyan);
-            border-radius: 24px;
-            padding: 2rem;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 0 60px rgba(0,242,254,0.3);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        /* Pour les petits écrans */
-        @media (max-width: 480px) {
-            .glass-card { padding: 1.2rem; }
-            .public-header { padding: 0.8rem 1rem; }
-            .dashboard-container .dashboard-header { padding: 0.8rem 1rem; }
-            .share-module { padding: 0.5rem 1rem; flex-wrap: wrap; }
-            .dashboard-nav .nav-item { font-size: 0.6rem; padding: 0.2rem 0.4rem; }
-            .tab-content { padding: 0.8rem 1rem; }
-            .modal-content { width: 95%; padding: 1.2rem; }
-            .admin-panel .qr-upload-row { flex-direction: column; align-items: flex-start; }
-            .testimonial-item { flex-direction: column; align-items: stretch; }
-            .schedule-item { flex-direction: column; align-items: stretch; }
-            .admin-link-item { flex-direction: column; align-items: stretch; }
-            .theme-manager .color-picker-row { flex-wrap: wrap; }
-        }
-
-        /* ===== Le reste du CSS (identique, conservé) ===== */
+        /* ===== RESTE DU CSS (identique, adapté) ===== */
         .brand {
             font-family: var(--font-heading);
             font-size: 2.2rem;
@@ -891,9 +846,11 @@
             border-radius: 24px;
             padding: 2rem;
             max-width: 400px;
-            width: 100%;
+            width: 90%;
             text-align: center;
             box-shadow: 0 0 60px rgba(0,242,254,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .modal-content img {
             width: 100%;
@@ -1368,16 +1325,6 @@
             font-size: 1rem;
         }
 
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
         /* ===== DASHBOARD ===== */
         .dashboard-container {
             display: flex;
@@ -1475,6 +1422,8 @@
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.2rem;
         }
         .dashboard-nav .nav-item {
             background: transparent;
@@ -3002,7 +2951,7 @@
         // GESTION DU THÈME PAR localStorage (individuel)
         // ============================================================
 
-        // Applique le thème stocké dans localStorage
+        // Applique le thème stocké dans localStorage (couleur principale + image de fond)
         function applyUserTheme() {
             let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
             try {
@@ -3029,90 +2978,44 @@
             applyUserTheme();
         }
 
-        // Gestionnaire de thème dans l'Admin Panel (localStorage)
-        function renderThemeManager() {
-            const container = document.getElementById('theme-manager-container');
-            if (!container) return;
+        // ===== Application des thèmes visuels (style, fond) depuis localStorage =====
+        function applyStoredVisualTheme() {
+            const theme = localStorage.getItem('visualTheme') || 'cyberpunk';
+            document.body.classList.remove('theme-minimaliste', 'theme-neo-brutaliste');
+            if (theme === 'minimaliste') {
+                document.body.classList.add('theme-minimaliste');
+            } else if (theme === 'neo-brutaliste') {
+                document.body.classList.add('theme-neo-brutaliste');
+            }
+            // Mettre à jour le select s'il existe
+            const select = document.getElementById('visual-theme-select');
+            if (select) select.value = theme;
+        }
 
-            let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
-            try {
-                const stored = localStorage.getItem('userTheme');
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    if (parsed.primaryColor) themeData.primaryColor = parsed.primaryColor;
-                    if (parsed.backgroundImage) themeData.backgroundImage = parsed.backgroundImage;
-                }
-            } catch (e) { /* ignore */ }
+        function applyStoredBackground() {
+            const bg = localStorage.getItem('background') || 'cyberpunk';
+            document.body.classList.remove('fond-aurora', 'fond-particules', 'fond-unique');
+            const oldCanvas = document.getElementById('particles-canvas');
+            if (oldCanvas) oldCanvas.remove();
+            if (bg === 'aurora') {
+                document.body.classList.add('fond-aurora');
+            } else if (bg === 'particules') {
+                document.body.classList.add('fond-particules');
+                initParticles();
+            } else if (bg === 'uni') {
+                document.body.classList.add('fond-unique');
+            }
+            // Mettre à jour le select s'il existe
+            const select = document.getElementById('background-select');
+            if (select) select.value = bg;
+        }
 
-            container.innerHTML = `
-                <div class="theme-manager">
-                    <div class="admin-field">
-                        <label>Couleur principale</label>
-                        <div class="color-picker-row">
-                            <input type="color" id="theme-primary-color" value="${themeData.primaryColor}">
-                            <span style="font-size:0.8rem; color:var(--text-secondary);">Choisissez une couleur</span>
-                        </div>
-                    </div>
-                    <div class="admin-field">
-                        <label>Image de fond (upload Cloudinary)</label>
-                        <div class="upload-bg-row">
-                            <button class="btn btn-outline" id="btn-upload-bg" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
-                                <i class="fas fa-image"></i> Changer l'image
-                            </button>
-                            ${themeData.backgroundImage ? `<img class="bg-preview" src="${themeData.backgroundImage}" alt="Fond">` : ''}
-                            ${themeData.backgroundImage ? `<button class="btn btn-outline btn-remove-bg" style="padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);"><i class="fas fa-times"></i> Supprimer</button>` : ''}
-                        </div>
-                    </div>
-                    <button class="btn" id="save-theme-btn" style="margin-top:0.5rem;">Enregistrer le thème</button>
-                </div>
-            `;
-
-            // Upload de fond
-            document.getElementById('btn-upload-bg')?.addEventListener('click', function() {
-                openCloudinaryWidget({
-                    button: this,
-                    onSuccess: (url) => {
-                        const preview = container.querySelector('.bg-preview');
-                        if (preview) preview.src = url;
-                        else {
-                            const row = container.querySelector('.upload-bg-row');
-                            const img = document.createElement('img');
-                            img.className = 'bg-preview';
-                            img.src = url;
-                            row.appendChild(img);
-                            const removeBtn = document.createElement('button');
-                            removeBtn.className = 'btn btn-outline btn-remove-bg';
-                            removeBtn.style.cssText = 'padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);';
-                            removeBtn.innerHTML = '<i class="fas fa-times"></i> Supprimer';
-                            row.appendChild(removeBtn);
-                            removeBtn.addEventListener('click', function() {
-                                saveUserTheme(document.getElementById('theme-primary-color').value, '');
-                                renderThemeManager();
-                                applyUserTheme();
-                                showToast('Image de fond supprimée.', 'info');
-                            });
-                        }
-                        showToast('Image de fond téléversée.', 'info');
-                    }
-                });
-            });
-
-            // Suppression de l'image (géré via le bouton dynamique)
-            container.querySelector('.btn-remove-bg')?.addEventListener('click', function() {
-                saveUserTheme(document.getElementById('theme-primary-color').value, '');
-                renderThemeManager();
-                applyUserTheme();
-                showToast('Image de fond supprimée.', 'info');
-            });
-
-            // Sauvegarde du thème
-            document.getElementById('save-theme-btn')?.addEventListener('click', function() {
-                const color = document.getElementById('theme-primary-color').value;
-                const bgImg = container.querySelector('.bg-preview')?.src || '';
-                saveUserTheme(color, bgImg);
-                showToast('Thème enregistré !', 'info');
-                addAdminLog('Mise à jour du thème (local)');
-            });
+        // Fonction d'initialisation complète des thèmes (appelée au chargement)
+        function initializeThemes() {
+            applyUserTheme();
+            applySavedTheme(); // clair/sombre
+            applyStoredVisualTheme();
+            applyStoredBackground();
         }
 
         // ============================================================
@@ -3452,6 +3355,92 @@
             });
         }
 
+        // Gestionnaire de thème dans l'Admin Panel (localStorage)
+        function renderThemeManager() {
+            const container = document.getElementById('theme-manager-container');
+            if (!container) return;
+
+            let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
+            try {
+                const stored = localStorage.getItem('userTheme');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.primaryColor) themeData.primaryColor = parsed.primaryColor;
+                    if (parsed.backgroundImage) themeData.backgroundImage = parsed.backgroundImage;
+                }
+            } catch (e) { /* ignore */ }
+
+            container.innerHTML = `
+                <div class="theme-manager">
+                    <div class="admin-field">
+                        <label>Couleur principale</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="theme-primary-color" value="${themeData.primaryColor}">
+                            <span style="font-size:0.8rem; color:var(--text-secondary);">Choisissez une couleur</span>
+                        </div>
+                    </div>
+                    <div class="admin-field">
+                        <label>Image de fond (upload Cloudinary)</label>
+                        <div class="upload-bg-row">
+                            <button class="btn btn-outline" id="btn-upload-bg" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                                <i class="fas fa-image"></i> Changer l'image
+                            </button>
+                            ${themeData.backgroundImage ? `<img class="bg-preview" src="${themeData.backgroundImage}" alt="Fond">` : ''}
+                            ${themeData.backgroundImage ? `<button class="btn btn-outline btn-remove-bg" style="padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);"><i class="fas fa-times"></i> Supprimer</button>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn" id="save-theme-btn" style="margin-top:0.5rem;">Enregistrer le thème</button>
+                </div>
+            `;
+
+            // Upload de fond
+            document.getElementById('btn-upload-bg')?.addEventListener('click', function() {
+                openCloudinaryWidget({
+                    button: this,
+                    onSuccess: (url) => {
+                        const preview = container.querySelector('.bg-preview');
+                        if (preview) preview.src = url;
+                        else {
+                            const row = container.querySelector('.upload-bg-row');
+                            const img = document.createElement('img');
+                            img.className = 'bg-preview';
+                            img.src = url;
+                            row.appendChild(img);
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'btn btn-outline btn-remove-bg';
+                            removeBtn.style.cssText = 'padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);';
+                            removeBtn.innerHTML = '<i class="fas fa-times"></i> Supprimer';
+                            row.appendChild(removeBtn);
+                            removeBtn.addEventListener('click', function() {
+                                saveUserTheme(document.getElementById('theme-primary-color').value, '');
+                                renderThemeManager();
+                                applyUserTheme();
+                                showToast('Image de fond supprimée.', 'info');
+                            });
+                        }
+                        showToast('Image de fond téléversée.', 'info');
+                    }
+                });
+            });
+
+            // Suppression de l'image (géré via le bouton dynamique)
+            container.querySelector('.btn-remove-bg')?.addEventListener('click', function() {
+                saveUserTheme(document.getElementById('theme-primary-color').value, '');
+                renderThemeManager();
+                applyUserTheme();
+                showToast('Image de fond supprimée.', 'info');
+            });
+
+            // Sauvegarde du thème
+            document.getElementById('save-theme-btn')?.addEventListener('click', function() {
+                const color = document.getElementById('theme-primary-color').value;
+                const bgImg = container.querySelector('.bg-preview')?.src || '';
+                saveUserTheme(color, bgImg);
+                showToast('Thème enregistré !', 'info');
+                addAdminLog('Mise à jour du thème (local)');
+            });
+        }
+
         // ============================================================
         // CLOUDINARY WIDGET (avec vérification des variables)
         // ============================================================
@@ -3520,12 +3509,19 @@
         }
 
         // ============================================================
-        // PARTICULES CYBER-MATRIX
+        // PARTICULES CYBER-MATRIX (avec pointer-events: none)
         // ============================================================
         function initParticles() {
+            // Supprimer l'ancien canvas s'il existe
+            const oldCanvas = document.getElementById('particles-canvas');
+            if (oldCanvas) oldCanvas.remove();
+
             const canvas = document.createElement('canvas');
             canvas.id = 'particles-canvas';
+            // Les styles sont déjà appliqués via CSS, mais on les force pour sécurité
+            canvas.style.cssText = 'pointer-events: none !important; z-index: -1 !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;';
             document.body.prepend(canvas);
+
             const ctx = canvas.getContext('2d');
             let width, height;
             const particles = [];
@@ -4183,14 +4179,15 @@
             updateStats();
             renderDashboardLinks();
             renderTopNetworks();
-            applyVisualTheme();
-            applyBackground();
+            // Appliquer les thèmes visuels et fonds (depuis localStorage) – ils seront déjà appliqués via l'initialisation, mais on les réapplique pour être sûr
+            applyStoredVisualTheme();
+            applyStoredBackground();
             renderSubscribers();
             renderTestimonialsPrivate();
             renderSchedules();
             startScheduler();
 
-            // Appliquer le thème depuis localStorage (individuel)
+            // Appliquer le thème personnalisé (couleur principale + image)
             applyUserTheme();
 
             // ===== GESTION ADMIN =====
@@ -4529,8 +4526,8 @@
                 statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
 
                 applySavedTheme();
-                applyVisualTheme();
-                applyBackground();
+                applyStoredVisualTheme();
+                applyStoredBackground();
 
                 const flashContainer = document.getElementById('flash-banner-container');
                 flashContainer.innerHTML = '';
@@ -5247,12 +5244,12 @@
             // --- Redirection Unique ---
             document.getElementById('redirect-toggle-track').addEventListener('click', toggleRedirectUnique);
 
-            // --- Sélecteurs de thème visuel et fond ---
+            // --- Sélecteurs de thème visuel et fond (avec application immédiate) ---
             document.getElementById('visual-theme-select').addEventListener('change', function() {
-                applyVisualTheme();
+                applyVisualTheme(); // change les classes et sauvegarde
             });
             document.getElementById('background-select').addEventListener('change', function() {
-                applyBackground();
+                applyBackground(); // change les classes, sauvegarde et lance les particules si besoin
             });
 
             // --- Flash toggle et couleurs ---
@@ -5635,10 +5632,8 @@ URL:${urlProfil}
         // ============================================================
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
-            // Appliquer le thème utilisateur au chargement
-            applyUserTheme();
-            // Appliquer le thème clair/sombre sauvegardé
-            applySavedTheme();
+            // Initialisation complète des thèmes (couleur, clair/sombre, visuel, fond)
+            initializeThemes();
         });
 
     })();
