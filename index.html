@@ -18,9 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-
-    <!-- ===== TOTP LIBRARY (otplib) pour Google Authenticator ===== -->
-    <script src="https://cdn.jsdelivr.net/npm/otplib@12.0.1/dist/otplib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* ===== VARIABLES ===== */
@@ -1835,6 +1833,12 @@
             color: var(--text-secondary);
             margin-bottom: 1rem;
         }
+        .admin-gate .modal-content .totp-setup #totp-qr-container-setup {
+            display: inline-block;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
 
         .donate-btn {
             background: linear-gradient(135deg, #f7971e, #ffd200);
@@ -2282,6 +2286,104 @@
         let scheduleInterval = null;
 
         // ============================================================
+        // FONCTIONS TOTP NATIVES (sans otplib)
+        // ============================================================
+        // Convertir une chaîne Base32 en Uint8Array
+        function base32ToBytes(base32) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            let bits = '';
+            let bytes = [];
+            for (let i = 0; i < base32.length; i++) {
+                const val = alphabet.indexOf(base32[i].toUpperCase());
+                if (val === -1) continue;
+                bits += val.toString(2).padStart(5, '0');
+                while (bits.length >= 8) {
+                    bytes.push(parseInt(bits.slice(0, 8), 2));
+                    bits = bits.slice(8);
+                }
+            }
+            return new Uint8Array(bytes);
+        }
+
+        // Générer un secret TOTP (Base32 aléatoire, 20 octets)
+        function generateTotpSecret() {
+            const bytes = new Uint8Array(20);
+            crypto.getRandomValues(bytes);
+            // Encodage Base32 simple (RFC 4648)
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            let base32 = '';
+            let bits = 0;
+            let bitCount = 0;
+            for (let i = 0; i < bytes.length; i++) {
+                bits = (bits << 8) | bytes[i];
+                bitCount += 8;
+                while (bitCount >= 5) {
+                    const index = (bits >> (bitCount - 5)) & 31;
+                    base32 += alphabet[index];
+                    bitCount -= 5;
+                }
+            }
+            if (bitCount > 0) {
+                const index = (bits << (5 - bitCount)) & 31;
+                base32 += alphabet[index];
+            }
+            // Padding éventuel pour faire un multiple de 8
+            while (base32.length % 8 !== 0) base32 += '=';
+            return base32;
+        }
+
+        // Calculer HMAC-SHA1 avec l'API Web Crypto
+        async function hmacSha1(key, message) {
+            const keyData = typeof key === 'string' ? new TextEncoder().encode(key) : key;
+            const msgData = new TextEncoder().encode(message);
+            const cryptoKey = await crypto.subtle.importKey(
+                'raw',
+                keyData,
+                { name: 'HMAC', hash: { name: 'SHA-1' } },
+                false,
+                ['sign']
+            );
+            const signature = await crypto.subtle.sign('HMAC', cryptoKey, msgData);
+            return new Uint8Array(signature);
+        }
+
+        // Générer le code TOTP pour un timestamp donné (en secondes)
+        async function generateTOTP(secret, timestamp) {
+            // Étape 1 : décoder le secret en bytes
+            const keyBytes = base32ToBytes(secret);
+            // Étape 2 : construire le message (counter sur 8 octets en big-endian)
+            const counter = Math.floor(timestamp / 30);
+            const counterBytes = new Uint8Array(8);
+            for (let i = 7; i >= 0; i--) {
+                counterBytes[i] = counter & 0xff;
+                counter >>= 8;
+            }
+            // Étape 3 : HMAC-SHA1
+            const hmac = await hmacSha1(keyBytes, counterBytes);
+            // Étape 4 : dynamic truncation
+            const offset = hmac[19] & 0x0f;
+            const binary = ((hmac[offset] & 0x7f) << 24) |
+                          ((hmac[offset + 1] & 0xff) << 16) |
+                          ((hmac[offset + 2] & 0xff) << 8) |
+                          (hmac[offset + 3] & 0xff);
+            const otp = binary % 1000000;
+            return otp.toString().padStart(6, '0');
+        }
+
+        // Vérifier un code TOTP avec fenêtre de tolérance (window = 1 => ±30s)
+        async function verifyTOTP(token, secret, window = 1) {
+            if (!token || token.length !== 6) return false;
+            if (!secret || secret.length < 16) return false;
+            const now = Math.floor(Date.now() / 1000);
+            for (let i = -window; i <= window; i++) {
+                const time = now + i * 30;
+                const code = await generateTOTP(secret, time);
+                if (code === token) return true;
+            }
+            return false;
+        }
+
+        // ============================================================
         // VUES
         // ============================================================
         const views = {
@@ -2422,7 +2524,37 @@
         }
 
         // ============================================================
-        // MODALE ADMIN - VALIDATION TOTP + BACKUP
+        // GESTION DE LA COLLECTION donations (initialisation automatique)
+        // ============================================================
+        async function loadDonationConfig() {
+            try {
+                let docRef = db.collection('donations').doc('config');
+                let doc = await docRef.get();
+                if (!doc.exists) {
+                    // Création automatique d'un document par défaut
+                    const defaultData = { methods: { usdt: '', tron: '', btc: '', mtn: '', moov: '', wave: '' } };
+                    await docRef.set(defaultData);
+                    doc = await docRef.get();
+                }
+                return doc.data();
+            } catch (e) {
+                console.warn('Erreur chargement/initialisation donations :', e);
+                return null;
+            }
+        }
+
+        async function saveDonationConfig(data) {
+            try {
+                await db.collection('donations').doc('config').set(data, { merge: true });
+                return true;
+            } catch (e) {
+                console.warn('Erreur sauvegarde donations :', e);
+                return false;
+            }
+        }
+
+        // ============================================================
+        // MODALE ADMIN - VALIDATION TOTP + BACKUP (sans otplib)
         // ============================================================
         async function openAdminGate() {
             return new Promise((resolve) => {
@@ -2480,10 +2612,8 @@
                                 errorDiv.style.display = 'block';
                                 return;
                             }
-                            // Vérifier avec otplib (tolérance d'un intervalle de 30s)
-                            // Configurer la fenêtre de tolérance à 1 (soit ±30s)
-                            otplib.authenticator.options = { window: 1 };
-                            const isValid = otplib.authenticator.check(totp, totpSecret);
+                            // Vérification avec notre fonction native (tolérance ±1 intervalle)
+                            const isValid = await verifyTOTP(totp, totpSecret, 1);
                             if (isValid) {
                                 modal.classList.remove('active');
                                 resolve(true);
@@ -2707,31 +2837,8 @@
         }
 
         // ============================================================
-        // GESTION DES DONS
+        // ADMIN PANEL (donations)
         // ============================================================
-        async function loadDonationConfig() {
-            try {
-                const doc = await db.collection('donations').doc('config').get();
-                if (doc.exists) {
-                    return doc.data();
-                }
-                return null;
-            } catch (e) {
-                console.warn('Erreur chargement donations :', e);
-                return null;
-            }
-        }
-
-        async function saveDonationConfig(data) {
-            try {
-                await db.collection('donations').doc('config').set(data, { merge: true });
-                return true;
-            } catch (e) {
-                console.warn('Erreur sauvegarde donations :', e);
-                return false;
-            }
-        }
-
         function renderAdminPanel(donationData) {
             const panel = document.getElementById('admin-panel');
             if (!donationData) {
