@@ -2418,7 +2418,7 @@
         }
 
         // ============================================================
-        // MODALE ADMIN - VÉRIFICATION PIN + BACKUP CODE
+        // MODALE ADMIN - VÉRIFICATION PIN + BACKUP CODE (avec logs)
         // ============================================================
         async function openAdminGate() {
             return new Promise((resolve) => {
@@ -2446,7 +2446,6 @@
                         const data = doc.data();
                         adminPinHash = data.pinHash || '';
                         adminBackupCode = data.backupCode || '';
-                        // Si les champs sont vides, on affiche un message
                         if (!adminPinHash || !adminBackupCode) {
                             errorDiv.textContent = 'Le compte admin n\'est pas encore configuré.';
                             errorDiv.style.display = 'block';
@@ -2468,6 +2467,8 @@
                     }
                     try {
                         const pinHash = await sha256(pin);
+                        console.log('🔑 Hash généré pour le PIN saisi :', pinHash);
+                        console.log('📦 Hash stocké dans Firestore     :', adminPinHash);
                         if (pinHash !== adminPinHash) {
                             errorDiv.textContent = 'PIN incorrect.';
                             errorDiv.style.display = 'block';
