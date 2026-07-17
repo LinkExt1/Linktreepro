@@ -149,7 +149,6 @@
             --bg-deep-image: none;
             background-color: #0a0b10;
         }
-        /* Le fond "particules" est supprimé */
 
         /* ===== STYLES GÉNÉRAUX PLEIN ÉCRAN ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -2297,7 +2296,6 @@
                         <select id="visual-theme-select"><option value="cyberpunk">Cyberpunk</option><option value="minimaliste">Minimaliste Blanc</option><option value="neo-brutaliste">Néo‑brutaliste</option></select>
                         <label style="margin-left:0.5rem;"><i class="fas fa-image"></i> Fond</label>
                         <select id="background-select"><option value="cyberpunk">Dégradé Cyberpunk</option><option value="aurora">Dégradé Aurora</option><option value="uni">Fond uni</option></select>
-                        <!-- Option "particules" supprimée -->
                     </div>
                     <div class="flex-between mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.5rem;">
                         <div class="maintenance-toggle"><span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span><div class="toggle-track" id="maintenance-toggle"></div></div>
@@ -2484,6 +2482,13 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // FORCER LE LONG POLLING pour éviter les erreurs QUIC
+        try {
+            db.settings({ experimentalForceLongPolling: true });
+        } catch (e) {
+            console.warn('Impossible de forcer le long polling:', e);
+        }
+
         // ============================================================
         // CONSTANTES CLOUDINARY (avec vérification)
         // ============================================================
@@ -2522,7 +2527,7 @@
         let donationUnsubscribe = null;
         let adminLinksUnsubscribe = null;
         let adminLogsUnsubscribe = null;
-        let adminStatusUnsubscribe = null; // pour le statut admin
+        let adminStatusUnsubscribe = null;
         let currentAdminStatus = 'disponible';
 
         // ============================================================
@@ -2570,9 +2575,13 @@
         }
 
         // ============================================================
-        // FIRESTORE - LECTURE / ÉCRITURE
+        // FIRESTORE - LECTURE / ÉCRITURE (avec sécurisation)
         // ============================================================
         async function loadUserProfile(uid) {
+            if (!uid || uid === '') {
+                console.warn('loadUserProfile: uid invalide');
+                return null;
+            }
             try {
                 const docRef = db.collection('users').doc(uid);
                 const doc = await docRef.get();
@@ -2617,6 +2626,10 @@
         }
 
         async function saveUserProfile(uid, data) {
+            if (!uid || uid === '') {
+                console.warn('saveUserProfile: uid invalide');
+                return false;
+            }
             try {
                 const docRef = db.collection('users').doc(uid);
                 await docRef.set(data, { merge: true });
@@ -2634,7 +2647,7 @@
         // ADMIN - VÉRIFICATION DES DROITS
         // ============================================================
         async function checkIsAdmin(uid) {
-            if (!uid) {
+            if (!uid || uid === '') {
                 console.warn('checkIsAdmin: uid manquant');
                 return false;
             }
@@ -2772,88 +2785,91 @@
                 donationUnsubscribe = null;
             }
 
-            donationUnsubscribe = db.collection('donations').doc('payment_details')
-                .onSnapshot((doc) => {
-                    if (!doc.exists) {
-                        container.innerHTML = '<p style="color:var(--text-secondary);">Aucune méthode de don configurée.</p>';
-                        return;
-                    }
-                    const data = doc.data();
-                    const methods = data.methods || {};
-                    let html = '';
-                    const cryptoItems = [
-                        { key: 'usdt', label: 'USDT (TRC-20)', addr: methods.usdt, qr: methods.usdtQR },
-                        { key: 'tron', label: 'Tron (TRX)', addr: methods.tron, qr: methods.tronQR },
-                        { key: 'btc', label: 'Bitcoin (BTC)', addr: methods.btc, qr: methods.btcQR }
-                    ];
-                    cryptoItems.forEach(item => {
-                        if (item.addr) {
-                            html += `
-                                <div class="donation-method">
-                                    <div class="method-label"><i class="fab fa-bitcoin"></i> ${item.label}</div>
-                                    <div class="method-detail">
-                                        <span>${item.addr}</span>
-                                        <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
-                                        ${item.qr ? `<img class="qr-thumb" src="${item.qr}" alt="QR" data-qr="${item.qr}">` : ''}
-                                    </div>
-                                </div>
-                            `;
+            try {
+                donationUnsubscribe = db.collection('donations').doc('payment_details')
+                    .onSnapshot((doc) => {
+                        if (!doc.exists) {
+                            container.innerHTML = '<p style="color:var(--text-secondary);">Aucune méthode de don configurée.</p>';
+                            return;
                         }
-                    });
-                    const mobileItems = [
-                        { key: 'mtn', label: 'MTN Mobile Money', addr: methods.mtn },
-                        { key: 'moov', label: 'Moov', addr: methods.moov },
-                        { key: 'wave', label: 'Wave', addr: methods.wave }
-                    ];
-                    mobileItems.forEach(item => {
-                        if (item.addr) {
-                            html += `
-                                <div class="donation-method">
-                                    <div class="method-label"><i class="fas fa-mobile-alt"></i> ${item.label}</div>
-                                    <div class="method-detail">
-                                        <span>${item.addr}</span>
-                                        <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
+                        const data = doc.data();
+                        const methods = data.methods || {};
+                        let html = '';
+                        const cryptoItems = [
+                            { key: 'usdt', label: 'USDT (TRC-20)', addr: methods.usdt, qr: methods.usdtQR },
+                            { key: 'tron', label: 'Tron (TRX)', addr: methods.tron, qr: methods.tronQR },
+                            { key: 'btc', label: 'Bitcoin (BTC)', addr: methods.btc, qr: methods.btcQR }
+                        ];
+                        cryptoItems.forEach(item => {
+                            if (item.addr) {
+                                html += `
+                                    <div class="donation-method">
+                                        <div class="method-label"><i class="fab fa-bitcoin"></i> ${item.label}</div>
+                                        <div class="method-detail">
+                                            <span>${item.addr}</span>
+                                            <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
+                                            ${item.qr ? `<img class="qr-thumb" src="${item.qr}" alt="QR" data-qr="${item.qr}">` : ''}
+                                        </div>
                                     </div>
-                                </div>
-                            `;
+                                `;
+                            }
+                        });
+                        const mobileItems = [
+                            { key: 'mtn', label: 'MTN Mobile Money', addr: methods.mtn },
+                            { key: 'moov', label: 'Moov', addr: methods.moov },
+                            { key: 'wave', label: 'Wave', addr: methods.wave }
+                        ];
+                        mobileItems.forEach(item => {
+                            if (item.addr) {
+                                html += `
+                                    <div class="donation-method">
+                                        <div class="method-label"><i class="fas fa-mobile-alt"></i> ${item.label}</div>
+                                        <div class="method-detail">
+                                            <span>${item.addr}</span>
+                                            <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        });
+                        if (html === '') {
+                            html = '<p style="color:var(--text-secondary);">Aucune méthode de don configurée.</p>';
                         }
-                    });
-                    if (html === '') {
-                        html = '<p style="color:var(--text-secondary);">Aucune méthode de don configurée.</p>';
-                    }
-                    container.innerHTML = html;
+                        container.innerHTML = html;
 
-                    // Copieurs
-                    container.querySelectorAll('.copy-btn').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const text = this.dataset.text;
-                            navigator.clipboard.writeText(text).then(() => {
-                                showToast('Adresse copiée !', 'info');
-                            }).catch(() => {
-                                const input = document.createElement('input');
-                                input.value = text;
-                                document.body.appendChild(input);
-                                input.select();
-                                document.execCommand('copy');
-                                document.body.removeChild(input);
-                                showToast('Adresse copiée !', 'info');
+                        container.querySelectorAll('.copy-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const text = this.dataset.text;
+                                navigator.clipboard.writeText(text).then(() => {
+                                    showToast('Adresse copiée !', 'info');
+                                }).catch(() => {
+                                    const input = document.createElement('input');
+                                    input.value = text;
+                                    document.body.appendChild(input);
+                                    input.select();
+                                    document.execCommand('copy');
+                                    document.body.removeChild(input);
+                                    showToast('Adresse copiée !', 'info');
+                                });
                             });
                         });
-                    });
 
-                    // Lightbox pour QR Code
-                    container.querySelectorAll('.qr-thumb').forEach(img => {
-                        img.addEventListener('click', function() {
-                            const lightbox = document.getElementById('qr-lightbox');
-                            const lightboxImg = document.getElementById('qr-lightbox-img');
-                            lightboxImg.src = this.dataset.qr;
-                            lightbox.classList.add('active');
+                        container.querySelectorAll('.qr-thumb').forEach(img => {
+                            img.addEventListener('click', function() {
+                                const lightbox = document.getElementById('qr-lightbox');
+                                const lightboxImg = document.getElementById('qr-lightbox-img');
+                                lightboxImg.src = this.dataset.qr;
+                                lightbox.classList.add('active');
+                            });
                         });
+                    }, (err) => {
+                        console.error('Erreur listener donations:', err);
+                        container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des dons.</p>';
                     });
-                }, (err) => {
-                    console.error('Erreur listener donations:', err);
-                    container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des dons.</p>';
-                });
+            } catch (e) {
+                console.error('Erreur lors de l\'écoute des donations :', e);
+                container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des dons.</p>';
+            }
         }
 
         // Fermeture de la popup et lightbox
@@ -2890,26 +2906,28 @@
                 adminStatusUnsubscribe();
                 adminStatusUnsubscribe = null;
             }
-            adminStatusUnsubscribe = db.collection('admin_config').doc('status')
-                .onSnapshot((doc) => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        currentAdminStatus = data.currentStatus || 'disponible';
-                    } else {
-                        // Créer le document avec statut par défaut
-                        db.collection('admin_config').doc('status').set({ currentStatus: 'disponible' })
-                            .catch(err => console.warn('Impossible de créer le statut admin:', err));
-                        currentAdminStatus = 'disponible';
-                    }
-                    // Mettre à jour l'affichage du statut dans l'interface admin
-                    updateAdminStatusUI(currentAdminStatus);
-                }, (err) => {
-                    console.warn('Erreur écoute statut admin:', err);
-                });
+            try {
+                adminStatusUnsubscribe = db.collection('admin_config').doc('status')
+                    .onSnapshot((doc) => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            currentAdminStatus = data.currentStatus || 'disponible';
+                        } else {
+                            // Créer le document avec statut par défaut
+                            db.collection('admin_config').doc('status').set({ currentStatus: 'disponible' })
+                                .catch(err => console.warn('Impossible de créer le statut admin:', err));
+                            currentAdminStatus = 'disponible';
+                        }
+                        updateAdminStatusUI(currentAdminStatus);
+                    }, (err) => {
+                        console.warn('Erreur écoute statut admin:', err);
+                    });
+            } catch (e) {
+                console.error('Erreur lors de l\'écoute du statut admin:', e);
+            }
         }
 
         function updateAdminStatusUI(status) {
-            // Mise à jour des boutons dans la section Admin
             const selector = document.getElementById('admin-status-selector');
             if (selector) {
                 selector.querySelectorAll('.status-option').forEach(el => {
@@ -2949,94 +2967,98 @@
                 adminLinksUnsubscribe = null;
             }
 
-            adminLinksUnsubscribe = db.collection('links')
-                .orderBy('order', 'asc')
-                .onSnapshot((snapshot) => {
-                    let html = '';
-                    if (snapshot.empty) {
-                        html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucun lien configuré.</p>';
-                    } else {
-                        snapshot.forEach((doc, index) => {
-                            const data = doc.data();
-                            const id = doc.id;
-                            html += `
-                                <div class="admin-link-item" data-id="${id}">
-                                    <input type="text" class="admin-link-label" value="${data.label || ''}" placeholder="Label">
-                                    <input type="text" class="admin-link-url" value="${data.url || ''}" placeholder="URL">
-                                    <select class="admin-link-icon">
-                                        ${PLATFORMS.map(p => `<option value="${p.icon}" ${data.icon === p.icon ? 'selected' : ''}>${p.name}</option>`).join('')}
-                                    </select>
-                                    <div class="link-actions">
-                                        <button class="save-link-btn" title="Sauvegarder"><i class="fas fa-save"></i></button>
-                                        <button class="delete-link-btn" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+            try {
+                adminLinksUnsubscribe = db.collection('links')
+                    .orderBy('order', 'asc')
+                    .onSnapshot((snapshot) => {
+                        let html = '';
+                        if (snapshot.empty) {
+                            html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucun lien configuré.</p>';
+                        } else {
+                            snapshot.forEach((doc, index) => {
+                                const data = doc.data();
+                                const id = doc.id;
+                                html += `
+                                    <div class="admin-link-item" data-id="${id}">
+                                        <input type="text" class="admin-link-label" value="${data.label || ''}" placeholder="Label">
+                                        <input type="text" class="admin-link-url" value="${data.url || ''}" placeholder="URL">
+                                        <select class="admin-link-icon">
+                                            ${PLATFORMS.map(p => `<option value="${p.icon}" ${data.icon === p.icon ? 'selected' : ''}>${p.name}</option>`).join('')}
+                                        </select>
+                                        <div class="link-actions">
+                                            <button class="save-link-btn" title="Sauvegarder"><i class="fas fa-save"></i></button>
+                                            <button class="delete-link-btn" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
-                        });
-                    }
-                    html += `
-                        <div style="margin-top:0.5rem;">
-                            <button class="btn btn-outline" id="add-admin-link-btn" style="padding:0.2rem 0.8rem; font-size:0.8rem;">
-                                <i class="fas fa-plus"></i> Ajouter un lien
-                            </button>
-                        </div>
-                    `;
-                    container.innerHTML = html;
-
-                    // Événements sur les liens
-                    container.querySelectorAll('.save-link-btn').forEach(btn => {
-                        btn.addEventListener('click', async function() {
-                            const item = this.closest('.admin-link-item');
-                            const id = item.dataset.id;
-                            const label = item.querySelector('.admin-link-label').value.trim();
-                            const url = item.querySelector('.admin-link-url').value.trim();
-                            const icon = item.querySelector('.admin-link-icon').value;
-                            if (!label || !url) {
-                                showToast('Label et URL requis.', 'error');
-                                return;
-                            }
-                            try {
-                                await db.collection('links').doc(id).update({ label, url, icon });
-                                showToast('Lien mis à jour !', 'info');
-                            } catch (e) {
-                                console.error(e);
-                                showToast('Erreur de mise à jour.', 'error');
-                            }
-                        });
-                    });
-                    container.querySelectorAll('.delete-link-btn').forEach(btn => {
-                        btn.addEventListener('click', async function() {
-                            if (!confirm('Supprimer ce lien ?')) return;
-                            const id = this.closest('.admin-link-item').dataset.id;
-                            try {
-                                await db.collection('links').doc(id).delete();
-                                showToast('Lien supprimé.', 'info');
-                            } catch (e) {
-                                console.error(e);
-                                showToast('Erreur de suppression.', 'error');
-                            }
-                        });
-                    });
-                    document.getElementById('add-admin-link-btn')?.addEventListener('click', async function() {
-                        try {
-                            const snapshot = await db.collection('links').get();
-                            const order = snapshot.size;
-                            await db.collection('links').add({
-                                label: 'Nouveau lien',
-                                url: 'https://exemple.com',
-                                icon: 'fab fa-link',
-                                order: order
+                                `;
                             });
-                            showToast('Lien ajouté.', 'info');
-                        } catch (e) {
-                            console.error(e);
-                            showToast('Erreur d\'ajout.', 'error');
                         }
+                        html += `
+                            <div style="margin-top:0.5rem;">
+                                <button class="btn btn-outline" id="add-admin-link-btn" style="padding:0.2rem 0.8rem; font-size:0.8rem;">
+                                    <i class="fas fa-plus"></i> Ajouter un lien
+                                </button>
+                            </div>
+                        `;
+                        container.innerHTML = html;
+
+                        container.querySelectorAll('.save-link-btn').forEach(btn => {
+                            btn.addEventListener('click', async function() {
+                                const item = this.closest('.admin-link-item');
+                                const id = item.dataset.id;
+                                const label = item.querySelector('.admin-link-label').value.trim();
+                                const url = item.querySelector('.admin-link-url').value.trim();
+                                const icon = item.querySelector('.admin-link-icon').value;
+                                if (!label || !url) {
+                                    showToast('Label et URL requis.', 'error');
+                                    return;
+                                }
+                                try {
+                                    await db.collection('links').doc(id).update({ label, url, icon });
+                                    showToast('Lien mis à jour !', 'info');
+                                } catch (e) {
+                                    console.error(e);
+                                    showToast('Erreur de mise à jour.', 'error');
+                                }
+                            });
+                        });
+                        container.querySelectorAll('.delete-link-btn').forEach(btn => {
+                            btn.addEventListener('click', async function() {
+                                if (!confirm('Supprimer ce lien ?')) return;
+                                const id = this.closest('.admin-link-item').dataset.id;
+                                try {
+                                    await db.collection('links').doc(id).delete();
+                                    showToast('Lien supprimé.', 'info');
+                                } catch (e) {
+                                    console.error(e);
+                                    showToast('Erreur de suppression.', 'error');
+                                }
+                            });
+                        });
+                        document.getElementById('add-admin-link-btn')?.addEventListener('click', async function() {
+                            try {
+                                const snapshot = await db.collection('links').get();
+                                const order = snapshot.size;
+                                await db.collection('links').add({
+                                    label: 'Nouveau lien',
+                                    url: 'https://exemple.com',
+                                    icon: 'fab fa-link',
+                                    order: order
+                                });
+                                showToast('Lien ajouté.', 'info');
+                            } catch (e) {
+                                console.error(e);
+                                showToast('Erreur d\'ajout.', 'error');
+                            }
+                        });
+                    }, (err) => {
+                        console.error('Erreur listener links:', err);
+                        container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des liens.</p>';
                     });
-                }, (err) => {
-                    console.error('Erreur listener links:', err);
-                    container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des liens.</p>';
-                });
+            } catch (e) {
+                console.error('Erreur lors de l\'écoute des liens admin:', e);
+                container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des liens.</p>';
+            }
         }
 
         // 2. Journal d'activité (collection "admin_logs") avec pagination
@@ -3044,7 +3066,6 @@
             const container = document.getElementById('admin-logs-container');
             if (!container) return;
 
-            // Désabonner le listener précédent
             if (adminLogsUnsubscribe) {
                 adminLogsUnsubscribe();
                 adminLogsUnsubscribe = null;
@@ -3052,49 +3073,52 @@
 
             container.innerHTML = '<span class="spinner"></span> Chargement...';
 
-            let query = db.collection('admin_logs').orderBy('timestamp', 'desc');
-            if (limit !== null) {
-                query = query.limit(limit);
-            }
-
-            adminLogsUnsubscribe = query.onSnapshot((snapshot) => {
-                let html = '';
-                if (snapshot.empty) {
-                    html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucune activité enregistrée.</p>';
-                } else {
-                    snapshot.forEach((doc) => {
-                        const data = doc.data();
-                        const date = data.timestamp?.toDate?.() || new Date(data.timestamp);
-                        const timeStr = date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                        html += `
-                            <div class="admin-log-entry">
-                                <span class="log-time">${timeStr}</span>
-                                <span class="log-action">${data.action || 'Action'}</span>
-                            </div>
-                        `;
-                    });
+            try {
+                let query = db.collection('admin_logs').orderBy('timestamp', 'desc');
+                if (limit !== null) {
+                    query = query.limit(limit);
                 }
-                container.innerHTML = html;
 
-                // Ajouter un bouton "Voir plus" si on a atteint la limite et qu'il y a potentiellement plus de documents
-                if (limit !== null && snapshot.size === limit) {
-                    const moreDiv = document.createElement('div');
-                    moreDiv.className = 'admin-log-load-more';
-                    const btn = document.createElement('button');
-                    btn.innerHTML = '<i class="fas fa-plus"></i> Voir plus';
-                    btn.addEventListener('click', function() {
-                        loadAdminLogs(null); // null = pas de limite
-                    });
-                    moreDiv.appendChild(btn);
-                    container.appendChild(moreDiv);
-                }
-            }, (err) => {
-                console.error('Erreur listener logs:', err);
+                adminLogsUnsubscribe = query.onSnapshot((snapshot) => {
+                    let html = '';
+                    if (snapshot.empty) {
+                        html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucune activité enregistrée.</p>';
+                    } else {
+                        snapshot.forEach((doc) => {
+                            const data = doc.data();
+                            const date = data.timestamp?.toDate?.() || new Date(data.timestamp);
+                            const timeStr = date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                            html += `
+                                <div class="admin-log-entry">
+                                    <span class="log-time">${timeStr}</span>
+                                    <span class="log-action">${data.action || 'Action'}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                    container.innerHTML = html;
+
+                    if (limit !== null && snapshot.size === limit) {
+                        const moreDiv = document.createElement('div');
+                        moreDiv.className = 'admin-log-load-more';
+                        const btn = document.createElement('button');
+                        btn.innerHTML = '<i class="fas fa-plus"></i> Voir plus';
+                        btn.addEventListener('click', function() {
+                            loadAdminLogs(null);
+                        });
+                        moreDiv.appendChild(btn);
+                        container.appendChild(moreDiv);
+                    }
+                }, (err) => {
+                    console.error('Erreur listener logs:', err);
+                    container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des logs.</p>';
+                });
+            } catch (e) {
+                console.error('Erreur lors de l\'écoute des logs admin:', e);
                 container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des logs.</p>';
-            });
+            }
         }
 
-        // Ajouter une entrée dans le journal
         async function addAdminLog(action) {
             try {
                 await db.collection('admin_logs').add({
@@ -3110,7 +3134,6 @@
         // GESTION DU THÈME PAR localStorage (individuel)
         // ============================================================
 
-        // Applique le thème stocké dans localStorage (couleur primaire et image de fond)
         function applyUserTheme() {
             let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
             try {
@@ -3130,7 +3153,6 @@
             }
         }
 
-        // Sauvegarde du thème dans localStorage
         function saveUserTheme(primaryColor, backgroundImage) {
             const data = { primaryColor, backgroundImage };
             localStorage.setItem('userTheme', JSON.stringify(data));
@@ -3141,14 +3163,12 @@
         // GESTION DES THÈMES VISUELS ET FONDS (localStorage + classes)
         // ============================================================
 
-        // Applique le thème visuel (cyberpunk, minimaliste, neo-brutaliste)
         function applyVisualTheme(theme) {
             if (!theme) {
                 const select = document.getElementById('visual-theme-select');
                 if (select) {
                     theme = select.value;
                 } else {
-                    // Page publique : lire localStorage
                     theme = localStorage.getItem('visualTheme') || 'cyberpunk';
                 }
             }
@@ -3160,10 +3180,8 @@
             } else if (theme === 'neo-brutaliste') {
                 document.body.classList.add('theme-neo-brutaliste');
             }
-            // cyberpunk est le défaut (pas de classe)
         }
 
-        // Applique le fond (cyberpunk, aurora, uni)
         function applyBackground(bg) {
             if (!bg) {
                 const select = document.getElementById('background-select');
@@ -3181,7 +3199,6 @@
             } else if (bg === 'uni') {
                 document.body.classList.add('fond-unique');
             }
-            // cyberpunk est le défaut (pas de classe)
         }
 
         // ============================================================
@@ -3363,25 +3380,21 @@
             const container = document.getElementById('admin-panel-container');
             container.innerHTML = `
                 <div class="admin-panel">
-                    <!-- Donations -->
                     <div class="admin-field" id="admin-donations-section">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-coins"></i> Coordonnées de paiement</h4>
                         <div id="admin-donations-container"></div>
                     </div>
 
-                    <!-- Gestionnaire de liens -->
                     <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-link"></i> Liens du Dashboard</h4>
                         <div id="admin-links-container"></div>
                     </div>
 
-                    <!-- Journal d'activité -->
                     <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-history"></i> Journal d'activité</h4>
                         <div id="admin-logs-container"></div>
                     </div>
 
-                    <!-- Gestionnaire de thème (localStorage) -->
                     <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-palette"></i> Gestionnaire de thème</h4>
                         <div id="theme-manager-container"></div>
@@ -3389,14 +3402,12 @@
                 </div>
             `;
 
-            // Charger chaque sous-section
             loadDonationAdminPanel();
             renderAdminLinks();
             loadAdminLogs(10);
             renderThemeManager();
         }
 
-        // Sous-section Donations (Admin)
         function loadDonationAdminPanel() {
             const container = document.getElementById('admin-donations-container');
             loadDonationConfig().then((data) => {
@@ -3458,7 +3469,6 @@
                 `;
                 container.innerHTML = html;
 
-                // Upload QR
                 container.querySelectorAll('.admin-upload-qr').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const field = this.dataset.field;
@@ -3476,7 +3486,6 @@
                     });
                 });
 
-                // Suppression QR
                 container.querySelectorAll('.btn-remove-qr').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const field = this.dataset.field;
@@ -3490,7 +3499,6 @@
                     });
                 });
 
-                // Sauvegarde des coordonnées
                 document.getElementById('save-admin-donations').addEventListener('click', async function() {
                     const usdt = document.getElementById('admin-usdt').value.trim();
                     const tron = document.getElementById('admin-tron').value.trim();
@@ -3521,7 +3529,6 @@
             });
         }
 
-        // Gestionnaire de thème dans l'Admin Panel (localStorage)
         function renderThemeManager() {
             const container = document.getElementById('theme-manager-container');
             if (!container) return;
@@ -3559,7 +3566,6 @@
                 </div>
             `;
 
-            // Upload de fond
             document.getElementById('btn-upload-bg')?.addEventListener('click', function() {
                 openCloudinaryWidget({
                     button: this,
@@ -3589,7 +3595,6 @@
                 });
             });
 
-            // Suppression de l'image (géré via le bouton dynamique)
             container.querySelector('.btn-remove-bg')?.addEventListener('click', function() {
                 saveUserTheme(document.getElementById('theme-primary-color').value, '');
                 renderThemeManager();
@@ -3597,7 +3602,6 @@
                 showToast('Image de fond supprimée.', 'info');
             });
 
-            // Sauvegarde du thème
             document.getElementById('save-theme-btn')?.addEventListener('click', function() {
                 const color = document.getElementById('theme-primary-color').value;
                 const bgImg = container.querySelector('.bg-preview')?.src || '';
@@ -3744,6 +3748,7 @@
         // FONCTIONS MÉTIERS
         // ============================================================
         async function incrementViews(uid) {
+            if (!uid || uid === '') return;
             const key = 'viewCounted_' + uid;
             if (sessionStorage.getItem(key) === 'true') return;
             try {
@@ -3759,6 +3764,7 @@
         }
 
         async function incrementLinkClick(uid, linkId) {
+            if (!uid || !linkId) return;
             try {
                 const docRef = db.collection('users').doc(uid);
                 const doc = await docRef.get();
@@ -3784,6 +3790,7 @@
         }
 
         async function addSubscriber(uid, email) {
+            if (!uid || !email) return false;
             try {
                 const docRef = db.collection('users').doc(uid);
                 const doc = await docRef.get();
@@ -4191,7 +4198,6 @@
                 };
             }
 
-            // Remplir les champs
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
             document.getElementById('views-count-display').textContent = userProfile.views || 0;
@@ -4226,7 +4232,6 @@
             renderDashboardLinks();
             renderTopNetworks();
 
-            // Appliquer les thèmes visuels et fonds (lecture localStorage)
             applyVisualTheme();
             applyBackground();
 
@@ -4235,10 +4240,8 @@
             renderSchedules();
             startScheduler();
 
-            // Appliquer le thème depuis localStorage (couleur primaire)
             applyUserTheme();
 
-            // ===== GESTION ADMIN =====
             const adminTab = document.getElementById('admin-tab');
             const adminStatusControl = document.getElementById('admin-status-control');
             try {
@@ -4249,10 +4252,8 @@
                     adminTab.style.opacity = '0.5';
                     adminTab.style.pointerEvents = 'auto';
 
-                    // Afficher le contrôle de statut admin
                     if (adminStatusControl) {
                         adminStatusControl.style.display = 'block';
-                        // Initialiser les événements des boutons de statut admin
                         const adminSelector = document.getElementById('admin-status-selector');
                         if (adminSelector) {
                             adminSelector.querySelectorAll('.status-option').forEach(btn => {
@@ -4262,7 +4263,6 @@
                                 });
                             });
                         }
-                        // Démarrer l'écoute du statut admin
                         listenAdminStatus();
                     }
 
@@ -4272,18 +4272,14 @@
                         if (granted) {
                             adminTab.style.opacity = '1';
                             adminTab.style.pointerEvents = 'auto';
-                            // Charger tout l'Admin Panel
                             renderFullAdminPanel();
-                            // Ajouter un log
                             addAdminLog('Connexion Admin réussie');
-                            // Basculer sur l'onglet Admin
                             document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
                             document.querySelectorAll('.tab-content .tab-pane').forEach(p => p.classList.remove('active'));
                             adminTab.classList.add('active');
                             document.getElementById('tab-admin').classList.add('active');
                             showToast('Accès administrateur accordé.', 'info');
                         } else {
-                            // Échec ou fermeture : cacher l'onglet et rediriger vers Profil
                             adminTab.style.display = 'none';
                             if (adminStatusControl) adminStatusControl.style.display = 'none';
                             document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
@@ -4345,9 +4341,6 @@
             document.body.removeChild(input);
         }
 
-        // ============================================================
-        // GESTION DU STATUT (UI) - personnel
-        // ============================================================
         function updateStatusUI(status) {
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
                 el.classList.toggle('active', el.dataset.value === status);
@@ -4359,9 +4352,6 @@
             track.classList.toggle('active', enabled);
         }
 
-        // ============================================================
-        // AFFICHAGE DES ABONNÉS
-        // ============================================================
         function renderSubscribers() {
             const container = document.getElementById('subscribers-list-container');
             if (!userProfile || !userProfile.subscribers || userProfile.subscribers.length === 0) {
@@ -4399,9 +4389,6 @@
             });
         }
 
-        // ============================================================
-        // THÈMES CLAIR/SOMBRE (localStorage)
-        // ============================================================
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
@@ -4448,9 +4435,6 @@
             updateThemeIcons();
         }
 
-        // ============================================================
-        // INJECTION SEO & TRACKING
-        // ============================================================
         function injectSEO(seo) {
             let titleEl = document.querySelector('title');
             if (!titleEl) {
@@ -4520,6 +4504,10 @@
         // ROUTAGE PUBLIC
         // ============================================================
         async function loadPublicProfile(uid) {
+            if (!uid || uid === '') {
+                showToast('Identifiant de profil invalide.', 'error');
+                return;
+            }
             try {
                 const docRef = db.collection('users').doc(uid);
                 const doc = await docRef.get();
@@ -4555,34 +4543,35 @@
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
 
-                // Vérifier si l'utilisateur est admin pour afficher le statut administrateur
                 const isAdmin = await checkIsAdmin(uid);
                 let statusBadge = document.getElementById('public-status-badge');
                 if (isAdmin) {
-                    // Écouter le statut admin en temps réel
                     if (adminStatusUnsubscribe) {
                         adminStatusUnsubscribe();
                         adminStatusUnsubscribe = null;
                     }
-                    adminStatusUnsubscribe = db.collection('admin_config').doc('status')
-                        .onSnapshot((doc) => {
-                            let status = 'disponible';
-                            if (doc.exists) {
-                                status = doc.data().currentStatus || 'disponible';
-                            }
-                            const statusMap = {
-                                disponible: { label: 'Disponible', class: 'disponible' },
-                                occupe: { label: 'Occupé', class: 'occupe' },
-                                enlive: { label: 'En Live', class: 'enlive' }
-                            };
-                            const st = statusMap[status] || statusMap.disponible;
-                            statusBadge.className = `status-badge ${st.class}`;
-                            statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
-                        }, (err) => {
-                            console.warn('Erreur écoute statut admin public:', err);
-                        });
+                    try {
+                        adminStatusUnsubscribe = db.collection('admin_config').doc('status')
+                            .onSnapshot((doc) => {
+                                let status = 'disponible';
+                                if (doc.exists) {
+                                    status = doc.data().currentStatus || 'disponible';
+                                }
+                                const statusMap = {
+                                    disponible: { label: 'Disponible', class: 'disponible' },
+                                    occupe: { label: 'Occupé', class: 'occupe' },
+                                    enlive: { label: 'En Live', class: 'enlive' }
+                                };
+                                const st = statusMap[status] || statusMap.disponible;
+                                statusBadge.className = `status-badge ${st.class}`;
+                                statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+                            }, (err) => {
+                                console.warn('Erreur écoute statut admin public:', err);
+                            });
+                    } catch (e) {
+                        console.error('Erreur lors de l\'écoute du statut admin public:', e);
+                    }
                 } else {
-                    // Statut personnel
                     const statusMap = {
                         disponible: { label: 'Disponible', class: 'disponible' },
                         occupe: { label: 'Occupé', class: 'occupe' },
@@ -4593,7 +4582,6 @@
                     statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
                 }
 
-                // Appliquer les thèmes (clair/sombre, visuel, fond)
                 applySavedTheme();
                 applyVisualTheme();
                 applyBackground();
@@ -4827,9 +4815,6 @@
             }
         }
 
-        // ============================================================
-        // EXPORT RAPPORT
-        // ============================================================
         function exportReport() {
             if (!userProfile) {
                 showToast('Profil non chargé.', 'error');
@@ -4973,7 +4958,6 @@
         // ATTACHEMENT DES ÉVÉNEMENTS
         // ============================================================
         function attachAllEventListeners() {
-            // --- Consentement ---
             document.getElementById('accept-consent-btn').addEventListener('click', function(e) {
                 e.preventDefault();
                 setConsentGiven(true);
@@ -4985,14 +4969,12 @@
                 }
             });
 
-            // --- Auth tabs ---
             document.getElementById('auth-tabs').addEventListener('click', (e) => {
                 if (e.target.classList.contains('tab')) {
                     updateAuthUIForMode(e.target.dataset.tab);
                 }
             });
 
-            // --- Auth form ---
             document.getElementById('auth-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('auth-email').value.trim();
@@ -5031,7 +5013,6 @@
                 }
             });
 
-            // --- Google Sign-In ---
             document.getElementById('google-signin-btn').addEventListener('click', async () => {
                 const googleBtn = document.getElementById('google-signin-btn');
                 const googleText = document.getElementById('google-btn-text');
@@ -5063,7 +5044,6 @@
                 }
             });
 
-            // --- Mot de passe oublié ---
             document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
                 e.preventDefault();
                 const email = prompt('Entrez votre adresse email pour réinitialiser le mot de passe :');
@@ -5076,7 +5056,6 @@
                 }
             });
 
-            // --- Onboarding ---
             document.getElementById('skip-onboarding-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const bio = document.getElementById('onboarding-bio').value.trim();
@@ -5179,7 +5158,6 @@
                 await populateDashboard();
             });
 
-            // --- Dashboard : Ajouter un lien ---
             document.getElementById('add-link-btn').addEventListener('click', () => {
                 selectedNetworkType = null;
                 document.querySelectorAll('.network-card').forEach(el => el.classList.remove('selected'));
@@ -5205,7 +5183,6 @@
                 this.classList.toggle('active');
             });
 
-            // --- Dashboard : Enregistrer ---
             document.getElementById('save-dashboard-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const name = document.getElementById('dashboard-name').value.trim();
@@ -5256,7 +5233,6 @@
                 }
             });
 
-            // --- Déconnexion ---
             document.getElementById('logout-btn').addEventListener('click', () => {
                 setConsentGiven(false);
                 auth.signOut();
@@ -5283,11 +5259,9 @@
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
             });
 
-            // --- Uploads ---
             setupAvatarUpload();
             setupLinkImageUpload();
 
-            // --- Événements dashboard (statut, maintenance) ---
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
                 el.addEventListener('click', () => {
                     const value = el.dataset.value;
@@ -5308,16 +5282,13 @@
 
             document.getElementById('reset-views-btn').addEventListener('click', resetViews);
 
-            // --- Thème privé ---
             document.getElementById('theme-toggle-private').addEventListener('click', function(e) {
                 e.preventDefault();
                 toggleTheme();
             });
 
-            // --- Redirection Unique ---
             document.getElementById('redirect-toggle-track').addEventListener('click', toggleRedirectUnique);
 
-            // --- Sélecteurs de thème visuel et fond (application immédiate) ---
             document.getElementById('visual-theme-select').addEventListener('change', function() {
                 applyVisualTheme(this.value);
             });
@@ -5325,7 +5296,6 @@
                 applyBackground(this.value);
             });
 
-            // --- Flash toggle et couleurs ---
             document.getElementById('flash-toggle').addEventListener('click', function() {
                 this.classList.toggle('active');
             });
@@ -5336,32 +5306,24 @@
                 });
             });
 
-            // --- Export Rapport ---
             document.getElementById('export-report-btn').addEventListener('click', exportReport);
 
-            // --- Copier les emails ---
             document.getElementById('copy-emails-btn').addEventListener('click', copyEmails);
 
-            // --- QR Code et Vcard ---
             setupQRModal();
             setupVcard();
 
-            // --- Gated Modal ---
             setupGatedModal();
 
-            // --- Grille d'ajout ---
             renderAddLinkGrid();
 
-            // --- Theme toggle public ---
             document.getElementById('theme-toggle-btn').addEventListener('click', function(e) {
                 e.preventDefault();
                 toggleTheme();
             });
 
-            // --- Tabs du Dashboard ---
             setupTabs();
 
-            // --- Ajouter témoignage ---
             document.getElementById('add-testimonial-btn').addEventListener('click', () => {
                 if (!currentUser) {
                     showToast('Connectez-vous.', 'error');
@@ -5377,7 +5339,6 @@
                 saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
             });
 
-            // --- Ajouter plage horaire (planificateur) ---
             document.getElementById('add-schedule-btn').addEventListener('click', () => {
                 if (!currentUser || !userProfile) return;
                 if (!userProfile.schedules) userProfile.schedules = [];
@@ -5387,10 +5348,8 @@
                 updateScheduledStatus();
             });
 
-            // --- Bouton Don ---
             document.getElementById('donate-btn').addEventListener('click', showDonationPopup);
 
-            // --- Admin gate close (gérée dans openAdminGate) mais on prévoit la fermeture manuelle
             document.getElementById('admin-gate-close').addEventListener('click', () => {
                 const modal = document.getElementById('admin-gate-modal');
                 modal.classList.remove('active');
@@ -5563,9 +5522,6 @@
             showToast('Section ajoutée !', 'info');
         }
 
-        // ============================================================
-        // QR MODAL & VCARD
-        // ============================================================
         function setupQRModal() {
             const modal = document.getElementById('qr-modal');
             const openBtn = document.getElementById('qr-code-btn');
@@ -5701,18 +5657,12 @@ URL:${urlProfil}
         });
 
         // ============================================================
-        // INIT - Application des thèmes au chargement
+        // INIT
         // ============================================================
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
-
-            // Appliquer le thème utilisateur (couleur primaire)
             applyUserTheme();
-
-            // Appliquer le thème clair/sombre sauvegardé
             applySavedTheme();
-
-            // Appliquer le thème visuel et le fond depuis localStorage
             applyVisualTheme();
             applyBackground();
         });
