@@ -20,7 +20,7 @@
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
     <style>
-        /* ===== VARIABLES (surchargées dynamiquement par le thème) ===== */
+        /* ===== VARIABLES ===== */
         :root {
             --bg-deep: #0a0b10;
             --bg-card: rgba(10, 11, 16, 0.7);
@@ -104,7 +104,7 @@
             color: var(--text-primary);
         }
 
-        /* ===== STYLES GÉNÉRAUX (inchangés) ===== */
+        /* ===== STYLES GÉNÉRAUX ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: var(--font-body);
@@ -1788,7 +1788,7 @@
             color: var(--danger);
         }
 
-        /* ---- Journal d'activité ---- */
+        /* ---- Journal d'activité (paginé) ---- */
         .admin-log-entry {
             display: flex;
             justify-content: space-between;
@@ -1803,6 +1803,24 @@
         }
         .admin-log-entry .log-action {
             color: var(--text-secondary);
+        }
+        .admin-log-load-more {
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        .admin-log-load-more button {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            padding: 0.2rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+        .admin-log-load-more button:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
         }
 
         /* ---- Gestionnaire de thème ---- */
@@ -2283,10 +2301,14 @@
         const db = firebase.firestore();
 
         // ============================================================
-        // CONSTANTES
+        // CONSTANTES CLOUDINARY (avec vérification)
         // ============================================================
         const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
         const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
+        if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+            console.error('Cloudinary config manquante !');
+        }
+
         const PLATFORMS = [
             { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp' },
             { id: 'telegram', name: 'Telegram', icon: 'fab fa-telegram-plane' },
@@ -2779,42 +2801,59 @@
                 });
         }
 
-        // 2. Journal d'activité (collection "admin_logs")
-        function renderAdminLogs() {
+        // 2. Journal d'activité (collection "admin_logs") avec pagination
+        function loadAdminLogs(limit = 10) {
             const container = document.getElementById('admin-logs-container');
             if (!container) return;
-            container.innerHTML = '<span class="spinner"></span> Chargement...';
 
+            // Désabonner le listener précédent
             if (adminLogsUnsubscribe) {
                 adminLogsUnsubscribe();
                 adminLogsUnsubscribe = null;
             }
 
-            adminLogsUnsubscribe = db.collection('admin_logs')
-                .orderBy('timestamp', 'desc')
-                .limit(20)
-                .onSnapshot((snapshot) => {
-                    let html = '';
-                    if (snapshot.empty) {
-                        html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucune activité enregistrée.</p>';
-                    } else {
-                        snapshot.forEach((doc) => {
-                            const data = doc.data();
-                            const date = data.timestamp?.toDate?.() || new Date(data.timestamp);
-                            const timeStr = date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                            html += `
-                                <div class="admin-log-entry">
-                                    <span class="log-time">${timeStr}</span>
-                                    <span class="log-action">${data.action || 'Action'}</span>
-                                </div>
-                            `;
-                        });
-                    }
-                    container.innerHTML = html;
-                }, (err) => {
-                    console.error('Erreur listener logs:', err);
-                    container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des logs.</p>';
-                });
+            container.innerHTML = '<span class="spinner"></span> Chargement...';
+
+            let query = db.collection('admin_logs').orderBy('timestamp', 'desc');
+            if (limit !== null) {
+                query = query.limit(limit);
+            }
+
+            adminLogsUnsubscribe = query.onSnapshot((snapshot) => {
+                let html = '';
+                if (snapshot.empty) {
+                    html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucune activité enregistrée.</p>';
+                } else {
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const date = data.timestamp?.toDate?.() || new Date(data.timestamp);
+                        const timeStr = date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                        html += `
+                            <div class="admin-log-entry">
+                                <span class="log-time">${timeStr}</span>
+                                <span class="log-action">${data.action || 'Action'}</span>
+                            </div>
+                        `;
+                    });
+                }
+                container.innerHTML = html;
+
+                // Ajouter un bouton "Voir plus" si on a atteint la limite et qu'il y a potentiellement plus de documents
+                if (limit !== null && snapshot.size === limit) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.className = 'admin-log-load-more';
+                    const btn = document.createElement('button');
+                    btn.innerHTML = '<i class="fas fa-plus"></i> Voir plus';
+                    btn.addEventListener('click', function() {
+                        loadAdminLogs(null); // null = pas de limite
+                    });
+                    moreDiv.appendChild(btn);
+                    container.appendChild(moreDiv);
+                }
+            }, (err) => {
+                console.error('Erreur listener logs:', err);
+                container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des logs.</p>';
+            });
         }
 
         // Ajouter une entrée dans le journal
@@ -3150,7 +3189,7 @@
             // Charger chaque sous-section
             loadDonationAdminPanel();
             renderAdminLinks();
-            renderAdminLogs();
+            loadAdminLogs(10); // 10 premiers logs
             renderThemeManager();
         }
 
@@ -3280,11 +3319,16 @@
         }
 
         // ============================================================
-        // CLOUDINARY WIDGET
+        // CLOUDINARY WIDGET (avec vérification des variables)
         // ============================================================
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
                 showToast('Connectez-vous pour continuer.', 'error');
+                return;
+            }
+            if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+                showToast('Erreur de configuration Cloudinary.', 'error');
+                if (onError) onError('Cloudinary config manquante');
                 return;
             }
             if (isCloudinaryWidgetOpen) return;
