@@ -54,6 +54,7 @@
             background-image: var(--bg-deep-image), var(--theme-background-image);
             color: var(--text-primary);
             transition: background 0.3s ease, color 0.3s ease;
+            overflow-y: auto;
         }
 
         /* --- Thèmes visuels --- */
@@ -148,7 +149,7 @@
             --bg-deep-image: none;
             background-color: #0a0b10;
         }
-        /* Les particules sont gérées par le canvas, on garde le fond par défaut */
+        /* Le fond "particules" est supprimé */
 
         /* ===== STYLES GÉNÉRAUX PLEIN ÉCRAN ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -170,6 +171,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow-y: auto;
         }
 
         .view {
@@ -177,10 +179,10 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* alignement en haut pour permettre le scroll */
+            justify-content: flex-start;
             padding: 1rem;
             animation: fadeSlideIn 0.4s ease-out;
-            overflow-y: auto;  /* Permet le défilement */
+            overflow-y: auto;
             width: 100%;
             height: 100%;
             -webkit-overflow-scrolling: touch;
@@ -210,7 +212,7 @@
             max-height: 100%;
             display: flex;
             flex-direction: column;
-            margin: auto; /* centré verticalement si contenu petit, mais si grand, scroll */
+            margin: auto;
         }
 
         /* Ajustements pour le dashboard (plein écran) */
@@ -307,7 +309,6 @@
             overflow-y: auto;
         }
 
-        /* Pour les petits écrans */
         @media (max-width: 480px) {
             .glass-card { padding: 1.2rem; }
             .public-header { padding: 0.8rem 1rem; }
@@ -321,17 +322,6 @@
             .schedule-item { flex-direction: column; align-items: stretch; }
             .admin-link-item { flex-direction: column; align-items: stretch; }
             .theme-manager .color-picker-row { flex-wrap: wrap; }
-        }
-
-        /* ===== PARTICULES ===== */
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;  /* Ne bloque pas les interactions */
-            z-index: -1;           /* Derrière tout le contenu */
         }
 
         /* ===== Le reste du CSS (identique, conservé) ===== */
@@ -2306,7 +2296,8 @@
                         <label><i class="fas fa-palette"></i> Style visuel</label>
                         <select id="visual-theme-select"><option value="cyberpunk">Cyberpunk</option><option value="minimaliste">Minimaliste Blanc</option><option value="neo-brutaliste">Néo‑brutaliste</option></select>
                         <label style="margin-left:0.5rem;"><i class="fas fa-image"></i> Fond</label>
-                        <select id="background-select"><option value="cyberpunk">Dégradé Cyberpunk</option><option value="aurora">Dégradé Aurora</option><option value="particules">Particules légères</option><option value="uni">Fond uni</option></select>
+                        <select id="background-select"><option value="cyberpunk">Dégradé Cyberpunk</option><option value="aurora">Dégradé Aurora</option><option value="uni">Fond uni</option></select>
+                        <!-- Option "particules" supprimée -->
                     </div>
                     <div class="flex-between mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.5rem;">
                         <div class="maintenance-toggle"><span style="font-size:0.8rem; color:var(--text-secondary);">Maintenance</span><div class="toggle-track" id="maintenance-toggle"></div></div>
@@ -2345,9 +2336,23 @@
                     <button class="btn btn-outline" id="add-testimonial-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem; margin-top:0.5rem;"><i class="fas fa-plus"></i> Ajouter un témoignage</button>
                 </div>
 
-                <!-- ===== ADMIN (caché par défaut) ===== -->
+                <!-- ===== ADMIN ===== -->
                 <div class="tab-pane" id="tab-admin">
                     <h3><i class="fas fa-shield-alt"></i> Administration</h3>
+                    <!-- Statut administrateur (visible uniquement pour l'admin) -->
+                    <div id="admin-status-control" style="display:none; margin-bottom:1.5rem; border:1px solid var(--border-glow); border-radius:12px; padding:0.8rem;">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-bullhorn"></i> Statut Administrateur</h4>
+                        <p style="font-size:0.8rem; color:var(--text-secondary);">Ce statut sera affiché sur votre profil public.</p>
+                        <div class="status-selector" id="admin-status-selector">
+                            <span class="status-option" data-value="disponible"><span class="dot"></span> Disponible</span>
+                            <span class="status-option" data-value="occupe"><span class="dot"></span> Occupé</span>
+                            <span class="status-option" data-value="enlive"><span class="dot"></span> En Live</span>
+                        </div>
+                        <div style="margin-top:0.5rem; font-size:0.75rem; color:var(--text-secondary);">
+                            Statut actuel : <span id="admin-current-status-display">-</span>
+                        </div>
+                    </div>
+
                     <div id="admin-panel-container">
                         <!-- Contenu chargé dynamiquement après validation -->
                     </div>
@@ -2517,6 +2522,8 @@
         let donationUnsubscribe = null;
         let adminLinksUnsubscribe = null;
         let adminLogsUnsubscribe = null;
+        let adminStatusUnsubscribe = null; // pour le statut admin
+        let currentAdminStatus = 'disponible';
 
         // ============================================================
         // VUES
@@ -2876,6 +2883,58 @@
         });
 
         // ============================================================
+        // GESTION DU STATUT ADMINISTRATEUR (Firestore)
+        // ============================================================
+        function listenAdminStatus() {
+            if (adminStatusUnsubscribe) {
+                adminStatusUnsubscribe();
+                adminStatusUnsubscribe = null;
+            }
+            adminStatusUnsubscribe = db.collection('admin_config').doc('status')
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        currentAdminStatus = data.currentStatus || 'disponible';
+                    } else {
+                        // Créer le document avec statut par défaut
+                        db.collection('admin_config').doc('status').set({ currentStatus: 'disponible' })
+                            .catch(err => console.warn('Impossible de créer le statut admin:', err));
+                        currentAdminStatus = 'disponible';
+                    }
+                    // Mettre à jour l'affichage du statut dans l'interface admin
+                    updateAdminStatusUI(currentAdminStatus);
+                }, (err) => {
+                    console.warn('Erreur écoute statut admin:', err);
+                });
+        }
+
+        function updateAdminStatusUI(status) {
+            // Mise à jour des boutons dans la section Admin
+            const selector = document.getElementById('admin-status-selector');
+            if (selector) {
+                selector.querySelectorAll('.status-option').forEach(el => {
+                    el.classList.toggle('active', el.dataset.value === status);
+                });
+            }
+            const display = document.getElementById('admin-current-status-display');
+            if (display) {
+                const labels = { disponible: 'Disponible', occupe: 'Occupé', enlive: 'En Live' };
+                display.textContent = labels[status] || status;
+            }
+        }
+
+        async function updateAdminStatus(newStatus) {
+            try {
+                await db.collection('admin_config').doc('status').set({ currentStatus: newStatus }, { merge: true });
+                showToast('Statut administrateur mis à jour !', 'info');
+                addAdminLog('Changement de statut administrateur : ' + newStatus);
+            } catch (e) {
+                console.error('Erreur mise à jour statut admin:', e);
+                showToast('Erreur lors de la mise à jour du statut.', 'error');
+            }
+        }
+
+        // ============================================================
         // NOUVELLES FONCTIONNALITÉS ADMIN
         // ============================================================
 
@@ -3084,7 +3143,6 @@
 
         // Applique le thème visuel (cyberpunk, minimaliste, neo-brutaliste)
         function applyVisualTheme(theme) {
-            // Si aucun paramètre, on lit depuis localStorage ou le selecteur
             if (!theme) {
                 const select = document.getElementById('visual-theme-select');
                 if (select) {
@@ -3094,10 +3152,8 @@
                     theme = localStorage.getItem('visualTheme') || 'cyberpunk';
                 }
             }
-            // Sauvegarder dans localStorage
             localStorage.setItem('visualTheme', theme);
 
-            // Retirer les classes existantes
             document.body.classList.remove('theme-minimaliste', 'theme-neo-brutaliste');
             if (theme === 'minimaliste') {
                 document.body.classList.add('theme-minimaliste');
@@ -3107,7 +3163,7 @@
             // cyberpunk est le défaut (pas de classe)
         }
 
-        // Applique le fond (cyberpunk, aurora, particules, uni)
+        // Applique le fond (cyberpunk, aurora, uni)
         function applyBackground(bg) {
             if (!bg) {
                 const select = document.getElementById('background-select');
@@ -3119,134 +3175,13 @@
             }
             localStorage.setItem('background', bg);
 
-            document.body.classList.remove('fond-aurora', 'fond-particules', 'fond-unique');
-            // Supprimer l'ancien canvas si présent
-            const oldCanvas = document.getElementById('particles-canvas');
-            if (oldCanvas) oldCanvas.remove();
-
+            document.body.classList.remove('fond-aurora', 'fond-unique');
             if (bg === 'aurora') {
                 document.body.classList.add('fond-aurora');
-            } else if (bg === 'particules') {
-                document.body.classList.add('fond-particules');
-                initParticles();
             } else if (bg === 'uni') {
                 document.body.classList.add('fond-unique');
             }
             // cyberpunk est le défaut (pas de classe)
-        }
-
-        // ============================================================
-        // PARTICULES (avec pointer-events:none et z-index:-1)
-        // ============================================================
-        function initParticles() {
-            const canvas = document.createElement('canvas');
-            canvas.id = 'particles-canvas';
-            // Les propriétés CSS sont définies dans le style
-            document.body.prepend(canvas);
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            const particles = [];
-            const count = 70;
-
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            for (let i = 0; i < count; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.6,
-                    vy: (Math.random() - 0.5) * 0.6,
-                    r: Math.random() * 2.5 + 1,
-                    color: `rgba(0,242,254,${Math.random() * 0.5 + 0.1})`
-                });
-            }
-
-            let mouseX = null, mouseY = null;
-            let touchActive = false;
-
-            function onMove(x, y) {
-                mouseX = x;
-                mouseY = y;
-                touchActive = true;
-            }
-
-            document.addEventListener('mousemove', (e) => {
-                onMove(e.clientX, e.clientY);
-            });
-            document.addEventListener('touchmove', (e) => {
-                const touch = e.touches[0];
-                if (touch) onMove(touch.clientX, touch.clientY);
-                e.preventDefault();
-            }, { passive: false });
-            document.addEventListener('touchend', () => {
-                touchActive = false;
-            });
-
-            function draw() {
-                ctx.clearRect(0, 0, width, height);
-                const attractRadius = 150;
-                const repulseRadius = 80;
-
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < 0 || p.x > width) p.vx *= -1;
-                    if (p.y < 0 || p.y > height) p.vy *= -1;
-
-                    if (touchActive && mouseX !== null && mouseY !== null) {
-                        const dx = p.x - mouseX;
-                        const dy = p.y - mouseY;
-                        const dist = Math.sqrt(dx*dx + dy*dy);
-                        if (dist < attractRadius && dist > 0) {
-                            const force = (attractRadius - dist) / attractRadius;
-                            const angle = Math.atan2(dy, dx);
-                            if (dist < repulseRadius) {
-                                const repForce = (repulseRadius - dist) / repulseRadius * 0.8;
-                                p.vx += Math.cos(angle) * repForce * 0.5;
-                                p.vy += Math.sin(angle) * repForce * 0.5;
-                            } else {
-                                p.vx -= Math.cos(angle) * force * 0.3;
-                                p.vy -= Math.sin(angle) * force * 0.3;
-                            }
-                        }
-                    }
-                    const maxSpeed = 2;
-                    const spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
-                    if (spd > maxSpeed) {
-                        p.vx = (p.vx / spd) * maxSpeed;
-                        p.vy = (p.vy / spd) * maxSpeed;
-                    }
-
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
-                    ctx.fill();
-                });
-
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 130) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            const alpha = 0.15 * (1 - dist / 130);
-                            ctx.strokeStyle = `rgba(0,242,254,${alpha})`;
-                            ctx.lineWidth = 0.6;
-                            ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(draw);
-            }
-            draw();
         }
 
         // ============================================================
@@ -4305,6 +4240,7 @@
 
             // ===== GESTION ADMIN =====
             const adminTab = document.getElementById('admin-tab');
+            const adminStatusControl = document.getElementById('admin-status-control');
             try {
                 const admin = await checkIsAdmin(currentUser.uid);
                 console.log('Résultat checkIsAdmin :', admin);
@@ -4312,6 +4248,23 @@
                     adminTab.style.display = 'flex';
                     adminTab.style.opacity = '0.5';
                     adminTab.style.pointerEvents = 'auto';
+
+                    // Afficher le contrôle de statut admin
+                    if (adminStatusControl) {
+                        adminStatusControl.style.display = 'block';
+                        // Initialiser les événements des boutons de statut admin
+                        const adminSelector = document.getElementById('admin-status-selector');
+                        if (adminSelector) {
+                            adminSelector.querySelectorAll('.status-option').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const value = this.dataset.value;
+                                    updateAdminStatus(value);
+                                });
+                            });
+                        }
+                        // Démarrer l'écoute du statut admin
+                        listenAdminStatus();
+                    }
 
                     adminTab.onclick = async function(e) {
                         e.preventDefault();
@@ -4332,6 +4285,7 @@
                         } else {
                             // Échec ou fermeture : cacher l'onglet et rediriger vers Profil
                             adminTab.style.display = 'none';
+                            if (adminStatusControl) adminStatusControl.style.display = 'none';
                             document.querySelectorAll('#dashboard-nav .nav-item').forEach(n => n.classList.remove('active'));
                             document.querySelectorAll('.tab-content .tab-pane').forEach(p => p.classList.remove('active'));
                             const profileNav = document.querySelector('#dashboard-nav .nav-item[data-tab="profile"]');
@@ -4344,10 +4298,12 @@
                     };
                 } else {
                     adminTab.style.display = 'none';
+                    if (adminStatusControl) adminStatusControl.style.display = 'none';
                 }
             } catch (error) {
                 console.error('Erreur lors de la vérification des droits admin :', error);
                 adminTab.style.display = 'none';
+                if (adminStatusControl) adminStatusControl.style.display = 'none';
                 showToast('Impossible de vérifier les droits administrateur.', 'error');
             }
         }
@@ -4390,7 +4346,7 @@
         }
 
         // ============================================================
-        // GESTION DU STATUT (UI)
+        // GESTION DU STATUT (UI) - personnel
         // ============================================================
         function updateStatusUI(status) {
             document.querySelectorAll('.status-selector .status-option').forEach(el => {
@@ -4599,15 +4555,43 @@
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
 
-                const statusBadge = document.getElementById('public-status-badge');
-                const statusMap = {
-                    disponible: { label: 'Disponible', class: 'disponible' },
-                    occupe: { label: 'Occupé', class: 'occupe' },
-                    enlive: { label: 'En Live', class: 'enlive' }
-                };
-                const st = statusMap[data.status] || statusMap.disponible;
-                statusBadge.className = `status-badge ${st.class}`;
-                statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+                // Vérifier si l'utilisateur est admin pour afficher le statut administrateur
+                const isAdmin = await checkIsAdmin(uid);
+                let statusBadge = document.getElementById('public-status-badge');
+                if (isAdmin) {
+                    // Écouter le statut admin en temps réel
+                    if (adminStatusUnsubscribe) {
+                        adminStatusUnsubscribe();
+                        adminStatusUnsubscribe = null;
+                    }
+                    adminStatusUnsubscribe = db.collection('admin_config').doc('status')
+                        .onSnapshot((doc) => {
+                            let status = 'disponible';
+                            if (doc.exists) {
+                                status = doc.data().currentStatus || 'disponible';
+                            }
+                            const statusMap = {
+                                disponible: { label: 'Disponible', class: 'disponible' },
+                                occupe: { label: 'Occupé', class: 'occupe' },
+                                enlive: { label: 'En Live', class: 'enlive' }
+                            };
+                            const st = statusMap[status] || statusMap.disponible;
+                            statusBadge.className = `status-badge ${st.class}`;
+                            statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+                        }, (err) => {
+                            console.warn('Erreur écoute statut admin public:', err);
+                        });
+                } else {
+                    // Statut personnel
+                    const statusMap = {
+                        disponible: { label: 'Disponible', class: 'disponible' },
+                        occupe: { label: 'Occupé', class: 'occupe' },
+                        enlive: { label: 'En Live', class: 'enlive' }
+                    };
+                    const st = statusMap[data.status] || statusMap.disponible;
+                    statusBadge.className = `status-badge ${st.class}`;
+                    statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+                }
 
                 // Appliquer les thèmes (clair/sombre, visuel, fond)
                 applySavedTheme();
@@ -5290,6 +5274,10 @@
                 if (adminLogsUnsubscribe) {
                     adminLogsUnsubscribe();
                     adminLogsUnsubscribe = null;
+                }
+                if (adminStatusUnsubscribe) {
+                    adminStatusUnsubscribe();
+                    adminStatusUnsubscribe = null;
                 }
                 showView('view-consent');
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
