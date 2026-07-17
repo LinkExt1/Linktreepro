@@ -48,12 +48,115 @@
             --theme-background-image: none;
         }
 
-        /* ===== CORPS ET CONTENEUR PRINCIPAL ===== */
+        /* ===== APPLICATION DYNAMIQUE DU THÈME (via localStorage) ===== */
+        body {
+            background-color: var(--bg-deep);
+            background-image: var(--bg-deep-image), var(--theme-background-image);
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- Thèmes visuels --- */
+        body.theme-minimaliste {
+            --bg-deep: #f5f5f5;
+            --bg-card: rgba(255,255,255,0.85);
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --border-glow: rgba(0,0,0,0.1);
+            --card-border: rgba(0,0,0,0.1);
+            --input-bg: rgba(0,0,0,0.05);
+            --input-border: rgba(0,0,0,0.2);
+            --shadow-color: rgba(0,0,0,0.1);
+            --bg-deep-image: none;
+            --nav-bg: rgba(255,255,255,0.9);
+            color: #1a1a1a;
+        }
+        body.theme-minimaliste .brand,
+        body.theme-minimaliste .public-name {
+            background: linear-gradient(135deg, #0077ff, #00c6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        body.theme-minimaliste .btn {
+            background: linear-gradient(135deg, #0077ff, #00c6ff);
+            color: #fff;
+        }
+        body.theme-minimaliste .btn-outline {
+            border-color: #0077ff;
+            color: #0077ff;
+        }
+        body.theme-minimaliste .views-counter,
+        body.theme-minimaliste .stats-summary .stat-card .stat-number,
+        body.theme-minimaliste .link-item .platform-icon,
+        body.theme-minimaliste .rich-link-card .link-action-bar i,
+        body.theme-minimaliste .top-networks .rank-item i,
+        body.theme-minimaliste .top-networks .rank-item .rank-num,
+        body.theme-minimaliste .toggle-switch.active,
+        body.theme-minimaliste .status-selector .status-option.active {
+            --cyan: #0077ff;
+            --theme-primary-color: #0077ff;
+        }
+
+        body.theme-neo-brutaliste {
+            --bg-deep: #f0e6d0;
+            --bg-card: #ffffff;
+            --border-glow: #ff0055;
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --card-border: #000;
+            --input-bg: #fff;
+            --input-border: #000;
+            --shadow-color: rgba(0,0,0,0.3);
+            --bg-deep-image: none;
+            --nav-bg: #fff;
+            color: #1a1a1a;
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+        }
+        body.theme-neo-brutaliste .glass-card {
+            border: 3px solid #000;
+            border-radius: 0;
+            box-shadow: 6px 6px 0 #000;
+        }
+        body.theme-neo-brutaliste .btn {
+            background: #ff0055;
+            color: #fff;
+            border: 2px solid #000;
+            border-radius: 0;
+            box-shadow: 4px 4px 0 #000;
+        }
+        body.theme-neo-brutaliste .btn-outline {
+            background: transparent;
+            border: 2px solid #000;
+            color: #000;
+            box-shadow: 4px 4px 0 #000;
+        }
+        body.theme-neo-brutaliste .brand,
+        body.theme-neo-brutaliste .public-name {
+            background: none;
+            -webkit-text-fill-color: #ff0055;
+            color: #ff0055;
+        }
+
+        /* --- Fonds --- */
+        body.fond-aurora {
+            --bg-deep-image: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-blend-mode: overlay;
+        }
+        body.fond-unique {
+            --bg-deep-image: none;
+            background-color: #0a0b10;
+        }
+        /* Les particules sont gérées par le canvas, on garde le fond par défaut */
+
+        /* ===== STYLES GÉNÉRAUX PLEIN ÉCRAN ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         html, body {
             width: 100vw;
-            height: 100%;
-            overflow-x: hidden;
-            overflow-y: auto;
+            height: 100dvh;
+            overflow: hidden;
             margin: 0;
             padding: 0;
             font-family: var(--font-body);
@@ -66,9 +169,7 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
             position: relative;
-            min-height: 100vh;
         }
 
         .view {
@@ -76,12 +177,13 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* alignement en haut pour permettre le scroll */
             padding: 1rem;
-            overflow-y: auto;
             animation: fadeSlideIn 0.4s ease-out;
+            overflow-y: auto;  /* Permet le défilement */
             width: 100%;
             height: 100%;
+            -webkit-overflow-scrolling: touch;
         }
         .view.active {
             display: flex;
@@ -92,126 +194,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== PARTICULES ===== */
-        #particles-canvas {
-            pointer-events: none !important;
-            z-index: -1 !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        /* ===== THÈMES VISUELS ===== */
-        /* Minimaliste (clair) */
-        .theme-minimaliste {
-            --bg-deep: #f5f5f5;
-            --bg-card: rgba(255,255,255,0.85);
-            --text-primary: #1a1a1a;
-            --text-secondary: #555555;
-            --border-glow: rgba(0,0,0,0.1);
-            --card-bg: rgba(255,255,255,0.5);
-            --card-border: rgba(0,0,0,0.08);
-            --input-bg: rgba(0,0,0,0.05);
-            --input-border: rgba(0,0,0,0.2);
-            --shadow-color: rgba(0,0,0,0.15);
-            --nav-bg: rgba(255,255,255,0.9);
-            --bg-deep-image: none;
-            background-color: #f5f5f5 !important;
-            color: #1a1a1a !important;
-        }
-        .theme-minimaliste .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(6px);
-            border-color: rgba(0,0,0,0.1);
-        }
-        .theme-minimaliste .brand,
-        .theme-minimaliste .public-name {
-            background: linear-gradient(135deg, #222, #555);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .theme-minimaliste .btn {
-            background: #1a1a1a;
-            color: #fff;
-        }
-        .theme-minimaliste .btn-outline {
-            border-color: #1a1a1a;
-            color: #1a1a1a;
-        }
-        .theme-minimaliste .input-field {
-            background: #fff;
-            border-color: #ccc;
-            color: #1a1a1a;
-        }
-
-        /* Néo‑brutaliste */
-        .theme-neo-brutaliste {
-            --bg-deep: #ffe600;
-            --bg-card: rgba(255,255,255,0.95);
-            --text-primary: #000;
-            --text-secondary: #333;
-            --border-glow: #000;
-            --card-bg: #fff;
-            --card-border: #000;
-            --input-bg: #fff;
-            --input-border: #000;
-            --shadow-color: rgba(0,0,0,0.5);
-            --nav-bg: #ffe600;
-            --bg-deep-image: none;
-            background-color: #ffe600 !important;
-            color: #000 !important;
-            border: 4px solid #000;
-            box-shadow: 8px 8px 0 #000;
-        }
-        .theme-neo-brutaliste .glass-card {
-            border: 4px solid #000;
-            box-shadow: 8px 8px 0 #000;
-            border-radius: 0 !important;
-            background: #fff;
-        }
-        .theme-neo-brutaliste .btn {
-            border: 3px solid #000;
-            box-shadow: 4px 4px 0 #000;
-            border-radius: 0 !important;
-            background: #fff;
-            color: #000;
-        }
-        .theme-neo-brutaliste .btn-outline {
-            border-color: #000;
-            color: #000;
-            background: transparent;
-        }
-        .theme-neo-brutaliste .input-field {
-            border: 2px solid #000;
-            background: #fff;
-            color: #000;
-            border-radius: 0;
-        }
-        .theme-neo-brutaliste .toggle-switch {
-            background: #000;
-        }
-        .theme-neo-brutaliste .toggle-switch::after {
-            background: #ffe600;
-        }
-
-        /* ===== FONDS ===== */
-        .fond-aurora {
-            background-image: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%) !important;
-            background-attachment: fixed !important;
-        }
-        .fond-unique {
-            background-color: #1a1a2e !important;
-            background-image: none !important;
-        }
-        .fond-particules {
-            background-color: transparent !important;
-            background-image: none !important;
-        }
-
-        /* ===== GLASS CARD ET AUTRES STYLES ===== */
         .glass-card {
             background: var(--bg-card);
             backdrop-filter: blur(14px);
@@ -228,9 +210,131 @@
             max-height: 100%;
             display: flex;
             flex-direction: column;
+            margin: auto; /* centré verticalement si contenu petit, mais si grand, scroll */
         }
 
-        /* ===== RESTE DU CSS (identique, adapté) ===== */
+        /* Ajustements pour le dashboard (plein écran) */
+        .dashboard-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: 100%;
+            padding: 0;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .dashboard-container .dashboard-header {
+            padding: 1.2rem 1.8rem 0.5rem 1.8rem;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .dashboard-container .dashboard-header .brand {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0.8rem;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.8rem 1.8rem 1.8rem;
+            scroll-behavior: smooth;
+        }
+
+        .share-module {
+            padding: 0.8rem 1.8rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-glow);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        /* Ajustements public */
+        .public-wrapper .glass-card {
+            max-width: 600px;
+            padding: 0 0 1.2rem 0;
+            overflow: visible;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 1.5rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: var(--bg-deep);
+            border: 1px solid var(--cyan);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0,242,254,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Pour les petits écrans */
+        @media (max-width: 480px) {
+            .glass-card { padding: 1.2rem; }
+            .public-header { padding: 0.8rem 1rem; }
+            .dashboard-container .dashboard-header { padding: 0.8rem 1rem; }
+            .share-module { padding: 0.5rem 1rem; flex-wrap: wrap; }
+            .dashboard-nav .nav-item { font-size: 0.6rem; padding: 0.2rem 0.4rem; }
+            .tab-content { padding: 0.8rem 1rem; }
+            .modal-content { width: 95%; padding: 1.2rem; }
+            .admin-panel .qr-upload-row { flex-direction: column; align-items: flex-start; }
+            .testimonial-item { flex-direction: column; align-items: stretch; }
+            .schedule-item { flex-direction: column; align-items: stretch; }
+            .admin-link-item { flex-direction: column; align-items: stretch; }
+            .theme-manager .color-picker-row { flex-wrap: wrap; }
+        }
+
+        /* ===== PARTICULES ===== */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;  /* Ne bloque pas les interactions */
+            z-index: -1;           /* Derrière tout le contenu */
+        }
+
+        /* ===== Le reste du CSS (identique, conservé) ===== */
         .brand {
             font-family: var(--font-heading);
             font-size: 2.2rem;
@@ -846,11 +950,9 @@
             border-radius: 24px;
             padding: 2rem;
             max-width: 400px;
-            width: 90%;
+            width: 100%;
             text-align: center;
             box-shadow: 0 0 60px rgba(0,242,254,0.3);
-            max-height: 90vh;
-            overflow-y: auto;
         }
         .modal-content img {
             width: 100%;
@@ -1422,8 +1524,6 @@
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
-            flex-wrap: wrap;
-            gap: 0.2rem;
         }
         .dashboard-nav .nav-item {
             background: transparent;
@@ -2951,7 +3051,7 @@
         // GESTION DU THÈME PAR localStorage (individuel)
         // ============================================================
 
-        // Applique le thème stocké dans localStorage (couleur principale + image de fond)
+        // Applique le thème stocké dans localStorage (couleur primaire et image de fond)
         function applyUserTheme() {
             let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
             try {
@@ -2978,25 +3078,52 @@
             applyUserTheme();
         }
 
-        // ===== Application des thèmes visuels (style, fond) depuis localStorage =====
-        function applyStoredVisualTheme() {
-            const theme = localStorage.getItem('visualTheme') || 'cyberpunk';
+        // ============================================================
+        // GESTION DES THÈMES VISUELS ET FONDS (localStorage + classes)
+        // ============================================================
+
+        // Applique le thème visuel (cyberpunk, minimaliste, neo-brutaliste)
+        function applyVisualTheme(theme) {
+            // Si aucun paramètre, on lit depuis localStorage ou le selecteur
+            if (!theme) {
+                const select = document.getElementById('visual-theme-select');
+                if (select) {
+                    theme = select.value;
+                } else {
+                    // Page publique : lire localStorage
+                    theme = localStorage.getItem('visualTheme') || 'cyberpunk';
+                }
+            }
+            // Sauvegarder dans localStorage
+            localStorage.setItem('visualTheme', theme);
+
+            // Retirer les classes existantes
             document.body.classList.remove('theme-minimaliste', 'theme-neo-brutaliste');
             if (theme === 'minimaliste') {
                 document.body.classList.add('theme-minimaliste');
             } else if (theme === 'neo-brutaliste') {
                 document.body.classList.add('theme-neo-brutaliste');
             }
-            // Mettre à jour le select s'il existe
-            const select = document.getElementById('visual-theme-select');
-            if (select) select.value = theme;
+            // cyberpunk est le défaut (pas de classe)
         }
 
-        function applyStoredBackground() {
-            const bg = localStorage.getItem('background') || 'cyberpunk';
+        // Applique le fond (cyberpunk, aurora, particules, uni)
+        function applyBackground(bg) {
+            if (!bg) {
+                const select = document.getElementById('background-select');
+                if (select) {
+                    bg = select.value;
+                } else {
+                    bg = localStorage.getItem('background') || 'cyberpunk';
+                }
+            }
+            localStorage.setItem('background', bg);
+
             document.body.classList.remove('fond-aurora', 'fond-particules', 'fond-unique');
+            // Supprimer l'ancien canvas si présent
             const oldCanvas = document.getElementById('particles-canvas');
             if (oldCanvas) oldCanvas.remove();
+
             if (bg === 'aurora') {
                 document.body.classList.add('fond-aurora');
             } else if (bg === 'particules') {
@@ -3005,17 +3132,121 @@
             } else if (bg === 'uni') {
                 document.body.classList.add('fond-unique');
             }
-            // Mettre à jour le select s'il existe
-            const select = document.getElementById('background-select');
-            if (select) select.value = bg;
+            // cyberpunk est le défaut (pas de classe)
         }
 
-        // Fonction d'initialisation complète des thèmes (appelée au chargement)
-        function initializeThemes() {
-            applyUserTheme();
-            applySavedTheme(); // clair/sombre
-            applyStoredVisualTheme();
-            applyStoredBackground();
+        // ============================================================
+        // PARTICULES (avec pointer-events:none et z-index:-1)
+        // ============================================================
+        function initParticles() {
+            const canvas = document.createElement('canvas');
+            canvas.id = 'particles-canvas';
+            // Les propriétés CSS sont définies dans le style
+            document.body.prepend(canvas);
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            const particles = [];
+            const count = 70;
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.6,
+                    vy: (Math.random() - 0.5) * 0.6,
+                    r: Math.random() * 2.5 + 1,
+                    color: `rgba(0,242,254,${Math.random() * 0.5 + 0.1})`
+                });
+            }
+
+            let mouseX = null, mouseY = null;
+            let touchActive = false;
+
+            function onMove(x, y) {
+                mouseX = x;
+                mouseY = y;
+                touchActive = true;
+            }
+
+            document.addEventListener('mousemove', (e) => {
+                onMove(e.clientX, e.clientY);
+            });
+            document.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                if (touch) onMove(touch.clientX, touch.clientY);
+                e.preventDefault();
+            }, { passive: false });
+            document.addEventListener('touchend', () => {
+                touchActive = false;
+            });
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+                const attractRadius = 150;
+                const repulseRadius = 80;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    if (touchActive && mouseX !== null && mouseY !== null) {
+                        const dx = p.x - mouseX;
+                        const dy = p.y - mouseY;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if (dist < attractRadius && dist > 0) {
+                            const force = (attractRadius - dist) / attractRadius;
+                            const angle = Math.atan2(dy, dx);
+                            if (dist < repulseRadius) {
+                                const repForce = (repulseRadius - dist) / repulseRadius * 0.8;
+                                p.vx += Math.cos(angle) * repForce * 0.5;
+                                p.vy += Math.sin(angle) * repForce * 0.5;
+                            } else {
+                                p.vx -= Math.cos(angle) * force * 0.3;
+                                p.vy -= Math.sin(angle) * force * 0.3;
+                            }
+                        }
+                    }
+                    const maxSpeed = 2;
+                    const spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+                    if (spd > maxSpeed) {
+                        p.vx = (p.vx / spd) * maxSpeed;
+                        p.vy = (p.vy / spd) * maxSpeed;
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                });
+
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 130) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            const alpha = 0.15 * (1 - dist / 130);
+                            ctx.strokeStyle = `rgba(0,242,254,${alpha})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
         }
 
         // ============================================================
@@ -3442,7 +3673,7 @@
         }
 
         // ============================================================
-        // CLOUDINARY WIDGET (avec vérification des variables)
+        // CLOUDINARY WIDGET
         // ============================================================
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
@@ -3506,126 +3737,6 @@
                 button.innerHTML = originalHTML;
                 isCloudinaryWidgetOpen = false;
             });
-        }
-
-        // ============================================================
-        // PARTICULES CYBER-MATRIX (avec pointer-events: none)
-        // ============================================================
-        function initParticles() {
-            // Supprimer l'ancien canvas s'il existe
-            const oldCanvas = document.getElementById('particles-canvas');
-            if (oldCanvas) oldCanvas.remove();
-
-            const canvas = document.createElement('canvas');
-            canvas.id = 'particles-canvas';
-            // Les styles sont déjà appliqués via CSS, mais on les force pour sécurité
-            canvas.style.cssText = 'pointer-events: none !important; z-index: -1 !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;';
-            document.body.prepend(canvas);
-
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            const particles = [];
-            const count = 70;
-
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            for (let i = 0; i < count; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.6,
-                    vy: (Math.random() - 0.5) * 0.6,
-                    r: Math.random() * 2.5 + 1,
-                    color: `rgba(0,242,254,${Math.random() * 0.5 + 0.1})`
-                });
-            }
-
-            let mouseX = null, mouseY = null;
-            let touchActive = false;
-
-            function onMove(x, y) {
-                mouseX = x;
-                mouseY = y;
-                touchActive = true;
-            }
-
-            document.addEventListener('mousemove', (e) => {
-                onMove(e.clientX, e.clientY);
-            });
-            document.addEventListener('touchmove', (e) => {
-                const touch = e.touches[0];
-                if (touch) onMove(touch.clientX, touch.clientY);
-                e.preventDefault();
-            }, { passive: false });
-            document.addEventListener('touchend', () => {
-                touchActive = false;
-            });
-
-            function draw() {
-                ctx.clearRect(0, 0, width, height);
-                const attractRadius = 150;
-                const repulseRadius = 80;
-
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < 0 || p.x > width) p.vx *= -1;
-                    if (p.y < 0 || p.y > height) p.vy *= -1;
-
-                    if (touchActive && mouseX !== null && mouseY !== null) {
-                        const dx = p.x - mouseX;
-                        const dy = p.y - mouseY;
-                        const dist = Math.sqrt(dx*dx + dy*dy);
-                        if (dist < attractRadius && dist > 0) {
-                            const force = (attractRadius - dist) / attractRadius;
-                            const angle = Math.atan2(dy, dx);
-                            if (dist < repulseRadius) {
-                                const repForce = (repulseRadius - dist) / repulseRadius * 0.8;
-                                p.vx += Math.cos(angle) * repForce * 0.5;
-                                p.vy += Math.sin(angle) * repForce * 0.5;
-                            } else {
-                                p.vx -= Math.cos(angle) * force * 0.3;
-                                p.vy -= Math.sin(angle) * force * 0.3;
-                            }
-                        }
-                    }
-                    const maxSpeed = 2;
-                    const spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
-                    if (spd > maxSpeed) {
-                        p.vx = (p.vx / spd) * maxSpeed;
-                        p.vy = (p.vy / spd) * maxSpeed;
-                    }
-
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
-                    ctx.fill();
-                });
-
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 130) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            const alpha = 0.15 * (1 - dist / 130);
-                            ctx.strokeStyle = `rgba(0,242,254,${alpha})`;
-                            ctx.lineWidth = 0.6;
-                            ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(draw);
-            }
-            draw();
         }
 
         // ============================================================
@@ -4179,15 +4290,17 @@
             updateStats();
             renderDashboardLinks();
             renderTopNetworks();
-            // Appliquer les thèmes visuels et fonds (depuis localStorage) – ils seront déjà appliqués via l'initialisation, mais on les réapplique pour être sûr
-            applyStoredVisualTheme();
-            applyStoredBackground();
+
+            // Appliquer les thèmes visuels et fonds (lecture localStorage)
+            applyVisualTheme();
+            applyBackground();
+
             renderSubscribers();
             renderTestimonialsPrivate();
             renderSchedules();
             startScheduler();
 
-            // Appliquer le thème personnalisé (couleur principale + image)
+            // Appliquer le thème depuis localStorage (couleur primaire)
             applyUserTheme();
 
             // ===== GESTION ADMIN =====
@@ -4331,7 +4444,7 @@
         }
 
         // ============================================================
-        // THÈMES (clair/sombre, visuel, fond)
+        // THÈMES CLAIR/SOMBRE (localStorage)
         // ============================================================
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
@@ -4377,35 +4490,6 @@
                 track.classList.toggle('active', isLight);
             }
             updateThemeIcons();
-        }
-
-        function applyVisualTheme() {
-            const select = document.getElementById('visual-theme-select');
-            const theme = select.value;
-            document.body.classList.remove('theme-minimaliste', 'theme-neo-brutaliste');
-            if (theme === 'minimaliste') {
-                document.body.classList.add('theme-minimaliste');
-            } else if (theme === 'neo-brutaliste') {
-                document.body.classList.add('theme-neo-brutaliste');
-            }
-            localStorage.setItem('visualTheme', theme);
-        }
-
-        function applyBackground() {
-            const select = document.getElementById('background-select');
-            const bg = select.value;
-            document.body.classList.remove('fond-aurora', 'fond-particules', 'fond-unique');
-            const oldCanvas = document.getElementById('particles-canvas');
-            if (oldCanvas) oldCanvas.remove();
-            if (bg === 'aurora') {
-                document.body.classList.add('fond-aurora');
-            } else if (bg === 'particules') {
-                document.body.classList.add('fond-particules');
-                initParticles();
-            } else if (bg === 'uni') {
-                document.body.classList.add('fond-unique');
-            }
-            localStorage.setItem('background', bg);
         }
 
         // ============================================================
@@ -4525,9 +4609,10 @@
                 statusBadge.className = `status-badge ${st.class}`;
                 statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
 
+                // Appliquer les thèmes (clair/sombre, visuel, fond)
                 applySavedTheme();
-                applyStoredVisualTheme();
-                applyStoredBackground();
+                applyVisualTheme();
+                applyBackground();
 
                 const flashContainer = document.getElementById('flash-banner-container');
                 flashContainer.innerHTML = '';
@@ -5244,12 +5329,12 @@
             // --- Redirection Unique ---
             document.getElementById('redirect-toggle-track').addEventListener('click', toggleRedirectUnique);
 
-            // --- Sélecteurs de thème visuel et fond (avec application immédiate) ---
+            // --- Sélecteurs de thème visuel et fond (application immédiate) ---
             document.getElementById('visual-theme-select').addEventListener('change', function() {
-                applyVisualTheme(); // change les classes et sauvegarde
+                applyVisualTheme(this.value);
             });
             document.getElementById('background-select').addEventListener('change', function() {
-                applyBackground(); // change les classes, sauvegarde et lance les particules si besoin
+                applyBackground(this.value);
             });
 
             // --- Flash toggle et couleurs ---
@@ -5628,12 +5713,20 @@ URL:${urlProfil}
         });
 
         // ============================================================
-        // INIT
+        // INIT - Application des thèmes au chargement
         // ============================================================
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
-            // Initialisation complète des thèmes (couleur, clair/sombre, visuel, fond)
-            initializeThemes();
+
+            // Appliquer le thème utilisateur (couleur primaire)
+            applyUserTheme();
+
+            // Appliquer le thème clair/sombre sauvegardé
+            applySavedTheme();
+
+            // Appliquer le thème visuel et le fond depuis localStorage
+            applyVisualTheme();
+            applyBackground();
         });
 
     })();
