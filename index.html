@@ -48,7 +48,7 @@
             --theme-background-image: none;
         }
 
-        /* ===== APPLICATION DYNAMIQUE DU THÈME ===== */
+        /* ===== APPLICATION DYNAMIQUE DU THÈME (via localStorage) ===== */
         body {
             background-color: var(--bg-deep);
             background-image: var(--bg-deep-image), var(--theme-background-image);
@@ -104,36 +104,49 @@
             color: var(--text-primary);
         }
 
-        /* ===== STYLES GÉNÉRAUX ===== */
+        /* ===== STYLES GÉNÉRAUX PLEIN ÉCRAN ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font-body);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-attachment: fixed;
-            padding: 1.5rem;
+
+        html, body {
+            width: 100vw;
+            height: 100dvh;
+            overflow: hidden;
             margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            background-attachment: fixed;
             transition: background 0.5s ease, color 0.3s;
         }
+
         #app {
             width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             position: relative;
         }
+
         .view {
+            flex: 1;
             display: none;
             flex-direction: column;
-            gap: 1.8rem;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
             animation: fadeSlideIn 0.4s ease-out;
+            overflow-y: auto;
+            width: 100%;
+            height: 100%;
         }
-        .view.active { display: flex; }
+        .view.active {
+            display: flex;
+        }
+
         @keyframes fadeSlideIn {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         .glass-card {
             background: var(--bg-card);
             backdrop-filter: blur(14px);
@@ -145,7 +158,124 @@
             transition: all var(--transition);
             overflow: hidden;
             position: relative;
+            width: 100%;
+            max-width: 600px;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Ajustements pour le dashboard (plein écran) */
+        .dashboard-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: 100%;
+            padding: 0;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .dashboard-container .dashboard-header {
+            padding: 1.2rem 1.8rem 0.5rem 1.8rem;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .dashboard-container .dashboard-header .brand {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0.8rem;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.8rem 1.8rem 1.8rem;
+            scroll-behavior: smooth;
+        }
+
+        .share-module {
+            padding: 0.8rem 1.8rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-glow);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        /* Ajustements public */
+        .public-wrapper .glass-card {
+            max-width: 600px;
+            padding: 0 0 1.2rem 0;
+            overflow: visible;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 1.5rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: var(--bg-deep);
+            border: 1px solid var(--cyan);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0,242,254,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Pour les petits écrans */
+        @media (max-width: 480px) {
+            .glass-card { padding: 1.2rem; }
+            .public-header { padding: 0.8rem 1rem; }
+            .dashboard-container .dashboard-header { padding: 0.8rem 1rem; }
+            .share-module { padding: 0.5rem 1rem; flex-wrap: wrap; }
+            .dashboard-nav .nav-item { font-size: 0.6rem; padding: 0.2rem 0.4rem; }
+            .tab-content { padding: 0.8rem 1rem; }
+            .modal-content { width: 95%; padding: 1.2rem; }
+            .admin-panel .qr-upload-row { flex-direction: column; align-items: flex-start; }
+            .testimonial-item { flex-direction: column; align-items: stretch; }
+            .schedule-item { flex-direction: column; align-items: stretch; }
+            .admin-link-item { flex-direction: column; align-items: stretch; }
+            .theme-manager .color-picker-row { flex-wrap: wrap; }
+        }
+
+        /* ===== Le reste du CSS (identique, conservé) ===== */
         .brand {
             font-family: var(--font-heading);
             font-size: 2.2rem;
@@ -1823,7 +1953,7 @@
             color: var(--cyan);
         }
 
-        /* ---- Gestionnaire de thème ---- */
+        /* ---- Gestionnaire de thème (localStorage) ---- */
         .theme-manager .color-picker-row {
             display: flex;
             align-items: center;
@@ -2868,117 +2998,121 @@
             }
         }
 
-        // 3. Gestionnaire de thème (document "config/theme")
+        // ============================================================
+        // GESTION DU THÈME PAR localStorage (individuel)
+        // ============================================================
+
+        // Applique le thème stocké dans localStorage
+        function applyUserTheme() {
+            let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
+            try {
+                const stored = localStorage.getItem('userTheme');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.primaryColor) themeData.primaryColor = parsed.primaryColor;
+                    if (parsed.backgroundImage) themeData.backgroundImage = parsed.backgroundImage;
+                }
+            } catch (e) { /* ignore */ }
+
+            document.documentElement.style.setProperty('--theme-primary-color', themeData.primaryColor);
+            if (themeData.backgroundImage) {
+                document.documentElement.style.setProperty('--theme-background-image', `url(${themeData.backgroundImage})`);
+            } else {
+                document.documentElement.style.setProperty('--theme-background-image', 'none');
+            }
+        }
+
+        // Sauvegarde du thème dans localStorage
+        function saveUserTheme(primaryColor, backgroundImage) {
+            const data = { primaryColor, backgroundImage };
+            localStorage.setItem('userTheme', JSON.stringify(data));
+            applyUserTheme();
+        }
+
+        // Gestionnaire de thème dans l'Admin Panel (localStorage)
         function renderThemeManager() {
             const container = document.getElementById('theme-manager-container');
             if (!container) return;
 
-            db.collection('config').doc('theme').get().then((doc) => {
-                const data = doc.data() || {};
-                const primaryColor = data.primaryColor || '#00f2fe';
-                const bgImage = data.backgroundImage || '';
-                container.innerHTML = `
-                    <div class="theme-manager">
-                        <div class="admin-field">
-                            <label>Couleur principale</label>
-                            <div class="color-picker-row">
-                                <input type="color" id="theme-primary-color" value="${primaryColor}">
-                                <span style="font-size:0.8rem; color:var(--text-secondary);">Choisissez une couleur</span>
-                            </div>
+            let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
+            try {
+                const stored = localStorage.getItem('userTheme');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.primaryColor) themeData.primaryColor = parsed.primaryColor;
+                    if (parsed.backgroundImage) themeData.backgroundImage = parsed.backgroundImage;
+                }
+            } catch (e) { /* ignore */ }
+
+            container.innerHTML = `
+                <div class="theme-manager">
+                    <div class="admin-field">
+                        <label>Couleur principale</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="theme-primary-color" value="${themeData.primaryColor}">
+                            <span style="font-size:0.8rem; color:var(--text-secondary);">Choisissez une couleur</span>
                         </div>
-                        <div class="admin-field">
-                            <label>Image de fond (upload Cloudinary)</label>
-                            <div class="upload-bg-row">
-                                <button class="btn btn-outline" id="btn-upload-bg" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
-                                    <i class="fas fa-image"></i> Changer l'image
-                                </button>
-                                ${bgImage ? `<img class="bg-preview" src="${bgImage}" alt="Fond">` : ''}
-                                ${bgImage ? `<button class="btn btn-outline btn-remove-bg" style="padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);"><i class="fas fa-times"></i> Supprimer</button>` : ''}
-                            </div>
-                        </div>
-                        <button class="btn" id="save-theme-btn" style="margin-top:0.5rem;">Enregistrer le thème</button>
                     </div>
-                `;
+                    <div class="admin-field">
+                        <label>Image de fond (upload Cloudinary)</label>
+                        <div class="upload-bg-row">
+                            <button class="btn btn-outline" id="btn-upload-bg" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                                <i class="fas fa-image"></i> Changer l'image
+                            </button>
+                            ${themeData.backgroundImage ? `<img class="bg-preview" src="${themeData.backgroundImage}" alt="Fond">` : ''}
+                            ${themeData.backgroundImage ? `<button class="btn btn-outline btn-remove-bg" style="padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);"><i class="fas fa-times"></i> Supprimer</button>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn" id="save-theme-btn" style="margin-top:0.5rem;">Enregistrer le thème</button>
+                </div>
+            `;
 
-                // Upload de fond
-                document.getElementById('btn-upload-bg')?.addEventListener('click', function() {
-                    openCloudinaryWidget({
-                        button: this,
-                        onSuccess: (url) => {
-                            const preview = container.querySelector('.bg-preview');
-                            if (preview) preview.src = url;
-                            else {
-                                const row = container.querySelector('.upload-bg-row');
-                                const img = document.createElement('img');
-                                img.className = 'bg-preview';
-                                img.src = url;
-                                row.appendChild(img);
-                                const removeBtn = document.createElement('button');
-                                removeBtn.className = 'btn btn-outline btn-remove-bg';
-                                removeBtn.style.cssText = 'padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);';
-                                removeBtn.innerHTML = '<i class="fas fa-times"></i> Supprimer';
-                                row.appendChild(removeBtn);
-                                removeBtn.addEventListener('click', function() {
-                                    const field = 'backgroundImage';
-                                    const data = { [field]: '' };
-                                    db.collection('config').doc('theme').set(data, { merge: true }).then(() => {
-                                        showToast('Image de fond supprimée.', 'info');
-                                        renderThemeManager();
-                                        applyThemeToSite();
-                                    });
-                                });
-                            }
-                            showToast('Image de fond téléversée.', 'info');
+            // Upload de fond
+            document.getElementById('btn-upload-bg')?.addEventListener('click', function() {
+                openCloudinaryWidget({
+                    button: this,
+                    onSuccess: (url) => {
+                        const preview = container.querySelector('.bg-preview');
+                        if (preview) preview.src = url;
+                        else {
+                            const row = container.querySelector('.upload-bg-row');
+                            const img = document.createElement('img');
+                            img.className = 'bg-preview';
+                            img.src = url;
+                            row.appendChild(img);
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'btn btn-outline btn-remove-bg';
+                            removeBtn.style.cssText = 'padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);';
+                            removeBtn.innerHTML = '<i class="fas fa-times"></i> Supprimer';
+                            row.appendChild(removeBtn);
+                            removeBtn.addEventListener('click', function() {
+                                saveUserTheme(document.getElementById('theme-primary-color').value, '');
+                                renderThemeManager();
+                                applyUserTheme();
+                                showToast('Image de fond supprimée.', 'info');
+                            });
                         }
-                    });
-                });
-
-                // Suppression de l'image (géré via le bouton dynamique)
-                container.querySelector('.btn-remove-bg')?.addEventListener('click', function() {
-                    const data = { backgroundImage: '' };
-                    db.collection('config').doc('theme').set(data, { merge: true }).then(() => {
-                        showToast('Image de fond supprimée.', 'info');
-                        renderThemeManager();
-                        applyThemeToSite();
-                    });
-                });
-
-                // Sauvegarde du thème
-                document.getElementById('save-theme-btn')?.addEventListener('click', async function() {
-                    const color = document.getElementById('theme-primary-color').value;
-                    const bgImg = container.querySelector('.bg-preview')?.src || '';
-                    try {
-                        await db.collection('config').doc('theme').set({
-                            primaryColor: color,
-                            backgroundImage: bgImg
-                        }, { merge: true });
-                        showToast('Thème enregistré !', 'info');
-                        applyThemeToSite();
-                        addAdminLog('Mise à jour du thème');
-                    } catch (e) {
-                        console.error(e);
-                        showToast('Erreur d\'enregistrement.', 'error');
+                        showToast('Image de fond téléversée.', 'info');
                     }
                 });
-            }).catch(err => {
-                console.error(err);
-                container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement du thème.</p>';
             });
-        }
 
-        // Appliquer le thème au site
-        function applyThemeToSite() {
-            db.collection('config').doc('theme').get().then((doc) => {
-                const data = doc.data() || {};
-                const primaryColor = data.primaryColor || '#00f2fe';
-                const bgImage = data.backgroundImage || '';
-                document.documentElement.style.setProperty('--theme-primary-color', primaryColor);
-                if (bgImage) {
-                    document.documentElement.style.setProperty('--theme-background-image', `url(${bgImage})`);
-                } else {
-                    document.documentElement.style.setProperty('--theme-background-image', 'none');
-                }
-            }).catch(() => {});
+            // Suppression de l'image (géré via le bouton dynamique)
+            container.querySelector('.btn-remove-bg')?.addEventListener('click', function() {
+                saveUserTheme(document.getElementById('theme-primary-color').value, '');
+                renderThemeManager();
+                applyUserTheme();
+                showToast('Image de fond supprimée.', 'info');
+            });
+
+            // Sauvegarde du thème
+            document.getElementById('save-theme-btn')?.addEventListener('click', function() {
+                const color = document.getElementById('theme-primary-color').value;
+                const bgImg = container.querySelector('.bg-preview')?.src || '';
+                saveUserTheme(color, bgImg);
+                showToast('Thème enregistré !', 'info');
+                addAdminLog('Mise à jour du thème (local)');
+            });
         }
 
         // ============================================================
@@ -3178,7 +3312,7 @@
                         <div id="admin-logs-container"></div>
                     </div>
 
-                    <!-- Gestionnaire de thème -->
+                    <!-- Gestionnaire de thème (localStorage) -->
                     <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-palette"></i> Gestionnaire de thème</h4>
                         <div id="theme-manager-container"></div>
@@ -3189,7 +3323,7 @@
             // Charger chaque sous-section
             loadDonationAdminPanel();
             renderAdminLinks();
-            loadAdminLogs(10); // 10 premiers logs
+            loadAdminLogs(10);
             renderThemeManager();
         }
 
@@ -4056,8 +4190,8 @@
             renderSchedules();
             startScheduler();
 
-            // Appliquer le thème global
-            applyThemeToSite();
+            // Appliquer le thème depuis localStorage (individuel)
+            applyUserTheme();
 
             // ===== GESTION ADMIN =====
             const adminTab = document.getElementById('admin-tab');
@@ -5501,6 +5635,10 @@ URL:${urlProfil}
         // ============================================================
         window.addEventListener('DOMContentLoaded', () => {
             attachAllEventListeners();
+            // Appliquer le thème utilisateur au chargement
+            applyUserTheme();
+            // Appliquer le thème clair/sombre sauvegardé
+            applySavedTheme();
         });
 
     })();
