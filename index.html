@@ -1825,7 +1825,6 @@
             padding: 0.2rem;
         }
 
-        /* Modale Admin : on distingue les deux modes (setup / login) */
         .admin-gate .modal-content .setup-section,
         .admin-gate .modal-content .login-section {
             display: none;
@@ -1838,7 +1837,7 @@
             margin: 1rem 0;
             text-align: center;
         }
-        .admin-gate .modal-content .totp-setup #totp-qr-container {
+        .admin-gate .modal-content .totp-setup #totp-qr-container-setup {
             display: inline-block;
             background: white;
             padding: 0.5rem;
@@ -2488,45 +2487,43 @@
                 modal.classList.add('active');
 
                 // Charger la configuration admin
-                db.collection('admin_config').doc('security').get().then(async (doc) => {
-                    if (!doc.exists) {
-                        // Si le document n'existe pas, on le crée en mode setup
-                        console.log('Document admin_config/security inexistant -> mode setup');
-                        showSetupMode();
-                        return;
-                    }
-                    const data = doc.data();
-                    adminPinHash = data.pinHash || '';
-                    totpSecret = data.totpSecret || '';
+                db.collection('admin_config').doc('security').get()
+                    .then(async (doc) => {
+                        console.log('Document admin_config/security récupéré :', doc.exists, doc.data());
+                        if (!doc.exists) {
+                            console.log('Document inexistant -> mode setup');
+                            showSetupMode();
+                            return;
+                        }
+                        const data = doc.data();
+                        adminPinHash = data.pinHash || '';
+                        totpSecret = data.totpSecret || '';
 
-                    // Vérifier si les deux champs sont vides (ou inexistants) -> mode setup
-                    if (!adminPinHash || !totpSecret) {
-                        console.log('pinHash ou totpSecret manquant -> mode setup');
-                        showSetupMode();
-                    } else {
-                        // Mode connexion normale
-                        console.log('Mode login');
-                        title.textContent = 'Accès Administrateur';
-                        subtitle.textContent = 'Veuillez saisir votre code PIN et le code de votre application Google Authenticator.';
-                        loginSection.classList.add('active');
-                    }
-                }).catch(err => {
-                    console.error('Erreur de chargement des secrets :', err);
-                    showToast('Erreur de chargement des secrets.', 'error');
-                    modal.classList.remove('active');
-                    resolve(false);
-                });
+                        if (!adminPinHash || !totpSecret) {
+                            console.log('pinHash ou totpSecret manquant -> mode setup');
+                            showSetupMode();
+                        } else {
+                            // Mode connexion normale
+                            console.log('Mode login');
+                            title.textContent = 'Accès Administrateur';
+                            subtitle.textContent = 'Veuillez saisir votre code PIN et le code de votre application Google Authenticator.';
+                            loginSection.classList.add('active');
+                        }
+                    })
+                    .catch((err) => {
+                        console.error('Erreur de lecture Firestore :', err);
+                        showToast('Erreur de chargement des secrets : ' + err.message, 'error');
+                        modal.classList.remove('active');
+                        resolve(false);
+                    });
 
-                // Fonction pour afficher le mode Setup
                 function showSetupMode() {
                     title.textContent = '🔐 Configuration initiale';
                     subtitle.textContent = 'Scannez le QR Code avec Google Authenticator et créez votre code PIN.';
                     setupSection.classList.add('active');
 
-                    // Générer un nouveau secret TOTP
                     const secret = otplib.authenticator.generateSecret();
                     const otpAuth = otplib.authenticator.keyuri('LinkExtAdmin', 'LinkExt', secret);
-                    // Afficher QR Code
                     const qrContainer = document.getElementById('totp-qr-container-setup');
                     qrContainer.innerHTML = '';
                     new QRCode(qrContainer, {
@@ -2538,7 +2535,6 @@
                         correctLevel: QRCode.CorrectLevel.H
                     });
                     document.getElementById('totp-secret-display-setup').textContent = secret;
-                    // Stocker le secret pour la sauvegarde
                     window._setupSecret = secret;
                 }
 
@@ -2573,7 +2569,7 @@
                         resolve(true);
                     } catch (err) {
                         console.error('Erreur lors de la sauvegarde :', err);
-                        setupError.textContent = 'Erreur lors de la sauvegarde. Réessayez.';
+                        setupError.textContent = 'Erreur lors de la sauvegarde : ' + err.message;
                         setupError.style.display = 'block';
                         showToast('Erreur de sauvegarde.', 'error');
                     }
@@ -2588,28 +2584,31 @@
                         loginError.style.display = 'block';
                         return;
                     }
-                    // Vérifier le PIN (hash)
-                    const pinHash = await sha256(pin);
-                    if (pinHash !== adminPinHash) {
-                        loginError.textContent = 'PIN incorrect.';
+                    try {
+                        const pinHash = await sha256(pin);
+                        if (pinHash !== adminPinHash) {
+                            loginError.textContent = 'PIN incorrect.';
+                            loginError.style.display = 'block';
+                            return;
+                        }
+                        if (!totpSecret) {
+                            loginError.textContent = 'Secret TOTP non configuré.';
+                            loginError.style.display = 'block';
+                            return;
+                        }
+                        const isValid = otplib.authenticator.check(totp, totpSecret);
+                        if (!isValid) {
+                            loginError.textContent = 'Code Google Authenticator invalide.';
+                            loginError.style.display = 'block';
+                            return;
+                        }
+                        modal.classList.remove('active');
+                        resolve(true);
+                    } catch (err) {
+                        console.error('Erreur validation :', err);
+                        loginError.textContent = 'Erreur technique.';
                         loginError.style.display = 'block';
-                        return;
                     }
-                    // Vérifier TOTP
-                    if (!totpSecret) {
-                        loginError.textContent = 'Secret TOTP non configuré.';
-                        loginError.style.display = 'block';
-                        return;
-                    }
-                    const isValid = otplib.authenticator.check(totp, totpSecret);
-                    if (!isValid) {
-                        loginError.textContent = 'Code Google Authenticator invalide.';
-                        loginError.style.display = 'block';
-                        return;
-                    }
-                    // Succès
-                    modal.classList.remove('active');
-                    resolve(true);
                 }
 
                 submitBtn.onclick = validateLogin;
@@ -2617,7 +2616,6 @@
                     modal.classList.remove('active');
                     resolve(false);
                 };
-                // Support de la touche Entrée
                 pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validateLogin(); });
                 totpInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') validateLogin(); });
                 pinCreate.addEventListener('keydown', (e) => { if (e.key === 'Enter') finalizeBtn.click(); });
