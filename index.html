@@ -18,7 +18,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/otplib@12.0.1/otplib.min.js"></script>
+    
+    <!-- ===== BIBLIOTHÈQUES TOTP ET QRCODE ===== -->
+    <!-- Correction : utiliser la version navigateur de otplib -->
+    <script src="https://cdn.jsdelivr.net/npm/otplib@12.0.1/otplib-browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -2518,6 +2521,13 @@
                     });
 
                 function showSetupMode() {
+                    // Vérifier que la librairie otplib est chargée
+                    if (typeof otplib === 'undefined') {
+                        showToast('Erreur : la bibliothèque otplib n\'est pas chargée. Vérifiez votre connexion internet.', 'error');
+                        setupError.textContent = 'Bibliothèque TOTP non disponible.';
+                        setupError.style.display = 'block';
+                        return;
+                    }
                     title.textContent = '🔐 Configuration initiale';
                     subtitle.textContent = 'Scannez le QR Code avec Google Authenticator et créez votre code PIN.';
                     setupSection.classList.add('active');
