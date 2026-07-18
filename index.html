@@ -3677,14 +3677,8 @@
                         button.innerHTML = originalHTML;
                         isCloudinaryWidgetOpen = false;
                     }
-                    // Si l'événement est "success", on réinitialise également après le succès
-                    if (result && result.event === "success") {
-                        // On ne réinitialise pas ici car on veut que le bouton reste actif jusqu'à la fermeture
-                        // La fermeture sera gérée par l'événement "close"
-                    }
                 }
             );
-            // Note : la méthode .on n'est plus utilisée, le callback gère tout
         }
 
         // ============================================================
@@ -3754,15 +3748,23 @@
         }
 
         // ============================================================
-        // FONCTIONS MÉTIERS
+        // FONCTIONS MÉTIERS - INCÉMENTATION PUBLIQUE SANS AUTH
         // ============================================================
         async function incrementViews(uid) {
-            if (!uid || uid === '') return;
+            if (!uid) {
+                console.warn('incrementViews: uid manquant');
+                return;
+            }
             const key = 'viewCounted_' + uid;
-            if (sessionStorage.getItem(key) === 'true') return;
+            if (sessionStorage.getItem(key) === 'true') {
+                console.log('Vue déjà comptée pour', uid);
+                return;
+            }
             try {
                 const docRef = db.collection('users').doc(uid);
                 await docRef.update({ views: firebase.firestore.FieldValue.increment(1) });
+                console.log('Vue incrémentée pour', uid);
+                // Mise à jour du cache local si le profil est chargé
                 if (userProfile && userProfile._id === uid) {
                     userProfile.views = (userProfile.views || 0) + 1;
                 }
@@ -3772,20 +3774,29 @@
             }
         }
 
-        // ============================================================
-        // INCRÉMENTATION ATOMIQUE DES CLICS (transaction)
-        // ============================================================
         async function incrementLinkClick(uid, linkId) {
-            if (!uid || !linkId) return;
+            if (!uid || !linkId) {
+                console.warn('incrementLinkClick: uid ou linkId manquant');
+                return;
+            }
             const docRef = db.collection('users').doc(uid);
             try {
                 await db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(docRef);
-                    if (!doc.exists) return;
+                    if (!doc.exists) {
+                        console.warn('Document utilisateur introuvable pour uid', uid);
+                        return;
+                    }
                     const data = doc.data();
-                    if (!data.links) return;
+                    if (!data.links) {
+                        console.warn('Aucun lien trouvé pour uid', uid);
+                        return;
+                    }
                     const linkIndex = data.links.findIndex(l => l.id === linkId);
-                    if (linkIndex === -1) return;
+                    if (linkIndex === -1) {
+                        console.warn('Lien introuvable dans le profil :', linkId);
+                        return;
+                    }
                     // Incrémenter atomiquement le champ 'clicks' du lien
                     const updatedLinks = [...data.links];
                     updatedLinks[linkIndex] = {
@@ -3794,6 +3805,7 @@
                     };
                     transaction.update(docRef, { links: updatedLinks });
                 });
+                console.log('Clic incrémenté pour le lien', linkId);
                 // Mise à jour du cache local si le profil est chargé
                 if (userProfile && userProfile._id === uid) {
                     const link = userProfile.links.find(l => l.id === linkId);
@@ -5705,54 +5717,6 @@ URL:${urlProfil}
 
     })();
 </script>
-
-<!-- ============================================================
-     FIRESTORE SECURITY RULES (à coller dans la console Firebase)
-     ============================================================
-     Règles de sécurité demandées :
-     - admin_config, donations : lecture publique, écriture réservée à l'UID Admin
-     - links : lecture publique, update public pour les clics, création/suppression réservées à l'Admin
-     - admin_logs : création publique, lecture et suppression réservées à l'Admin
-
-     L'UID Admin est : TquBTa85OQeYWxt4CIsO1XEAcK43
--->
-<!--
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // ===== ADMIN_CONFIG : lecture publique, écriture admin =====
-    match /admin_config/{document} {
-      allow read: if true;
-      allow write: if request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
-    }
-
-    // ===== DONATIONS : lecture publique, écriture admin =====
-    match /donations/{document} {
-      allow read: if true;
-      allow write: if request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
-    }
-
-    // ===== LINKS : lecture publique, update public pour les clics, création/suppression admin =====
-    match /links/{document} {
-      allow read: if true;
-      allow update: if true; // pour permettre les incrémentations de clics (champ 'clicks')
-      allow create, delete: if request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
-    }
-
-    // ===== ADMIN_LOGS : création publique, lecture et suppression admin =====
-    match /admin_logs/{document} {
-      allow create: if true;
-      allow read, delete: if request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
-    }
-
-    // ===== USERS : sécurisé, seulement lecture/écriture par l'utilisateur propriétaire (optionnel) =====
-    match /users/{userId} {
-      allow read: if request.auth.uid == userId || request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
-      allow write: if request.auth.uid == userId || request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
-    }
-  }
-}
--->
 
 </body>
 </html>
