@@ -3,21 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>LinkExt | Cyber Linktree</title>
+    <title>Mon Site - Espace Personnel & Dashboard</title>
 
-    <meta name="description" content="Centralisez vos liens et réseaux sociaux en un seul endroit.">
-    <meta name="keywords" content="linktree, réseaux sociaux, cyberpunk">
-    <meta property="og:title" content="LinkExt">
-    <meta property="og:description" content="Centralisez vos liens et réseaux sociaux en un seul endroit.">
+    <!-- Balises SEO -->
+    <meta name="description" content="Bienvenue sur mon site internet. Découvrez mon profil, mes projets et mes liens officiels.">
+    <meta name="robots" content="index, follow">
+    <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
+
+    <!-- Open Graph / SEO supplémentaires -->
+    <meta property="og:title" content="Mon Site - Espace Personnel & Dashboard">
+    <meta property="og:description" content="Bienvenue sur mon site internet. Découvrez mon profil, mes projets et mes liens officiels.">
     <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
     <meta property="og:url" content="https://linkext.example.com">
     <meta property="og:type" content="website">
 
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
+    <!-- Robots.txt (fichier séparé à ajouter à la racine du projet) -->
+    <!-- Note : Ajouter un fichier robots.txt à la racine contenant :
+         User-agent: *
+         Allow: /
+    -->
 
     <style>
         /* ===== VARIABLES ===== */
@@ -2490,7 +2501,7 @@
         }
 
         // ============================================================
-        // CONSTANTES CLOUDINARY (avec vérification)
+        // CONSTANTES CLOUDINARY
         // ============================================================
         const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
         const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
@@ -2529,6 +2540,7 @@
         let adminLogsUnsubscribe = null;
         let adminStatusUnsubscribe = null;
         let currentAdminStatus = 'disponible';
+        let isAdmin = false; // rôle de l'utilisateur courant
 
         // ============================================================
         // VUES
@@ -2575,7 +2587,7 @@
         }
 
         // ============================================================
-        // FIRESTORE - LECTURE / ÉCRITURE (avec sécurisation)
+        // FIRESTORE - LECTURE / ÉCRITURE
         // ============================================================
         async function loadUserProfile(uid) {
             if (!uid || uid === '') {
@@ -2685,7 +2697,6 @@
                 errorDiv.style.display = 'none';
                 modal.classList.add('active');
 
-                // Charger le backupCode
                 db.collection('admin_config').doc('security').get()
                     .then((doc) => {
                         if (!doc.exists) {
@@ -2718,7 +2729,6 @@
                         errorDiv.style.display = 'block';
                         return;
                     }
-                    // Succès
                     modal.classList.remove('active');
                     resolve(true);
                 }
@@ -2735,7 +2745,7 @@
         }
 
         // ============================================================
-        // GESTION DES DONS - ADMIN (écriture) et UTILISATEUR (lecture temps réel)
+        // GESTION DES DONS
         // ============================================================
         const DONATIONS_DOC_PATH = 'donations/payment_details';
 
@@ -2771,9 +2781,6 @@
             }
         }
 
-        // ============================================================
-        // AFFICHAGE DES DONS DANS LA POPUP (lecture en temps réel)
-        // ============================================================
         function showDonationPopup() {
             const modal = document.getElementById('donation-modal');
             const container = document.getElementById('donation-methods-container');
@@ -2872,7 +2879,6 @@
             }
         }
 
-        // Fermeture de la popup et lightbox
         document.getElementById('close-donation-modal').addEventListener('click', () => {
             document.getElementById('donation-modal').classList.remove('active');
             if (donationUnsubscribe) {
@@ -2913,7 +2919,6 @@
                             const data = doc.data();
                             currentAdminStatus = data.currentStatus || 'disponible';
                         } else {
-                            // Créer le document avec statut par défaut
                             db.collection('admin_config').doc('status').set({ currentStatus: 'disponible' })
                                 .catch(err => console.warn('Impossible de créer le statut admin:', err));
                             currentAdminStatus = 'disponible';
@@ -2953,10 +2958,8 @@
         }
 
         // ============================================================
-        // NOUVELLES FONCTIONNALITÉS ADMIN
+        // ADMIN - GESTIONNAIRE DE LIENS ET LOGS
         // ============================================================
-
-        // 1. Gestionnaire de liens (collection "links")
         function renderAdminLinks() {
             const container = document.getElementById('admin-links-container');
             if (!container) return;
@@ -3061,7 +3064,6 @@
             }
         }
 
-        // 2. Journal d'activité (collection "admin_logs") avec pagination
         function loadAdminLogs(limit = 10) {
             const container = document.getElementById('admin-logs-container');
             if (!container) return;
@@ -3131,9 +3133,8 @@
         }
 
         // ============================================================
-        // GESTION DU THÈME PAR localStorage (individuel)
+        // GESTION DU THÈME (localStorage)
         // ============================================================
-
         function applyUserTheme() {
             let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
             try {
@@ -3158,10 +3159,6 @@
             localStorage.setItem('userTheme', JSON.stringify(data));
             applyUserTheme();
         }
-
-        // ============================================================
-        // GESTION DES THÈMES VISUELS ET FONDS (localStorage + classes)
-        // ============================================================
 
         function applyVisualTheme(theme) {
             if (!theme) {
@@ -3202,7 +3199,7 @@
         }
 
         // ============================================================
-        // GESTION DES TÉMOIGNAGES (CRUD)
+        // GESTION DES TÉMOIGNAGES
         // ============================================================
         function renderTestimonialsPrivate() {
             const container = document.getElementById('testimonials-list');
@@ -3284,7 +3281,7 @@
         }
 
         // ============================================================
-        // PLANIFICATEUR DE STATUT
+        // PLANIFICATEUR DE STATUT (mise à jour automatique)
         // ============================================================
         function renderSchedules() {
             const container = document.getElementById('schedule-list');
@@ -3336,6 +3333,7 @@
             });
         }
 
+        // Fonction de mise à jour du statut selon la planification
         function updateScheduledStatus() {
             if (!userProfile || !userProfile.schedules || userProfile.schedules.length === 0) return;
             const now = new Date();
@@ -3347,20 +3345,18 @@
                     break;
                 }
             }
-            if (newStatus && userProfile.status !== newStatus) {
-                userProfile.status = newStatus;
-                saveUserProfile(currentUser.uid, { status: newStatus }).catch(() => {});
-                updateStatusUI(newStatus);
-                if (document.getElementById('view-profile-public').classList.contains('active')) {
-                    const statusBadge = document.getElementById('public-status-badge');
-                    const statusMap = {
-                        disponible: { label: 'Disponible', class: 'disponible' },
-                        occupe: { label: 'Occupé', class: 'occupe' },
-                        enlive: { label: 'En Live', class: 'enlive' }
-                    };
-                    const st = statusMap[newStatus] || statusMap.disponible;
-                    statusBadge.className = `status-badge ${st.class}`;
-                    statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+            if (newStatus) {
+                // Si l'utilisateur est admin, on met à jour le statut admin
+                if (isAdmin) {
+                    if (currentAdminStatus !== newStatus) {
+                        updateAdminStatus(newStatus);
+                    }
+                } else {
+                    if (userProfile.status !== newStatus) {
+                        userProfile.status = newStatus;
+                        saveUserProfile(currentUser.uid, { status: newStatus }).catch(() => {});
+                        updateStatusUI(newStatus);
+                    }
                 }
             }
         }
@@ -4173,7 +4169,7 @@
         }
 
         // ============================================================
-        // DASHBOARD - PEUPLEMENT (avec gestion admin)
+        // DASHBOARD - PEUPLEMENT
         // ============================================================
         async function populateDashboard() {
             if (!currentUser) return;
@@ -4242,11 +4238,12 @@
 
             applyUserTheme();
 
+            // Gestion Admin
             const adminTab = document.getElementById('admin-tab');
             const adminStatusControl = document.getElementById('admin-status-control');
             try {
                 const admin = await checkIsAdmin(currentUser.uid);
-                console.log('Résultat checkIsAdmin :', admin);
+                isAdmin = admin; // stocker globalement
                 if (admin) {
                     adminTab.style.display = 'flex';
                     adminTab.style.opacity = '0.5';
@@ -4302,6 +4299,28 @@
                 if (adminStatusControl) adminStatusControl.style.display = 'none';
                 showToast('Impossible de vérifier les droits administrateur.', 'error');
             }
+
+            // Mettre à jour le comportement des boutons de statut du profil
+            const statusOptions = document.querySelectorAll('#status-selector .status-option');
+            statusOptions.forEach(option => {
+                option.removeEventListener('click', handleStatusClick);
+                option.addEventListener('click', handleStatusClick);
+            });
+        }
+
+        // Gestionnaire de clic sur les statuts (profil)
+        function handleStatusClick() {
+            const value = this.dataset.value;
+            updateStatusUI(value);
+            if (isAdmin) {
+                // L'admin met à jour le statut admin
+                updateAdminStatus(value);
+            } else {
+                // Utilisateur normal met à jour son propre statut
+                if (currentUser) {
+                    saveUserProfile(currentUser.uid, { status: value }).catch(() => {});
+                }
+            }
         }
 
         function setupShareButtons(publicLink) {
@@ -4342,7 +4361,7 @@
         }
 
         function updateStatusUI(status) {
-            document.querySelectorAll('.status-selector .status-option').forEach(el => {
+            document.querySelectorAll('#status-selector .status-option').forEach(el => {
                 el.classList.toggle('active', el.dataset.value === status);
             });
         }
@@ -4543,9 +4562,11 @@
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
 
-                const isAdmin = await checkIsAdmin(uid);
+                // Vérifier si le propriétaire est admin
+                const isOwnerAdmin = await checkIsAdmin(uid);
                 let statusBadge = document.getElementById('public-status-badge');
-                if (isAdmin) {
+                if (isOwnerAdmin) {
+                    // Écouter le statut admin
                     if (adminStatusUnsubscribe) {
                         adminStatusUnsubscribe();
                         adminStatusUnsubscribe = null;
@@ -5262,16 +5283,6 @@
             setupAvatarUpload();
             setupLinkImageUpload();
 
-            document.querySelectorAll('.status-selector .status-option').forEach(el => {
-                el.addEventListener('click', () => {
-                    const value = el.dataset.value;
-                    updateStatusUI(value);
-                    if (currentUser) {
-                        saveUserProfile(currentUser.uid, { status: value }).catch(() => {});
-                    }
-                });
-            });
-
             document.getElementById('maintenance-toggle').addEventListener('click', function() {
                 const enabled = !this.classList.contains('active');
                 updateMaintenanceUI(enabled);
@@ -5357,7 +5368,7 @@
         }
 
         // ============================================================
-        // DÉTAILS DES FONCTIONS MANQUANTES
+        // FONCTIONS DÉTAILLÉES
         // ============================================================
         function setupAvatarUpload() {
             const btn = document.getElementById('btn-change-photo');
