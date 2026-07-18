@@ -10,16 +10,16 @@
     <meta name="robots" content="index, follow">
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
 
-    <!-- Politiques de sécurité (Sucuri) -->
-    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none'; default-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://api.cloudinary.com; script-src 'self' 'unsafe-inline' https://*.googleapis.com https://api.cloudinary.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com https://*.googleapis.com;">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-
     <!-- Open Graph / SEO supplémentaires -->
     <meta property="og:title" content="Mon Site - Espace Personnel & Dashboard">
     <meta property="og:description" content="Bienvenue sur mon site internet. Découvrez mon profil, mes projets et mes liens officiels.">
     <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
     <meta property="og:url" content="https://linkext.example.com">
     <meta property="og:type" content="website">
+
+    <!-- Politiques de sécurité (ajoutées pour prévenir clickjacking et autres) -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none'; default-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://api.cloudinary.com; script-src 'self' 'unsafe-inline' https://*.googleapis.com https://api.cloudinary.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com https://*.googleapis.com;">
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2544,7 +2544,7 @@
         let adminLogsUnsubscribe = null;
         let adminStatusUnsubscribe = null;
         let currentAdminStatus = 'disponible';
-        let isAdmin = false;
+        let isAdmin = false; // rôle de l'utilisateur courant
 
         // ============================================================
         // VUES
@@ -3337,6 +3337,7 @@
             });
         }
 
+        // Fonction de mise à jour du statut selon la planification
         function updateScheduledStatus() {
             if (!userProfile || !userProfile.schedules || userProfile.schedules.length === 0) return;
             const now = new Date();
@@ -3349,6 +3350,7 @@
                 }
             }
             if (newStatus) {
+                // Si l'utilisateur est admin, on met à jour le statut admin
                 if (isAdmin) {
                     if (currentAdminStatus !== newStatus) {
                         updateAdminStatus(newStatus);
@@ -4240,11 +4242,12 @@
 
             applyUserTheme();
 
+            // Gestion Admin
             const adminTab = document.getElementById('admin-tab');
             const adminStatusControl = document.getElementById('admin-status-control');
             try {
                 const admin = await checkIsAdmin(currentUser.uid);
-                isAdmin = admin;
+                isAdmin = admin; // stocker globalement
                 if (admin) {
                     adminTab.style.display = 'flex';
                     adminTab.style.opacity = '0.5';
@@ -4301,6 +4304,7 @@
                 showToast('Impossible de vérifier les droits administrateur.', 'error');
             }
 
+            // Mettre à jour le comportement des boutons de statut du profil
             const statusOptions = document.querySelectorAll('#status-selector .status-option');
             statusOptions.forEach(option => {
                 option.removeEventListener('click', handleStatusClick);
@@ -4308,12 +4312,15 @@
             });
         }
 
+        // Gestionnaire de clic sur les statuts (profil)
         function handleStatusClick() {
             const value = this.dataset.value;
             updateStatusUI(value);
             if (isAdmin) {
+                // L'admin met à jour le statut admin
                 updateAdminStatus(value);
             } else {
+                // Utilisateur normal met à jour son propre statut
                 if (currentUser) {
                     saveUserProfile(currentUser.uid, { status: value }).catch(() => {});
                 }
@@ -4559,9 +4566,11 @@
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
 
+                // Vérifier si le propriétaire est admin
                 const isOwnerAdmin = await checkIsAdmin(uid);
                 let statusBadge = document.getElementById('public-status-badge');
                 if (isOwnerAdmin) {
+                    // Écouter le statut admin
                     if (adminStatusUnsubscribe) {
                         adminStatusUnsubscribe();
                         adminStatusUnsubscribe = null;
