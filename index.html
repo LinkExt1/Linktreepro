@@ -3774,23 +3774,34 @@
             }
         }
 
+        // ============================================================
+        // INCRÉMENTATION ATOMIQUE DES CLICS (transaction)
+        // ============================================================
         async function incrementLinkClick(uid, linkId) {
             if (!uid || !linkId) return;
+            const docRef = db.collection('users').doc(uid);
             try {
-                const docRef = db.collection('users').doc(uid);
-                const doc = await docRef.get();
-                if (!doc.exists) return;
-                const data = doc.data();
-                if (!data.links) return;
-                const updatedLinks = data.links.map(l => {
-                    if (l.id === linkId) {
-                        return { ...l, clicks: (l.clicks || 0) + 1 };
-                    }
-                    return l;
+                await db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(docRef);
+                    if (!doc.exists) return;
+                    const data = doc.data();
+                    if (!data.links) return;
+                    const linkIndex = data.links.findIndex(l => l.id === linkId);
+                    if (linkIndex === -1) return;
+                    // Incrémenter atomiquement le champ 'clicks' du lien
+                    const updatedLinks = [...data.links];
+                    updatedLinks[linkIndex] = {
+                        ...updatedLinks[linkIndex],
+                        clicks: (updatedLinks[linkIndex].clicks || 0) + 1
+                    };
+                    transaction.update(docRef, { links: updatedLinks });
                 });
-                await docRef.update({ links: updatedLinks });
+                // Mise à jour du cache local si le profil est chargé
                 if (userProfile && userProfile._id === uid) {
-                    userProfile.links = updatedLinks;
+                    const link = userProfile.links.find(l => l.id === linkId);
+                    if (link) {
+                        link.clicks = (link.clicks || 0) + 1;
+                    }
                     if (document.getElementById('view-dashboard').classList.contains('active')) {
                         updateStats();
                     }
