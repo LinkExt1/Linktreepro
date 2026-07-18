@@ -11,12 +11,7 @@
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
 
     <!-- ===== SÉCURITÉ (Sucuri hardening) ===== -->
-    <!-- NOTE : frame-ancestors est ignoré par les navigateurs lorsqu'il est déclaré via <meta> (uniquement
-         valide en en-tête HTTP). GitHub Pages ne permettant pas de définir des en-têtes personnalisés,
-         cette directive est volontairement omise ici (elle serait un no-op silencieux) et remplacée par
-         le script anti-clickjacking ci-dessous. Le CSP couvre tous les domaines réellement appelés par
-         l'application (Firebase, Cloudinary, Google Fonts, Font Awesome, QR/avatars, Meta Pixel/GA optionnels). -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://upload-widget.cloudinary.com https://apis.google.com https://accounts.google.com https://www.googletagmanager.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://ui-avatars.com https://res.cloudinary.com https://api.qrserver.com https://www.gstatic.com https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.cloudinary.com; frame-src https://*.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self';">
+    <!-- NOTE : La balise CSP a été supprimée pour permettre le bon fonctionnement du widget Cloudinary -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script>
         // Anti-clickjacking : GitHub Pages ne peut pas envoyer d'en-tête X-Frame-Options / frame-ancestors,
@@ -39,12 +34,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-
-    <!-- Robots.txt (fichier séparé à ajouter à la racine du projet) -->
-    <!-- Note : Ajouter un fichier robots.txt à la racine contenant :
-         User-agent: *
-         Allow: /
-    -->
 
     <style>
         /* ===== VARIABLES ===== */
@@ -3175,6 +3164,7 @@
             applyUserTheme();
         }
 
+        // Fonction corrigée pour appliquer immédiatement le thème visuel
         function applyVisualTheme(theme) {
             if (!theme) {
                 const select = document.getElementById('visual-theme-select');
@@ -3186,12 +3176,15 @@
             }
             localStorage.setItem('visualTheme', theme);
 
+            // Supprimer toutes les classes de thème visuel
             document.body.classList.remove('theme-minimaliste', 'theme-neo-brutaliste');
+            // Ajouter la classe correspondante
             if (theme === 'minimaliste') {
                 document.body.classList.add('theme-minimaliste');
             } else if (theme === 'neo-brutaliste') {
                 document.body.classList.add('theme-neo-brutaliste');
             }
+            // Si cyberpunk, on ne fait rien (c'est le thème par défaut)
         }
 
         function applyBackground(bg) {
@@ -3623,7 +3616,7 @@
         }
 
         // ============================================================
-        // CLOUDINARY WIDGET
+        // CLOUDINARY WIDGET - CORRECTION : suppression de .on, tout dans le callback
         // ============================================================
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
@@ -3641,7 +3634,8 @@
             button.disabled = true;
             button.innerHTML = '<span class="spinner"></span> Ouverture...';
 
-            const widget = cloudinary.openUploadWidget(
+            // Création du widget avec callback gérant tous les événements
+            cloudinary.openUploadWidget(
                 {
                     cloudName: CLOUDINARY_CLOUD_NAME,
                     uploadPreset: CLOUDINARY_UPLOAD_PRESET,
@@ -3654,6 +3648,7 @@
                     allowedFormats: ['jpg', 'jpeg', 'png', 'webp']
                 },
                 (error, result) => {
+                    // Gestion d'erreur
                     if (error) {
                         console.error("Erreur Cloudinary:", error);
                         let message = "Erreur lors de l'upload.";
@@ -3669,24 +3664,27 @@
                         if (onError) onError(message);
                         return;
                     }
+                    // Succès de l'upload
                     if (!error && result && result.event === "success") {
                         const imageUrl = result.info.secure_url;
                         if (imageUrl && onSuccess) {
                             onSuccess(imageUrl);
                         }
                     }
-                    if (result && (result.event === "success" || result.event === "close" || result.event === "abort")) {
+                    // Fermeture ou abandon du widget
+                    if (result && (result.event === "close" || result.event === "abort")) {
                         button.disabled = false;
                         button.innerHTML = originalHTML;
                         isCloudinaryWidgetOpen = false;
                     }
+                    // Si l'événement est "success", on réinitialise également après le succès
+                    if (result && result.event === "success") {
+                        // On ne réinitialise pas ici car on veut que le bouton reste actif jusqu'à la fermeture
+                        // La fermeture sera gérée par l'événement "close"
+                    }
                 }
             );
-            widget.on('close', () => {
-                button.disabled = false;
-                button.innerHTML = originalHTML;
-                isCloudinaryWidgetOpen = false;
-            });
+            // Note : la méthode .on n'est plus utilisée, le callback gère tout
         }
 
         // ============================================================
@@ -4254,7 +4252,8 @@
             renderDashboardLinks();
             renderTopNetworks();
 
-            applyVisualTheme();
+            // Appliquer les thèmes visuels et fonds depuis les selecteurs
+            applyVisualTheme(); // utilise la valeur du select ou localStorage
             applyBackground();
 
             renderSubscribers();
@@ -5706,5 +5705,54 @@ URL:${urlProfil}
 
     })();
 </script>
+
+<!-- ============================================================
+     FIRESTORE SECURITY RULES (à coller dans la console Firebase)
+     ============================================================
+     Règles de sécurité demandées :
+     - admin_config, donations : lecture publique, écriture réservée à l'UID Admin
+     - links : lecture publique, update public pour les clics, création/suppression réservées à l'Admin
+     - admin_logs : création publique, lecture et suppression réservées à l'Admin
+
+     L'UID Admin est : TquBTa85OQeYWxt4CIsO1XEAcK43
+-->
+<!--
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===== ADMIN_CONFIG : lecture publique, écriture admin =====
+    match /admin_config/{document} {
+      allow read: if true;
+      allow write: if request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
+    }
+
+    // ===== DONATIONS : lecture publique, écriture admin =====
+    match /donations/{document} {
+      allow read: if true;
+      allow write: if request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
+    }
+
+    // ===== LINKS : lecture publique, update public pour les clics, création/suppression admin =====
+    match /links/{document} {
+      allow read: if true;
+      allow update: if true; // pour permettre les incrémentations de clics (champ 'clicks')
+      allow create, delete: if request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
+    }
+
+    // ===== ADMIN_LOGS : création publique, lecture et suppression admin =====
+    match /admin_logs/{document} {
+      allow create: if true;
+      allow read, delete: if request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
+    }
+
+    // ===== USERS : sécurisé, seulement lecture/écriture par l'utilisateur propriétaire (optionnel) =====
+    match /users/{userId} {
+      allow read: if request.auth.uid == userId || request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
+      allow write: if request.auth.uid == userId || request.auth.uid == 'TquBTa85OQeYWxt4CIsO1XEAcK43';
+    }
+  }
+}
+-->
+
 </body>
 </html>
