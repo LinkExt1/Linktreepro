@@ -10,6 +10,22 @@
     <meta name="robots" content="index, follow">
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
 
+    <!-- ===== SÉCURITÉ (Sucuri hardening) ===== -->
+    <!-- NOTE : frame-ancestors est ignoré par les navigateurs lorsqu'il est déclaré via <meta> (uniquement
+         valide en en-tête HTTP). GitHub Pages ne permettant pas de définir des en-têtes personnalisés,
+         cette directive est volontairement omise ici (elle serait un no-op silencieux) et remplacée par
+         le script anti-clickjacking ci-dessous. Le CSP couvre tous les domaines réellement appelés par
+         l'application (Firebase, Cloudinary, Google Fonts, Font Awesome, QR/avatars, Meta Pixel/GA optionnels). -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://upload-widget.cloudinary.com https://apis.google.com https://accounts.google.com https://www.googletagmanager.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://ui-avatars.com https://res.cloudinary.com https://api.qrserver.com https://www.gstatic.com https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.cloudinary.com; frame-src https://*.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <script>
+        // Anti-clickjacking : GitHub Pages ne peut pas envoyer d'en-tête X-Frame-Options / frame-ancestors,
+        // donc on bloque côté client toute tentative d'affichage du site dans une iframe tierce.
+        if (window.top !== window.self) {
+            window.top.location = window.self.location;
+        }
+    </script>
+
     <!-- Open Graph / SEO supplémentaires -->
     <meta property="og:title" content="Mon Site - Espace Personnel & Dashboard">
     <meta property="og:description" content="Bienvenue sur mon site internet. Découvrez mon profil, mes projets et mes liens officiels.">
@@ -326,7 +342,6 @@
             .share-module { padding: 0.5rem 1rem; flex-wrap: wrap; }
             .dashboard-nav .nav-item { font-size: 0.6rem; padding: 0.2rem 0.4rem; }
             .tab-content { padding: 0.8rem 1rem; }
-            .modal-content { width: 95%; padding: 1.2rem; }
             .admin-panel .qr-upload-row { flex-direction: column; align-items: flex-start; }
             .testimonial-item { flex-direction: column; align-items: stretch; }
             .schedule-item { flex-direction: column; align-items: stretch; }
