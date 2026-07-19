@@ -10,7 +10,8 @@
     <meta name="description" content="Bienvenue sur mon site internet. Découvrez mon profil, mes projets et mes liens officiels.">
     <meta name="robots" content="index, follow">
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
-
+        <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00f2fe">
     <!-- ===== SÉCURITÉ (Sucuri hardening) ===== -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script>
@@ -61,7 +62,19 @@
             --theme-primary-color: #00f2fe;
             --theme-background-image: none;
         }
-
+              <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function(reg) {
+                        console.log('Service Worker enregistré avec succès.');
+                    })
+                    .catch(function(err) {
+                        console.warn('Erreur lors de l\'enregistrement du Service Worker:', err);
+                    });
+            });
+        }
+    </script>
         /* ===== APPLICATION DYNAMIQUE DU THÈME (via localStorage) ===== */
         body {
             background-color: var(--bg-deep);
