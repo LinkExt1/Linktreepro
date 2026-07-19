@@ -2552,6 +2552,8 @@
         let adminStatusUnsubscribe = null;
         let currentAdminStatus = 'disponible';
         let isAdmin = false;
+        let profileListenerUnsubscribe = null;
+        let profileListenerInitialized = false;
 
         // ============================================================
         // VUES
@@ -4351,6 +4353,47 @@
 
             applyUserTheme();
 
+            // ---- Injection SEO et tracking ----
+            if (userProfile.seo) {
+                injectSEO(userProfile.seo);
+            }
+            if (userProfile.integrations) {
+                injectTrackingScripts(userProfile.integrations);
+            }
+
+            // ---- Firestore Real‑time Listener pour SEO & intégrations ----
+            if (!profileListenerInitialized && currentUser) {
+                profileListenerInitialized = true;
+                profileListenerUnsubscribe = db.collection('users').doc(currentUser.uid)
+                    .onSnapshot((doc) => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            // Fusionner les données mises à jour sans écraser les objets non présents
+                            userProfile = { ...userProfile, ...data, _id: currentUser.uid };
+
+                            // Mettre à jour le SEO et les intégrations si présents
+                            if (data.seo) {
+                                injectSEO(data.seo);
+                            }
+                            if (data.integrations) {
+                                injectTrackingScripts(data.integrations);
+                            }
+
+                            // Optionnel : rafraîchir les champs du formulaire si la vue est active
+                            if (document.getElementById('view-dashboard').classList.contains('active')) {
+                                // Met à jour les champs du formulaire pour refléter les nouvelles valeurs
+                                document.getElementById('seo-title').value = userProfile.seo?.title || '';
+                                document.getElementById('seo-description').value = userProfile.seo?.description || '';
+                                document.getElementById('seo-keywords').value = userProfile.seo?.keywords || '';
+                                document.getElementById('meta-pixel-id').value = userProfile.integrations?.metaPixel || '';
+                                document.getElementById('google-analytics-id').value = userProfile.integrations?.ga || '';
+                            }
+                        }
+                    }, (error) => {
+                        console.error('Erreur du listener Firestore pour le profil:', error);
+                    });
+            }
+
             // Gestion Admin
             const adminTab = document.getElementById('admin-tab');
             const adminStatusControl = document.getElementById('admin-status-control');
@@ -4563,6 +4606,9 @@
             updateThemeIcons();
         }
 
+        // ============================================================
+        // SEO & TRACKING - FUNCTIONS
+        // ============================================================
         function injectSEO(seo) {
             let titleEl = document.querySelector('title');
             if (!titleEl) {
@@ -5382,6 +5428,12 @@
                 if (adminStatusUnsubscribe) {
                     adminStatusUnsubscribe();
                     adminStatusUnsubscribe = null;
+                }
+                // Nettoyer le listener du profil
+                if (profileListenerUnsubscribe) {
+                    profileListenerUnsubscribe();
+                    profileListenerUnsubscribe = null;
+                    profileListenerInitialized = false;
                 }
                 showView('view-consent');
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
