@@ -1,7 +1,7 @@
 {
   "name": "LinkExt",
   "short_name": "LinkExt",
-  "start_url": "/",
+  "start_url": "/Linktreepro/index.html",
   "display": "standalone",
   "background_color": "#0a0b10",
   "theme_color": "#00f2fe",
