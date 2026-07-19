@@ -11,11 +11,8 @@
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
 
     <!-- ===== SÉCURITÉ (Sucuri hardening) ===== -->
-    <!-- NOTE : La balise CSP a été supprimée pour permettre le bon fonctionnement du widget Cloudinary -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script>
-        // Anti-clickjacking : GitHub Pages ne peut pas envoyer d'en-tête X-Frame-Options / frame-ancestors,
-        // donc on bloque côté client toute tentative d'affichage du site dans une iframe tierce.
         if (window.top !== window.self) {
             window.top.location = window.self.location;
         }
@@ -230,7 +227,6 @@
             margin: auto;
         }
 
-        /* Ajustements pour le dashboard (plein écran) */
         .dashboard-container {
             flex: 1;
             display: flex;
@@ -289,7 +285,6 @@
             flex-shrink: 0;
         }
 
-        /* Ajustements public */
         .public-wrapper .glass-card {
             max-width: 600px;
             padding: 0 0 1.2rem 0;
@@ -298,7 +293,6 @@
             position: relative;
         }
 
-        /* Modales */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1979,6 +1973,7 @@
             border-bottom: 1px solid var(--border-glow);
             font-size: 0.8rem;
             color: var(--text-secondary);
+            align-items: center;
         }
         .admin-log-entry .log-time {
             color: var(--text-primary);
@@ -1986,6 +1981,21 @@
         }
         .admin-log-entry .log-action {
             color: var(--text-secondary);
+            flex: 1;
+            margin: 0 0.5rem;
+        }
+        .admin-log-entry .log-delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            padding: 0 0.2rem;
+        }
+        .admin-log-entry .log-delete-btn:hover {
+            color: #ff2040;
+            transform: scale(1.1);
         }
         .admin-log-load-more {
             margin-top: 0.5rem;
@@ -2497,7 +2507,6 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // FORCER LE LONG POLLING pour éviter les erreurs QUIC
         try {
             db.settings({ experimentalForceLongPolling: true });
         } catch (e) {
@@ -2509,9 +2518,6 @@
         // ============================================================
         const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
         const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
-        if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-            console.error('Cloudinary config manquante !');
-        }
 
         const PLATFORMS = [
             { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp' },
@@ -2544,7 +2550,7 @@
         let adminLogsUnsubscribe = null;
         let adminStatusUnsubscribe = null;
         let currentAdminStatus = 'disponible';
-        let isAdmin = false; // rôle de l'utilisateur courant
+        let isAdmin = false;
 
         // ============================================================
         // VUES
@@ -2668,7 +2674,6 @@
                 return false;
             }
             try {
-                console.log('checkIsAdmin: lecture de admin_config/security pour uid', uid);
                 const docRef = db.collection('admin_config').doc('security');
                 const doc = await docRef.get();
                 if (!doc.exists) {
@@ -2676,9 +2681,8 @@
                     return false;
                 }
                 const data = doc.data();
-                console.log('Données récupérées :', data);
                 const isAdmin = data.adminUid === uid;
-                console.log('adminUid stocké =', data.adminUid, 'uid =', uid, '=> isAdmin =', isAdmin);
+                console.log('isAdmin =', isAdmin);
                 return isAdmin;
             } catch (e) {
                 console.error('Erreur de lecture admin_config/security :', e);
@@ -2751,8 +2755,6 @@
         // ============================================================
         // GESTION DES DONS
         // ============================================================
-        const DONATIONS_DOC_PATH = 'donations/payment_details';
-
         async function loadDonationConfig() {
             try {
                 const docRef = db.collection('donations').doc('payment_details');
@@ -3068,6 +3070,42 @@
             }
         }
 
+        // --- GESTION DES LOGS (avec suppression) ---
+
+        async function deleteLog(docId) {
+            if (!confirm('Supprimer ce log définitivement ?')) return;
+            try {
+                await db.collection('admin_logs').doc(docId).delete();
+                showToast('Log supprimé.', 'info');
+                // Recharger la liste (pour mettre à jour)
+                loadAdminLogs(10);
+            } catch (e) {
+                console.error('Erreur suppression log :', e);
+                showToast('Erreur lors de la suppression.', 'error');
+            }
+        }
+
+        async function deleteAllLogs() {
+            if (!confirm('Supprimer TOUS les logs ? Cette action est irréversible.')) return;
+            try {
+                const snapshot = await db.collection('admin_logs').get();
+                if (snapshot.empty) {
+                    showToast('Aucun log à supprimer.', 'info');
+                    return;
+                }
+                const batch = db.batch();
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                showToast('Tous les logs ont été supprimés.', 'info');
+                loadAdminLogs(10);
+            } catch (e) {
+                console.error('Erreur suppression tous les logs :', e);
+                showToast('Erreur lors de la suppression.', 'error');
+            }
+        }
+
         function loadAdminLogs(limit = 10) {
             const container = document.getElementById('admin-logs-container');
             if (!container) return;
@@ -3086,23 +3124,45 @@
                 }
 
                 adminLogsUnsubscribe = query.onSnapshot((snapshot) => {
-                    let html = '';
+                    // Ajouter le bouton "Supprimer tout" en haut
+                    let html = `
+                        <div style="display:flex; justify-content:flex-end; margin-bottom:0.5rem;">
+                            <button class="btn btn-outline" id="delete-all-logs-btn" style="padding:0.2rem 0.8rem; font-size:0.8rem; border-color:var(--danger); color:var(--danger);">
+                                <i class="fas fa-trash-alt"></i> Supprimer tout
+                            </button>
+                        </div>
+                    `;
                     if (snapshot.empty) {
-                        html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucune activité enregistrée.</p>';
+                        html += '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucune activité enregistrée.</p>';
                     } else {
                         snapshot.forEach((doc) => {
                             const data = doc.data();
                             const date = data.timestamp?.toDate?.() || new Date(data.timestamp);
                             const timeStr = date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                             html += `
-                                <div class="admin-log-entry">
+                                <div class="admin-log-entry" data-id="${doc.id}">
                                     <span class="log-time">${timeStr}</span>
                                     <span class="log-action">${data.action || 'Action'}</span>
+                                    <button class="log-delete-btn" data-id="${doc.id}" title="Supprimer ce log"><i class="fas fa-times-circle"></i></button>
                                 </div>
                             `;
                         });
                     }
                     container.innerHTML = html;
+
+                    // Attacher les événements de suppression
+                    container.querySelectorAll('.log-delete-btn').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const docId = this.dataset.id;
+                            deleteLog(docId);
+                        });
+                    });
+
+                    const deleteAllBtn = document.getElementById('delete-all-logs-btn');
+                    if (deleteAllBtn) {
+                        deleteAllBtn.addEventListener('click', deleteAllLogs);
+                    }
 
                     if (limit !== null && snapshot.size === limit) {
                         const moreDiv = document.createElement('div');
@@ -3164,7 +3224,7 @@
             applyUserTheme();
         }
 
-        // Fonction corrigée pour appliquer immédiatement le thème visuel
+        // Fonction pour appliquer immédiatement le thème visuel
         function applyVisualTheme(theme) {
             if (!theme) {
                 const select = document.getElementById('visual-theme-select');
@@ -3176,15 +3236,12 @@
             }
             localStorage.setItem('visualTheme', theme);
 
-            // Supprimer toutes les classes de thème visuel
             document.body.classList.remove('theme-minimaliste', 'theme-neo-brutaliste');
-            // Ajouter la classe correspondante
             if (theme === 'minimaliste') {
                 document.body.classList.add('theme-minimaliste');
             } else if (theme === 'neo-brutaliste') {
                 document.body.classList.add('theme-neo-brutaliste');
             }
-            // Si cyberpunk, on ne fait rien (c'est le thème par défaut)
         }
 
         function applyBackground(bg) {
@@ -3289,7 +3346,7 @@
         }
 
         // ============================================================
-        // PLANIFICATEUR DE STATUT (mise à jour automatique)
+        // PLANIFICATEUR DE STATUT
         // ============================================================
         function renderSchedules() {
             const container = document.getElementById('schedule-list');
@@ -3341,7 +3398,6 @@
             });
         }
 
-        // Fonction de mise à jour du statut selon la planification
         function updateScheduledStatus() {
             if (!userProfile || !userProfile.schedules || userProfile.schedules.length === 0) return;
             const now = new Date();
@@ -3354,7 +3410,6 @@
                 }
             }
             if (newStatus) {
-                // Si l'utilisateur est admin, on met à jour le statut admin
                 if (isAdmin) {
                     if (currentAdminStatus !== newStatus) {
                         updateAdminStatus(newStatus);
@@ -3533,6 +3588,7 @@
             });
         }
 
+        // --- Gestionnaire de thème ADMIN avec sélecteur de style visuel ---
         function renderThemeManager() {
             const container = document.getElementById('theme-manager-container');
             if (!container) return;
@@ -3547,8 +3603,18 @@
                 }
             } catch (e) { /* ignore */ }
 
+            const currentVisualTheme = localStorage.getItem('visualTheme') || 'cyberpunk';
+
             container.innerHTML = `
                 <div class="theme-manager">
+                    <div class="admin-field">
+                        <label>Style visuel</label>
+                        <select id="admin-visual-theme-select" style="background:var(--input-bg); border:1px solid var(--input-border); color:var(--text-primary); padding:0.4rem 0.8rem; border-radius:30px; font-size:0.8rem; font-family:var(--font-body); outline:none;">
+                            <option value="cyberpunk" ${currentVisualTheme === 'cyberpunk' ? 'selected' : ''}>Cyberpunk</option>
+                            <option value="minimaliste" ${currentVisualTheme === 'minimaliste' ? 'selected' : ''}>Minimaliste Blanc</option>
+                            <option value="neo-brutaliste" ${currentVisualTheme === 'neo-brutaliste' ? 'selected' : ''}>Néo‑brutaliste</option>
+                        </select>
+                    </div>
                     <div class="admin-field">
                         <label>Couleur principale</label>
                         <div class="color-picker-row">
@@ -3569,6 +3635,20 @@
                     <button class="btn" id="save-theme-btn" style="margin-top:0.5rem;">Enregistrer le thème</button>
                 </div>
             `;
+
+            // Événement pour le sélecteur de style visuel
+            const adminThemeSelect = document.getElementById('admin-visual-theme-select');
+            if (adminThemeSelect) {
+                adminThemeSelect.addEventListener('change', function() {
+                    const theme = this.value;
+                    applyVisualTheme(theme);
+                    // Sauvegarder aussi la couleur primaire et l'image (inchangées)
+                    const color = document.getElementById('theme-primary-color').value;
+                    const bgImg = container.querySelector('.bg-preview')?.src || '';
+                    saveUserTheme(color, bgImg);
+                    showToast('Style visuel appliqué !', 'info');
+                });
+            }
 
             document.getElementById('btn-upload-bg')?.addEventListener('click', function() {
                 openCloudinaryWidget({
@@ -3609,9 +3689,12 @@
             document.getElementById('save-theme-btn')?.addEventListener('click', function() {
                 const color = document.getElementById('theme-primary-color').value;
                 const bgImg = container.querySelector('.bg-preview')?.src || '';
+                const visualTheme = document.getElementById('admin-visual-theme-select')?.value || 'cyberpunk';
+                // Appliquer le thème visuel
+                applyVisualTheme(visualTheme);
                 saveUserTheme(color, bgImg);
                 showToast('Thème enregistré !', 'info');
-                addAdminLog('Mise à jour du thème (local)');
+                addAdminLog('Mise à jour du thème (admin)');
             });
         }
 
@@ -3634,7 +3717,6 @@
             button.disabled = true;
             button.innerHTML = '<span class="spinner"></span> Ouverture...';
 
-            // Création du widget avec callback gérant tous les événements
             cloudinary.openUploadWidget(
                 {
                     cloudName: CLOUDINARY_CLOUD_NAME,
@@ -3648,7 +3730,6 @@
                     allowedFormats: ['jpg', 'jpeg', 'png', 'webp']
                 },
                 (error, result) => {
-                    // Gestion d'erreur
                     if (error) {
                         console.error("Erreur Cloudinary:", error);
                         let message = "Erreur lors de l'upload.";
@@ -3664,14 +3745,12 @@
                         if (onError) onError(message);
                         return;
                     }
-                    // Succès de l'upload
                     if (!error && result && result.event === "success") {
                         const imageUrl = result.info.secure_url;
                         if (imageUrl && onSuccess) {
                             onSuccess(imageUrl);
                         }
                     }
-                    // Fermeture ou abandon du widget
                     if (result && (result.event === "close" || result.event === "abort")) {
                         button.disabled = false;
                         button.innerHTML = originalHTML;
@@ -3764,7 +3843,6 @@
                 const docRef = db.collection('users').doc(uid);
                 await docRef.update({ views: firebase.firestore.FieldValue.increment(1) });
                 console.log('Vue incrémentée pour', uid);
-                // Mise à jour du cache local si le profil est chargé
                 if (userProfile && userProfile._id === uid) {
                     userProfile.views = (userProfile.views || 0) + 1;
                 }
@@ -3797,7 +3875,6 @@
                         console.warn('Lien introuvable dans le profil :', linkId);
                         return;
                     }
-                    // Incrémenter atomiquement le champ 'clicks' du lien
                     const updatedLinks = [...data.links];
                     updatedLinks[linkIndex] = {
                         ...updatedLinks[linkIndex],
@@ -3806,7 +3883,6 @@
                     transaction.update(docRef, { links: updatedLinks });
                 });
                 console.log('Clic incrémenté pour le lien', linkId);
-                // Mise à jour du cache local si le profil est chargé
                 if (userProfile && userProfile._id === uid) {
                     const link = userProfile.links.find(l => l.id === linkId);
                     if (link) {
@@ -4264,8 +4340,7 @@
             renderDashboardLinks();
             renderTopNetworks();
 
-            // Appliquer les thèmes visuels et fonds depuis les selecteurs
-            applyVisualTheme(); // utilise la valeur du select ou localStorage
+            applyVisualTheme();
             applyBackground();
 
             renderSubscribers();
@@ -4280,7 +4355,7 @@
             const adminStatusControl = document.getElementById('admin-status-control');
             try {
                 const admin = await checkIsAdmin(currentUser.uid);
-                isAdmin = admin; // stocker globalement
+                isAdmin = admin;
                 if (admin) {
                     adminTab.style.display = 'flex';
                     adminTab.style.opacity = '0.5';
@@ -4337,7 +4412,6 @@
                 showToast('Impossible de vérifier les droits administrateur.', 'error');
             }
 
-            // Mettre à jour le comportement des boutons de statut du profil
             const statusOptions = document.querySelectorAll('#status-selector .status-option');
             statusOptions.forEach(option => {
                 option.removeEventListener('click', handleStatusClick);
@@ -4345,15 +4419,12 @@
             });
         }
 
-        // Gestionnaire de clic sur les statuts (profil)
         function handleStatusClick() {
             const value = this.dataset.value;
             updateStatusUI(value);
             if (isAdmin) {
-                // L'admin met à jour le statut admin
                 updateAdminStatus(value);
             } else {
-                // Utilisateur normal met à jour son propre statut
                 if (currentUser) {
                     saveUserProfile(currentUser.uid, { status: value }).catch(() => {});
                 }
@@ -4599,11 +4670,9 @@
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
 
-                // Vérifier si le propriétaire est admin
                 const isOwnerAdmin = await checkIsAdmin(uid);
                 let statusBadge = document.getElementById('public-status-badge');
                 if (isOwnerAdmin) {
-                    // Écouter le statut admin
                     if (adminStatusUnsubscribe) {
                         adminStatusUnsubscribe();
                         adminStatusUnsubscribe = null;
