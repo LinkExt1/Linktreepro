@@ -11,7 +11,6 @@
     <meta name="robots" content="index, follow">
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
         <link rel="manifest" href="/Linktreepro/manifest.json">
-    <meta name="theme-color" content="#00f2fe">
     <!-- ===== SÉCURITÉ (Sucuri hardening) ===== -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script>
@@ -6029,7 +6028,115 @@ URL:${urlProfil}
             applyVisualTheme();
             applyBackground();
         });
+// ================================================================
+// AJOUT : RECONNEXION INTELLIGENTE + BOUTON ACTUALISER
+// ================================================================
 
+// 1. Écouteur d'événement 'online' – ne recharge pas la page, 
+//    mais rafraîchit les données depuis Firebase
+window.addEventListener('online', function() {
+  console.log('[App] Reconnexion réseau détectée – Rafraîchissement des données');
+
+  // Si l'utilisateur est sur le tableau de bord
+  const dashboardView = document.getElementById('view-dashboard');
+  if (dashboardView && dashboardView.classList.contains('active')) {
+    // Rafraîchir le profil complet (listeners Firestore déjà actifs,
+    // mais on force une relecture pour les données critiques)
+    if (currentUser) {
+      // Recharger le profil depuis Firestore
+      loadUserProfile(currentUser.uid).then(() => {
+        populateDashboard();
+        showToast('Données rafraîchies (réseau rétabli)');
+      }).catch(() => {
+        showToast('Erreur lors du rafraîchissement, réessayez.', 'error');
+      });
+    }
+  } else if (isPublicMode()) {
+    // Si on est sur le profil public
+    const uid = getPublicUid();
+    if (uid) {
+      loadPublicProfile(uid);
+      showToast('Profil public rafraîchi');
+    }
+  }
+});
+
+// 2. Bouton "Actualiser" ajouté dynamiquement dans le share-module
+function addRefreshButton() {
+  const shareModule = document.getElementById('share-module');
+  if (!shareModule) return;
+
+  // Vérifier si le bouton existe déjà
+  if (document.getElementById('refresh-data-btn')) return;
+
+  const refreshBtn = document.createElement('button');
+  refreshBtn.id = 'refresh-data-btn';
+  refreshBtn.className = 'btn';
+  refreshBtn.title = 'Actualiser les données depuis Firebase';
+  refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+  refreshBtn.style.padding = '0.3rem 0.6rem';
+  refreshBtn.style.fontSize = '0.8rem';
+  refreshBtn.style.borderRadius = '30px';
+  refreshBtn.style.background = 'transparent';
+  refreshBtn.style.border = '1px solid var(--card-border)';
+  refreshBtn.style.color = 'var(--text-secondary)';
+  refreshBtn.style.transition = 'all var(--transition)';
+
+  // Ajouter l'événement de clic
+  refreshBtn.addEventListener('click', function() {
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner" style="width:14px;height:14px;"></span>';
+
+    const dashboardView = document.getElementById('view-dashboard');
+    if (dashboardView && dashboardView.classList.contains('active')) {
+      if (currentUser) {
+        loadUserProfile(currentUser.uid).then(() => {
+          populateDashboard();
+          showToast('Données actualisées !');
+        }).catch(() => {
+          showToast('Erreur lors de l\'actualisation.', 'error');
+        }).finally(() => {
+          this.disabled = false;
+          this.innerHTML = '<i class="fas fa-sync-alt"></i>';
+        });
+      }
+    } else if (isPublicMode()) {
+      const uid = getPublicUid();
+      if (uid) {
+        loadPublicProfile(uid);
+        showToast('Profil public actualisé !');
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-sync-alt"></i>';
+      }
+    } else {
+      this.disabled = false;
+      this.innerHTML = '<i class="fas fa-sync-alt"></i>';
+      showToast('Aucune donnée à actualiser.', 'info');
+    }
+  });
+
+  // Insérer le bouton après le share-link-wrapper (ou dans les share-actions)
+  const shareActions = shareModule.querySelector('.share-actions');
+  if (shareActions) {
+    // Insérer avant le premier bouton existant
+    shareActions.insertBefore(refreshBtn, shareActions.firstChild);
+  } else {
+    // Fallback : ajouter à la fin du module
+    shareModule.appendChild(refreshBtn);
+  }
+}
+
+// Appeler la fonction d'ajout du bouton après le chargement du DOM
+// (si le module share est déjà présent)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', addRefreshButton);
+} else {
+  addRefreshButton();
+}
+
+// ================================================================
+// FIN DES AJOUTS
+// ================================================================
     })();
 </script>
 
