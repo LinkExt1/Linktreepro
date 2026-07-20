@@ -11,6 +11,7 @@
     <meta name="robots" content="index, follow">
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
         <link rel="manifest" href="/Linktreepro/manifest.json">
+    <meta name="theme-color" content="#00f2fe">
     <!-- ===== SÉCURITÉ (Sucuri hardening) ===== -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script>
@@ -205,7 +206,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 1rem;
+            padding: 0; /* Suppression des marges intérieures pour le plein écran */
             animation: fadeSlideIn 0.4s ease-out;
             overflow-y: auto;
             width: 100%;
@@ -240,25 +241,39 @@
             margin: auto;
         }
 
+        /* ===== DASHBOARD PLEIN ÉCRAN ===== */
+        #view-dashboard {
+            padding: 0 !important;
+        }
+
         .dashboard-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             height: 100%;
-            max-height: 100%;
-            padding: 0;
-            border-radius: 24px;
             width: 100%;
             max-width: 100%;
+            max-height: 100%;
+            padding: 0;
+            margin: 0;
+            border-radius: 0; /* Suppression des angles arrondis pour un effet plein écran */
+            background: var(--bg-deep);
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            overflow: hidden;
         }
 
         .dashboard-container .dashboard-header {
-            padding: 1.2rem 1.8rem 0.5rem 1.8rem;
+            padding: 0.8rem 1.2rem;
             flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-glow);
+            background: var(--bg-deep);
+            z-index: 2;
         }
 
         .dashboard-container .dashboard-header .brand {
@@ -266,28 +281,9 @@
             margin: 0;
         }
 
-        .dashboard-nav {
-            display: flex;
-            justify-content: space-around;
-            padding: 0.5rem 0.8rem;
-            background: var(--nav-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            flex-shrink: 0;
-            flex-wrap: wrap;
-            gap: 0.2rem;
-        }
-
-        .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem 1.8rem 1.8rem 1.8rem;
-            scroll-behavior: smooth;
-        }
-
+        /* --- Module de partage (au-dessus du contenu) --- */
         .share-module {
-            padding: 0.8rem 1.8rem;
+            padding: 0.5rem 1.2rem;
             background: var(--card-bg);
             border-bottom: 1px solid var(--border-glow);
             backdrop-filter: blur(8px);
@@ -298,6 +294,167 @@
             flex-shrink: 0;
         }
 
+        .share-module .share-link-wrapper {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.04);
+            border-radius: 30px;
+            padding: 0.2rem 0.6rem 0.2rem 0.8rem;
+            border: 1px solid var(--card-border);
+        }
+        .share-module .share-link-wrapper i {
+            color: var(--cyan);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .share-module .share-link-wrapper .share-link-text {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0.3rem 0;
+            flex: 1;
+            min-width: 0;
+        }
+        .share-module .share-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+        }
+        .share-module .share-actions .btn {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            border-radius: 30px;
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            min-width: 36px;
+        }
+        .share-module .share-actions .btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(0,242,254,0.05);
+        }
+        .share-module .share-actions .btn:active {
+            transform: scale(0.92);
+        }
+
+        /* --- Contenu principal (scrollable) --- */
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.8rem 1.2rem 1.2rem 1.2rem;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* --- Barre de navigation en bas (fixe) --- */
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0.3rem 0.4rem;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            gap: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .dashboard-nav .nav-item {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.1rem;
+            padding: 0.3rem 0.4rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font-body);
+            white-space: nowrap;
+            flex: 0 1 auto;
+            min-width: 44px;
+        }
+        .dashboard-nav .nav-item i {
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        .dashboard-nav .nav-item span {
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            font-size: 0.55rem;
+        }
+        .dashboard-nav .nav-item:hover {
+            color: var(--text-primary);
+        }
+        .dashboard-nav .nav-item.active {
+            color: var(--cyan);
+            background: rgba(0,242,254,0.08);
+        }
+        .dashboard-nav .nav-item.active i {
+            text-shadow: 0 0 12px var(--cyan);
+        }
+        .dashboard-nav .nav-item:active {
+            transform: scale(0.92);
+        }
+
+        /* --- Boutons d'action (Enregistrer / Soutenir) intégrés dans la barre du bas --- */
+        .dashboard-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+            padding: 0.2rem 0.4rem;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .dashboard-actions .btn,
+        .dashboard-actions .donate-btn {
+            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            flex: 1;
+            min-width: 80px;
+            justify-content: center;
+        }
+        .dashboard-actions .donate-btn {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #0a0b10;
+            border: none;
+            font-weight: 700;
+        }
+        .dashboard-actions .donate-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(255, 210, 0, 0.5);
+        }
+
+        /* === Ajustements pour les autres vues (auth, onboarding, etc.) === */
+        .glass-card:not(.dashboard-container) {
+            max-width: 600px;
+            max-height: 90vh;
+            margin: auto;
+        }
+
         .public-wrapper .glass-card {
             max-width: 600px;
             padding: 0 0 1.2rem 0;
@@ -306,46 +463,66 @@
             position: relative;
         }
 
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            padding: 1.5rem;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: var(--bg-deep);
-            border: 1px solid var(--cyan);
-            border-radius: 24px;
-            padding: 2rem;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 0 60px rgba(0,242,254,0.3);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
+        /* --- Responsive --- */
         @media (max-width: 480px) {
-            .glass-card { padding: 1.2rem; }
-            .public-header { padding: 0.8rem 1rem; }
-            .dashboard-container .dashboard-header { padding: 0.8rem 1rem; }
-            .share-module { padding: 0.5rem 1rem; flex-wrap: wrap; }
-            .dashboard-nav .nav-item { font-size: 0.6rem; padding: 0.2rem 0.4rem; }
-            .tab-content { padding: 0.8rem 1rem; }
-            .admin-panel .qr-upload-row { flex-direction: column; align-items: flex-start; }
-            .testimonial-item { flex-direction: column; align-items: stretch; }
-            .schedule-item { flex-direction: column; align-items: stretch; }
-            .admin-link-item { flex-direction: column; align-items: stretch; }
-            .theme-manager .color-picker-row { flex-wrap: wrap; }
+            .dashboard-container .dashboard-header {
+                padding: 0.5rem 0.8rem;
+            }
+            .share-module {
+                padding: 0.3rem 0.8rem;
+                flex-wrap: wrap;
+            }
+            .tab-content {
+                padding: 0.5rem 0.8rem 0.8rem 0.8rem;
+            }
+            .dashboard-nav .nav-item {
+                font-size: 0.5rem;
+                padding: 0.2rem 0.3rem;
+                min-width: 36px;
+            }
+            .dashboard-nav .nav-item i {
+                font-size: 1rem;
+            }
+            .dashboard-nav .nav-item span {
+                font-size: 0.5rem;
+            }
+            .dashboard-actions .btn,
+            .dashboard-actions .donate-btn {
+                font-size: 0.6rem;
+                padding: 0.3rem 0.6rem;
+                min-width: 60px;
+            }
+            .dashboard-actions {
+                padding: 0.2rem 0.3rem;
+            }
+            .glass-card:not(.dashboard-container) {
+                padding: 1rem;
+                max-width: 100%;
+                border-radius: 0;
+                margin: 0;
+            }
+            #view-dashboard {
+                padding: 0 !important;
+            }
         }
 
-        /* ===== Le reste du CSS (identique, conservé) ===== */
+        @media (max-width: 380px) {
+            .dashboard-nav .nav-item {
+                font-size: 0.45rem;
+                padding: 0.1rem 0.2rem;
+                min-width: 30px;
+            }
+            .dashboard-nav .nav-item i {
+                font-size: 0.8rem;
+            }
+            .dashboard-nav .nav-item span {
+                font-size: 0.4rem;
+            }
+        }
+
+        /* ===== TOUS LES STYLES EXISTANTS CONSERVÉS ===== */
+        /* (les styles ci‑dessous sont identiques à ceux d’origine) */
+
         .brand {
             font-family: var(--font-heading);
             font-size: 2.2rem;
@@ -1442,11 +1619,11 @@
         .dashboard-container {
             display: flex;
             flex-direction: column;
-            height: 80vh;
-            max-height: 700px;
+            height: 100%;
+            max-height: 100%;
             padding: 0;
             overflow: hidden;
-            border-radius: 24px;
+            border-radius: 0; /* Pas d'arrondi pour le plein écran */
         }
         .dashboard-container .dashboard-header {
             padding: 1.2rem 1.8rem 0.5rem 1.8rem;
@@ -2242,14 +2419,18 @@
         </div>
     </div>
 
-    <!-- ========== VUE DASHBOARD ========== -->
+    <!-- ========== VUE DASHBOARD (PLEIN ÉCRAN) ========== -->
     <div id="view-dashboard" class="view">
+        <!-- Le conteneur principal occupe tout l'écran sans marges ni arrondis -->
         <div class="glass-card dashboard-container">
+
+            <!-- En‑tête du tableau de bord (resté en haut) -->
             <div class="dashboard-header">
                 <div class="brand" style="font-size:1.3rem; margin:0;">DASHBOARD</div>
                 <button class="btn btn-outline logout-btn" id="logout-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
+            <!-- Module de partage (juste sous le header) -->
             <div class="share-module" id="share-module">
                 <div class="share-link-wrapper">
                     <i class="fas fa-link"></i>
@@ -2261,14 +2442,7 @@
                 </div>
             </div>
 
-            <nav class="dashboard-nav" id="dashboard-nav">
-                <button class="nav-item active" data-tab="analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></button>
-                <button class="nav-item" data-tab="links"><i class="fas fa-link"></i><span>Liens</span></button>
-                <button class="nav-item" data-tab="profile"><i class="fas fa-user"></i><span>Profil</span></button>
-                <button class="nav-item" data-tab="advanced"><i class="fas fa-cog"></i><span>Avancé</span></button>
-                <button class="nav-item" data-tab="admin" id="admin-tab" style="display:none;"><i class="fas fa-shield-alt"></i><span>Admin</span></button>
-            </nav>
-
+            <!-- Contenu principal (scrollable) -->
             <div class="tab-content">
                 <!-- ===== ANALYTICS ===== -->
                 <div class="tab-pane active" id="tab-analytics">
@@ -2375,7 +2549,6 @@
                 <!-- ===== ADMIN ===== -->
                 <div class="tab-pane" id="tab-admin">
                     <h3><i class="fas fa-shield-alt"></i> Administration</h3>
-                    <!-- Statut administrateur (visible uniquement pour l'admin) -->
                     <div id="admin-status-control" style="display:none; margin-bottom:1.5rem; border:1px solid var(--border-glow); border-radius:12px; padding:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-bullhorn"></i> Statut Administrateur</h4>
                         <p style="font-size:0.8rem; color:var(--text-secondary);">Ce statut sera affiché sur votre profil public.</p>
@@ -2388,19 +2561,28 @@
                             Statut actuel : <span id="admin-current-status-display">-</span>
                         </div>
                     </div>
-
-                    <div id="admin-panel-container">
-                        <!-- Contenu chargé dynamiquement après validation -->
-                    </div>
+                    <div id="admin-panel-container"></div>
                 </div>
+            </div> <!-- fin .tab-content -->
+
+            <!-- ===== BARRE DE NAVIGATION EN BAS (fixe) ===== -->
+            <nav class="dashboard-nav" id="dashboard-nav">
+                <button class="nav-item active" data-tab="analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></button>
+                <button class="nav-item" data-tab="links"><i class="fas fa-link"></i><span>Liens</span></button>
+                <button class="nav-item" data-tab="profile"><i class="fas fa-user"></i><span>Profil</span></button>
+                <button class="nav-item" data-tab="advanced"><i class="fas fa-cog"></i><span>Avancé</span></button>
+                <button class="nav-item" data-tab="testimonials"><i class="fas fa-comments"></i><span>Avis</span></button>
+                <button class="nav-item" data-tab="admin" id="admin-tab" style="display:none;"><i class="fas fa-shield-alt"></i><span>Admin</span></button>
+            </nav>
+
+            <!-- ===== BOUTONS D'ACTION (Enregistrer / Soutenir) intégrés en bas ===== -->
+            <div class="dashboard-actions">
+                <button class="btn" id="save-dashboard-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                <button class="donate-btn" id="donate-btn"><i class="fas fa-heart"></i> Soutenir</button>
             </div>
 
-            <div style="padding:0.8rem 1.8rem 1.2rem 1.8rem; border-top:1px solid var(--border-glow); flex-shrink:0; display:flex; gap:0.6rem; flex-wrap:wrap;">
-                <button class="btn" id="save-dashboard-btn" style="flex:1; padding:0.7rem;">Enregistrer les modifications</button>
-                <button class="donate-btn" id="donate-btn" style="flex:1; justify-content:center;"><i class="fas fa-heart"></i> Soutenir</button>
-            </div>
-        </div>
-    </div>
+        </div> <!-- fin .dashboard-container -->
+    </div> <!-- fin #view-dashboard -->
 
     <!-- ========== VUE AJOUTER UN LIEN ========== -->
     <div id="view-add-link" class="view">
@@ -2464,7 +2646,6 @@
         <div class="modal-content">
             <h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-lock"></i> Accès Administrateur</h3>
             <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem 0;">Veuillez saisir votre clé de secours.</p>
-
             <div class="input-group">
                 <label>Clé de secours (Backup)</label>
                 <input type="password" class="input-field" id="admin-backup-input" placeholder="••••••••••••••••" autocomplete="off">
@@ -5848,115 +6029,7 @@ URL:${urlProfil}
             applyVisualTheme();
             applyBackground();
         });
-// ================================================================
-// AJOUT : RECONNEXION INTELLIGENTE + BOUTON ACTUALISER
-// ================================================================
 
-// 1. Écouteur d'événement 'online' – ne recharge pas la page, 
-//    mais rafraîchit les données depuis Firebase
-window.addEventListener('online', function() {
-  console.log('[App] Reconnexion réseau détectée – Rafraîchissement des données');
-
-  // Si l'utilisateur est sur le tableau de bord
-  const dashboardView = document.getElementById('view-dashboard');
-  if (dashboardView && dashboardView.classList.contains('active')) {
-    // Rafraîchir le profil complet (listeners Firestore déjà actifs,
-    // mais on force une relecture pour les données critiques)
-    if (currentUser) {
-      // Recharger le profil depuis Firestore
-      loadUserProfile(currentUser.uid).then(() => {
-        populateDashboard();
-        showToast('Données rafraîchies (réseau rétabli)');
-      }).catch(() => {
-        showToast('Erreur lors du rafraîchissement, réessayez.', 'error');
-      });
-    }
-  } else if (isPublicMode()) {
-    // Si on est sur le profil public
-    const uid = getPublicUid();
-    if (uid) {
-      loadPublicProfile(uid);
-      showToast('Profil public rafraîchi');
-    }
-  }
-});
-
-// 2. Bouton "Actualiser" ajouté dynamiquement dans le share-module
-function addRefreshButton() {
-  const shareModule = document.getElementById('share-module');
-  if (!shareModule) return;
-
-  // Vérifier si le bouton existe déjà
-  if (document.getElementById('refresh-data-btn')) return;
-
-  const refreshBtn = document.createElement('button');
-  refreshBtn.id = 'refresh-data-btn';
-  refreshBtn.className = 'btn';
-  refreshBtn.title = 'Actualiser les données depuis Firebase';
-  refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
-  refreshBtn.style.padding = '0.3rem 0.6rem';
-  refreshBtn.style.fontSize = '0.8rem';
-  refreshBtn.style.borderRadius = '30px';
-  refreshBtn.style.background = 'transparent';
-  refreshBtn.style.border = '1px solid var(--card-border)';
-  refreshBtn.style.color = 'var(--text-secondary)';
-  refreshBtn.style.transition = 'all var(--transition)';
-
-  // Ajouter l'événement de clic
-  refreshBtn.addEventListener('click', function() {
-    this.disabled = true;
-    this.innerHTML = '<span class="spinner" style="width:14px;height:14px;"></span>';
-
-    const dashboardView = document.getElementById('view-dashboard');
-    if (dashboardView && dashboardView.classList.contains('active')) {
-      if (currentUser) {
-        loadUserProfile(currentUser.uid).then(() => {
-          populateDashboard();
-          showToast('Données actualisées !');
-        }).catch(() => {
-          showToast('Erreur lors de l\'actualisation.', 'error');
-        }).finally(() => {
-          this.disabled = false;
-          this.innerHTML = '<i class="fas fa-sync-alt"></i>';
-        });
-      }
-    } else if (isPublicMode()) {
-      const uid = getPublicUid();
-      if (uid) {
-        loadPublicProfile(uid);
-        showToast('Profil public actualisé !');
-        this.disabled = false;
-        this.innerHTML = '<i class="fas fa-sync-alt"></i>';
-      }
-    } else {
-      this.disabled = false;
-      this.innerHTML = '<i class="fas fa-sync-alt"></i>';
-      showToast('Aucune donnée à actualiser.', 'info');
-    }
-  });
-
-  // Insérer le bouton après le share-link-wrapper (ou dans les share-actions)
-  const shareActions = shareModule.querySelector('.share-actions');
-  if (shareActions) {
-    // Insérer avant le premier bouton existant
-    shareActions.insertBefore(refreshBtn, shareActions.firstChild);
-  } else {
-    // Fallback : ajouter à la fin du module
-    shareModule.appendChild(refreshBtn);
-  }
-}
-
-// Appeler la fonction d'ajout du bouton après le chargement du DOM
-// (si le module share est déjà présent)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', addRefreshButton);
-} else {
-  addRefreshButton();
-}
-
-// ================================================================
-// FIN DES AJOUTS
-// ================================================================
     })();
 </script>
 
