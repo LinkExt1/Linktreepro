@@ -5566,6 +5566,49 @@
                 const modal = document.getElementById('admin-gate-modal');
                 modal.classList.remove('active');
             });
+
+            // ============================================================
+            // CORRECTION : BOUTON FERMER DE LA MODALE DONATION
+            // ============================================================
+            const closeDonationBtn = document.getElementById('close-donation-modal');
+            const donationModal = document.getElementById('donation-modal');
+
+            // Fonction de fermeture unifiée
+            function closeDonationModal() {
+                if (donationModal) {
+                    donationModal.classList.remove('active');
+                    // Nettoyer le listener de donation si nécessaire
+                    if (donationUnsubscribe) {
+                        donationUnsubscribe();
+                        donationUnsubscribe = null;
+                    }
+                }
+            }
+
+            // Écouteur pour le bouton "Fermer"
+            if (closeDonationBtn) {
+                closeDonationBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeDonationModal();
+                });
+            }
+
+            // Fermeture en cliquant sur l'arrière-plan sombre
+            if (donationModal) {
+                donationModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeDonationModal();
+                    }
+                });
+            }
+
+            // Fermeture avec la touche Échap (Escape)
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && donationModal && donationModal.classList.contains('active')) {
+                    closeDonationModal();
+                }
+            });
         }
 
         // ============================================================
