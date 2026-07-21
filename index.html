@@ -2581,9 +2581,48 @@
             return url;
         }
 
+        // ============================================================
+        // CORRECTION : VALIDATION D'URL AMÉLIORÉE
+        // ============================================================
         function isValidUrl(url) {
-            const pattern = /^(https?:\/\/)([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}([\/\w\-\.]*)*$/i;
-            return pattern.test(url.trim());
+            if (!url || typeof url !== 'string') return false;
+            const trimmed = url.trim();
+            if (!trimmed) return false;
+
+            // Autoriser explicitement les liens Telegram avec le format t.me/+...
+            if (/^https?:\/\/t\.me\/\+?[A-Za-z0-9_\-]+$/.test(trimmed)) {
+                return true;
+            }
+
+            // Autoriser les liens Telegram classiques
+            if (/^https?:\/\/t\.me\/[A-Za-z0-9_\-]+$/.test(trimmed)) {
+                return true;
+            }
+
+            // Autoriser les liens avec des paramètres de requête (ex: ?start=...)
+            if (/^https?:\/\/t\.me\/[A-Za-z0-9_\-]+\?[A-Za-z0-9_\-=&]+$/.test(trimmed)) {
+                return true;
+            }
+
+            // Validation générique d'URL pour les autres services
+            try {
+                const urlObj = new URL(trimmed);
+                // Vérifier que le protocole est http ou https
+                if (!['http:', 'https:'].includes(urlObj.protocol)) return false;
+                // Vérifier que le domaine est valide (au moins un point ou localhost)
+                const hostname = urlObj.hostname;
+                if (!hostname || hostname === '') return false;
+                // Autoriser localhost pour le développement
+                if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+                // Vérifier qu'il y a au moins un point dans le domaine (domaine valide)
+                // Et qu'il n'y a pas de caractères dangereux
+                if (!hostname.includes('.') && hostname !== 'localhost') return false;
+                // Vérifier que le domaine ne contient pas de caractères interdits
+                if (/[<>{}|\\^~\[\]`]/.test(hostname)) return false;
+                return true;
+            } catch (e) {
+                return false;
+            }
         }
 
         function generateAvatarUrl(name) {
