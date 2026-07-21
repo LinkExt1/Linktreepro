@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>LinkExt - Centralisez vos réseaux et projets en un clic</title>
-<meta name="description" content="Découvrez LinkExt, la plateforme rapide et fluide pour regrouper tous vos canaux importants. Partagez votre profil facilement, accédez à vos canaux officiels.">
-<meta name="google-site-verification" content="ooXwXN9-cj9un9be55b_NAz3CdF_vx8r1pLHjxXBuA4" />
-    <!-- Balises SEO -->
-    <meta name="description" content="Bienvenue sur mon site internet. Découvrez mon profil, mes projets et mes liens officiels.">
+    <meta name="description" content="Découvrez LinkExt, la plateforme rapide et fluide pour regrouper tous vos canaux importants. Partagez votre profil facilement, accédez à vos canaux officiels.">
+    <meta name="google-site-verification" content="ooXwXN9-cj9un9be55b_NAz3CdF_vx8r1pLHjxXBuA4" />
     <meta name="robots" content="index, follow">
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
-        <link rel="manifest" href="/Linktreepro/manifest.json">
-    <!-- ===== SÉCURITÉ (Sucuri hardening) ===== -->
+    
+    <!-- ===== PWA - MANIFESTE CORRIGÉ ===== -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#00f2fe">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    
+    <!-- ===== SÉCURITÉ ===== -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script>
         if (window.top !== window.self) {
@@ -19,7 +24,7 @@
         }
     </script>
 
-    <!-- Open Graph / SEO supplémentaires -->
+    <!-- Open Graph -->
     <meta property="og:title" content="Mon Site - Espace Personnel & Dashboard">
     <meta property="og:description" content="Bienvenue sur mon site internet. Découvrez mon profil, mes projets et mes liens officiels.">
     <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
@@ -60,27 +65,78 @@
             --nav-bg: rgba(10, 11, 16, 0.85);
             --theme-primary-color: #00f2fe;
             --theme-background-image: none;
+            --is-light: 0;
         }
-              <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(function(reg) {
-                        console.log('Service Worker enregistré avec succès.');
-                    })
-                    .catch(function(err) {
-                        console.warn('Erreur lors de l\'enregistrement du Service Worker:', err);
-                    });
-            });
-        }
-    </script>
-        /* ===== APPLICATION DYNAMIQUE DU THÈME (via localStorage) ===== */
+
+        /* ===== APPLICATION DYNAMIQUE DU THÈME ===== */
         body {
             background-color: var(--bg-deep);
             background-image: var(--bg-deep-image), var(--theme-background-image);
             color: var(--text-primary);
             transition: background 0.3s ease, color 0.3s ease;
             overflow-y: auto;
+            min-height: 100dvh;
+        }
+
+        /* --- CORRECTION MODE SOMBRE / CLAIR (contraste automatique) --- */
+        body.light-mode {
+            --bg-deep: #f5f5f7;
+            --bg-card: rgba(255,255,255,0.9);
+            --text-primary: #1a1a1a;
+            --text-secondary: #444444;
+            --border-glow: rgba(0,0,0,0.1);
+            --card-border: rgba(0,0,0,0.08);
+            --input-bg: rgba(0,0,0,0.04);
+            --input-border: rgba(0,0,0,0.15);
+            --shadow-color: rgba(0,0,0,0.08);
+            --bg-deep-image: none;
+            --nav-bg: rgba(255,255,255,0.92);
+            --is-light: 1;
+        }
+        body.light-mode .brand,
+        body.light-mode .public-name {
+            background: linear-gradient(135deg, #0077ff, #00c6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        body.light-mode .btn {
+            background: linear-gradient(135deg, #0077ff, #00c6ff);
+            color: #fff;
+        }
+        body.light-mode .btn-outline {
+            border-color: #0077ff;
+            color: #0077ff;
+        }
+        body.light-mode .views-counter,
+        body.light-mode .stats-summary .stat-card .stat-number,
+        body.light-mode .link-item .platform-icon,
+        body.light-mode .rich-link-card .link-action-bar i,
+        body.light-mode .top-networks .rank-item i,
+        body.light-mode .top-networks .rank-item .rank-num,
+        body.light-mode .toggle-switch.active,
+        body.light-mode .status-selector .status-option.active {
+            --cyan: #0077ff;
+            --theme-primary-color: #0077ff;
+        }
+        body.light-mode .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(8px);
+        }
+        body.light-mode .dashboard-nav .nav-item {
+            color: var(--text-secondary);
+        }
+        body.light-mode .dashboard-nav .nav-item.active {
+            color: var(--cyan);
+        }
+        body.light-mode .share-module .share-link-wrapper {
+            background: rgba(0,0,0,0.04);
+        }
+        body.light-mode .input-field::placeholder {
+            color: rgba(0,0,0,0.35);
+        }
+        body.light-mode .input-field {
+            color: var(--text-primary);
         }
 
         /* --- Thèmes visuels --- */
@@ -96,7 +152,7 @@
             --shadow-color: rgba(0,0,0,0.1);
             --bg-deep-image: none;
             --nav-bg: rgba(255,255,255,0.9);
-            color: #1a1a1a;
+            --is-light: 1;
         }
         body.theme-minimaliste .brand,
         body.theme-minimaliste .public-name {
@@ -137,7 +193,7 @@
             --shadow-color: rgba(0,0,0,0.3);
             --bg-deep-image: none;
             --nav-bg: #fff;
-            color: #1a1a1a;
+            --is-light: 1;
             border: 4px solid #000;
             box-shadow: 8px 8px 0 #000;
         }
@@ -205,7 +261,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 0; /* Suppression des marges intérieures pour le plein écran */
+            padding: 0;
             animation: fadeSlideIn 0.4s ease-out;
             overflow-y: auto;
             width: 100%;
@@ -255,7 +311,7 @@
             max-height: 100%;
             padding: 0;
             margin: 0;
-            border-radius: 0; /* Suppression des angles arrondis pour un effet plein écran */
+            border-radius: 0;
             background: var(--bg-deep);
             border: none;
             box-shadow: none;
@@ -274,13 +330,12 @@
             background: var(--bg-deep);
             z-index: 2;
         }
-
         .dashboard-container .dashboard-header .brand {
             font-size: 1.3rem;
             margin: 0;
         }
 
-        /* --- Module de partage (au-dessus du contenu) --- */
+        /* --- Module de partage --- */
         .share-module {
             padding: 0.5rem 1.2rem;
             background: var(--card-bg);
@@ -292,7 +347,6 @@
             flex-wrap: wrap;
             flex-shrink: 0;
         }
-
         .share-module .share-link-wrapper {
             flex: 1;
             min-width: 0;
@@ -339,11 +393,8 @@
             color: var(--cyan);
             background: rgba(0,242,254,0.05);
         }
-        .share-module .share-actions .btn:active {
-            transform: scale(0.92);
-        }
 
-        /* --- Contenu principal (scrollable) --- */
+        /* --- Contenu principal --- */
         .tab-content {
             flex: 1;
             overflow-y: auto;
@@ -351,8 +402,24 @@
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
+        .tab-content .tab-pane {
+            display: none;
+            animation: fadeSlideIn 0.25s ease-in-out;
+        }
+        .tab-content .tab-pane.active {
+            display: block;
+        }
+        .tab-pane h3 {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            color: var(--cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-        /* --- Barre de navigation en bas (fixe) --- */
+        /* --- Barre de navigation en bas --- */
         .dashboard-nav {
             display: flex;
             justify-content: space-around;
@@ -371,7 +438,6 @@
             bottom: 0;
             z-index: 10;
         }
-
         .dashboard-nav .nav-item {
             background: transparent;
             border: none;
@@ -410,11 +476,8 @@
         .dashboard-nav .nav-item.active i {
             text-shadow: 0 0 12px var(--cyan);
         }
-        .dashboard-nav .nav-item:active {
-            transform: scale(0.92);
-        }
 
-        /* --- Boutons d'action (Enregistrer / Soutenir) intégrés dans la barre du bas --- */
+        /* --- Boutons d'action en bas --- */
         .dashboard-actions {
             display: flex;
             gap: 0.4rem;
@@ -447,81 +510,333 @@
             box-shadow: 0 0 30px rgba(255, 210, 0, 0.5);
         }
 
-        /* === Ajustements pour les autres vues (auth, onboarding, etc.) === */
-        .glass-card:not(.dashboard-container) {
-            max-width: 600px;
-            max-height: 90vh;
-            margin: auto;
+        /* ===== VUE AJOUT DE LIEN (plein écran) ===== */
+        #view-add-link {
+            padding: 0 !important;
+        }
+        #view-add-link .glass-card {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 0;
+            margin: 0;
+            padding: 1.2rem;
+            background: var(--bg-deep);
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
         }
 
-        .public-wrapper .glass-card {
-            max-width: 600px;
+        /* ===== PROFIL PUBLIC (plein écran) ===== */
+        #view-profile-public {
+            padding: 0 !important;
+        }
+        #view-profile-public .glass-card {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 0;
+            margin: 0;
             padding: 0 0 1.2rem 0;
-            overflow: visible;
-            border-radius: 20px;
+            background: var(--bg-deep);
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            overflow-y: auto;
+        }
+        .public-wrapper {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+        }
+        .public-header {
+            padding: 1.2rem 1.8rem 0.4rem 1.8rem;
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .public-header-actions .btn,
+        .theme-toggle,
+        #qr-code-btn,
+        #vcard-btn {
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 3;
+        }
+        .public-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            margin-bottom: 0.4rem;
+        }
+        .public-header-top .avatar-glow-ring {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            padding: 2px;
+            background: conic-gradient(var(--cyan), var(--violet), var(--cyan));
+            box-shadow: 0 0 20px rgba(0,242,254,0.3);
+            flex-shrink: 0;
+            pointer-events: none;
+        }
+        .public-header-top .avatar-glow-ring .public-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            background: var(--bg-deep);
+        }
+        .public-header-actions {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+        .public-header-actions .btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            border-radius: 30px;
+            pointer-events: auto !important;
+        }
+        .public-name {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: center;
+            margin: 0.2rem 0 0.05rem 0;
+            letter-spacing: 0.5px;
+        }
+        .public-bio-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 0 0.5rem;
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.4;
+            margin: 0.1rem 0;
+        }
+        .public-status-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.2rem;
+        }
+        .public-links-divider {
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            margin: 0.6rem auto 0.8rem auto;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* ===== LIENS PUBLICS ===== */
+        #public-links {
+            padding: 0 1rem 0 1rem;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .rich-link-card {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--text-primary);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            transition: all var(--transition);
+            cursor: pointer;
             position: relative;
         }
-
-        /* --- Responsive --- */
-        @media (max-width: 480px) {
-            .dashboard-container .dashboard-header {
-                padding: 0.5rem 0.8rem;
-            }
-            .share-module {
-                padding: 0.3rem 0.8rem;
-                flex-wrap: wrap;
-            }
-            .tab-content {
-                padding: 0.5rem 0.8rem 0.8rem 0.8rem;
-            }
-            .dashboard-nav .nav-item {
-                font-size: 0.5rem;
-                padding: 0.2rem 0.3rem;
-                min-width: 36px;
-            }
-            .dashboard-nav .nav-item i {
-                font-size: 1rem;
-            }
-            .dashboard-nav .nav-item span {
-                font-size: 0.5rem;
-            }
-            .dashboard-actions .btn,
-            .dashboard-actions .donate-btn {
-                font-size: 0.6rem;
-                padding: 0.3rem 0.6rem;
-                min-width: 60px;
-            }
-            .dashboard-actions {
-                padding: 0.2rem 0.3rem;
-            }
-            .glass-card:not(.dashboard-container) {
-                padding: 1rem;
-                max-width: 100%;
-                border-radius: 0;
-                margin: 0;
-            }
-            #view-dashboard {
-                padding: 0 !important;
-            }
+        .rich-link-card:hover {
+            border-color: var(--cyan);
+            box-shadow: 0 0 30px rgba(0,242,254,0.2);
+            transform: translateY(-2px);
+        }
+        .rich-link-card .link-description {
+            padding: 8px 12px;
+            margin: 0;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.2);
+            letter-spacing: 0.3px;
+            text-align: left;
+        }
+        .rich-link-card .card-media {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block;
+            background: var(--bg-deep);
+            margin: 0;
+        }
+        .rich-link-card .card-media-default {
+            width: 100%;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-deep);
+            background-image: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.03) 0%, transparent 70%);
+            font-size: 3.5rem;
+            color: rgba(255,255,255,0.1);
+            transition: color 0.3s ease;
+            margin: 0;
+        }
+        .rich-link-card:hover .card-media-default {
+            color: rgba(255,255,255,0.25);
+        }
+        .rich-link-card .link-action-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 8px 12px;
+            margin: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+        }
+        .rich-link-card .link-action-bar i {
+            font-size: 1.2rem;
+        }
+        .border-glow-pulse {
+            border: 2px solid var(--cyan) !important;
+            animation: glowPulse 2.5s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 5px rgba(0,242,254,0.3), inset 0 0 5px rgba(0,242,254,0.1); }
+            50% { box-shadow: 0 0 30px rgba(0,242,254,0.7), inset 0 0 20px rgba(0,242,254,0.3); }
+            100% { box-shadow: 0 0 5px rgba(0,242,254,0.3), inset 0 0 5px rgba(0,242,254,0.1); }
+        }
+        .card-highlight .highlight-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--cyan);
+            color: #0a0b10;
+            border-radius: 30px;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            box-shadow: 0 0 15px rgba(0,242,254,0.5);
+            animation: pulseBadge 1.5s ease-in-out infinite;
+            z-index: 2;
+        }
+        @keyframes pulseBadge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); opacity: 0.9; }
+            100% { transform: scale(1); }
+        }
+        .public-section-title {
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            padding: 0.6rem 0.5rem 0.2rem 0.5rem;
+            margin: 0;
+            border-bottom: 1px solid var(--border-glow);
+            text-transform: uppercase;
+            opacity: 0.7;
+            text-align: left;
+            pointer-events: none;
         }
 
-        @media (max-width: 380px) {
-            .dashboard-nav .nav-item {
-                font-size: 0.45rem;
-                padding: 0.1rem 0.2rem;
-                min-width: 30px;
-            }
-            .dashboard-nav .nav-item i {
-                font-size: 0.8rem;
-            }
-            .dashboard-nav .nav-item span {
-                font-size: 0.4rem;
-            }
+        /* ===== CARROUSEL TÉMOIGNAGES (amélioré) ===== */
+        .testimonials-carousel {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 0.8rem;
+            border-radius: 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 0.8rem 0.2rem;
+            touch-action: pan-y;
+        }
+        .testimonials-carousel .carousel-track {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            gap: 0.6rem;
+            padding: 0 0.4rem;
+            will-change: transform;
+        }
+        .testimonials-carousel .testimonial-slide {
+            min-width: calc(100% - 0.8rem);
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1rem 0.8rem;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .testimonials-carousel .testimonial-slide .quote-icon {
+            color: var(--cyan);
+            font-size: 1.4rem;
+            opacity: 0.4;
+            margin-bottom: 0.2rem;
+        }
+        .testimonials-carousel .testimonial-slide .testimonial-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        .testimonials-carousel .testimonial-slide .testimonial-message {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+            margin: 0.3rem 0;
+        }
+        .testimonials-carousel .testimonial-slide .testimonial-stars {
+            color: #f1c40f;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+        .testimonials-carousel .testimonial-slide .testimonial-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--cyan);
+            margin-right: 0.6rem;
+            float: left;
+        }
+        .testimonials-carousel .carousel-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 0.6rem;
+        }
+        .testimonials-carousel .carousel-controls button {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            padding: 0.2rem 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.7rem;
+        }
+        .testimonials-carousel .carousel-controls button:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
         }
 
-        /* ===== TOUS LES STYLES EXISTANTS CONSERVÉS ===== */
-        /* (les styles ci‑dessous sont identiques à ceux d’origine) */
-
+        /* ===== AUTRES STYLES (conservés) ===== */
         .brand {
             font-family: var(--font-heading);
             font-size: 2.2rem;
@@ -873,16 +1188,6 @@
             font-size: 1rem;
             margin: 1rem 0 0.3rem 0;
         }
-        #view-consent .consent-text p {
-            margin-bottom: 0.5rem;
-        }
-        #view-consent .consent-text ul {
-            padding-left: 1.2rem;
-            margin: 0.3rem 0 0.6rem 0;
-        }
-        #view-consent .consent-text ul li {
-            margin-bottom: 0.2rem;
-        }
 
         /* ===== STATUT ===== */
         .status-badge {
@@ -997,7 +1302,6 @@
             font-size: 1rem;
             color: var(--text-secondary);
         }
-
         .redirect-toggle {
             display: flex;
             align-items: center;
@@ -1042,7 +1346,6 @@
         .redirect-toggle .status-label.active {
             color: var(--cyan);
         }
-
         .theme-selector {
             display: flex;
             gap: 0.5rem;
@@ -1068,7 +1371,6 @@
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
-
         .views-counter {
             display: inline-flex;
             align-items: center;
@@ -1078,9 +1380,9 @@
             border-radius: 30px;
             padding: 0.3rem 1rem;
             font-size: 0.9rem;
+            color: var(--text-primary);
         }
         .views-counter i { font-size: 1rem; }
-
         .stats-summary {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1098,6 +1400,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             font-family: var(--font-heading);
+            color: var(--text-primary);
         }
         .stats-summary .stat-card .stat-label {
             font-size: 0.65rem;
@@ -1118,7 +1421,6 @@
             border-radius: 4px;
             transition: width 0.6s ease;
         }
-
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1163,7 +1465,6 @@
             color: #0a0b10;
             border-color: var(--cyan);
         }
-
         .back-btn {
             background: transparent;
             border: none;
@@ -1278,19 +1579,7 @@
             border-bottom-width: 1px;
         }
 
-        /* ===== PROFIL PUBLIC ===== */
-        .public-wrapper {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            width: 100%;
-        }
-        #view-profile-public .glass-card {
-            padding: 0 0 1.2rem 0;
-            overflow: visible;
-            border-radius: 20px;
-            position: relative;
-        }
+        /* ===== FLASH BANNER ===== */
         .flash-banner {
             background: var(--flash-bg);
             color: var(--flash-text);
@@ -1326,270 +1615,7 @@
         }
         .flash-banner .flash-close:hover { opacity: 1; }
 
-        .public-header {
-            padding: 1.2rem 1.8rem 0.4rem 1.8rem;
-            margin: 0;
-            position: relative;
-            z-index: 2;
-            pointer-events: none;
-        }
-        .public-header .public-header-actions,
-        .public-header .public-status-wrap,
-        .public-header .public-name,
-        .public-header .public-bio-text {
-            pointer-events: none;
-        }
-        .public-header-actions .btn,
-        .theme-toggle,
-        #qr-code-btn,
-        #vcard-btn {
-            pointer-events: auto !important;
-            position: relative;
-            z-index: 3;
-        }
-        .public-wrapper .exclude-click {
-            position: relative;
-            z-index: 4;
-            pointer-events: auto !important;
-        }
-        .public-header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.8rem;
-            margin-bottom: 0.4rem;
-        }
-        .public-header-top .avatar-glow-ring {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            padding: 2px;
-            background: conic-gradient(var(--cyan), var(--violet), var(--cyan));
-            box-shadow: 0 0 20px rgba(0,242,254,0.3);
-            flex-shrink: 0;
-            transition: box-shadow 0.3s ease;
-            pointer-events: none;
-        }
-        .public-header-top .avatar-glow-ring .public-avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            display: block;
-            background: var(--bg-deep);
-        }
-        .public-header-actions {
-            display: flex;
-            gap: 0.4rem;
-            align-items: center;
-        }
-        .public-header-actions .btn {
-            padding: 0.3rem 0.8rem;
-            font-size: 0.7rem;
-            border-radius: 30px;
-            pointer-events: auto !important;
-        }
-        .public-name {
-            font-family: var(--font-heading);
-            font-size: 1.4rem;
-            font-weight: 600;
-            text-align: center;
-            margin: 0.2rem 0 0.05rem 0;
-            letter-spacing: 0.5px;
-        }
-        .public-bio-text {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            text-align: center;
-            padding: 0 0.5rem;
-            font-style: italic;
-            font-weight: 300;
-            line-height: 1.4;
-            margin: 0.1rem 0;
-        }
-        .public-status-wrap {
-            display: flex;
-            justify-content: center;
-            margin-top: 0.2rem;
-        }
-        .public-status-wrap .status-badge {
-            font-size: 0.65rem;
-            padding: 0.1rem 0.8rem;
-            pointer-events: none;
-        }
-
-        .public-links-divider {
-            width: 60%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-            margin: 0.6rem auto 0.8rem auto;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-
-        #public-links {
-            padding: 0 1rem 0 1rem;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .rich-link-card {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            text-decoration: none;
-            color: var(--text-primary);
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 14px;
-            transition: all var(--transition);
-            cursor: pointer;
-            position: relative;
-        }
-        .rich-link-card:hover {
-            border-color: var(--cyan);
-            box-shadow: 0 0 30px rgba(0,242,254,0.2);
-            transform: translateY(-2px);
-        }
-        .rich-link-card .link-description {
-            padding: 8px 12px;
-            margin: 0;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            background: rgba(0,0,0,0.2);
-            letter-spacing: 0.3px;
-            text-align: left;
-        }
-        .rich-link-card .card-media {
-            width: 100%;
-            aspect-ratio: 16/9;
-            object-fit: cover;
-            display: block;
-            background: var(--bg-deep);
-            margin: 0;
-        }
-        .rich-link-card .card-media-default {
-            width: 100%;
-            aspect-ratio: 16/9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-deep);
-            background-image: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.03) 0%, transparent 70%);
-            font-size: 3.5rem;
-            color: rgba(255,255,255,0.1);
-            transition: color 0.3s ease;
-            margin: 0;
-        }
-        .rich-link-card:hover .card-media-default {
-            color: rgba(255,255,255,0.25);
-        }
-        .rich-link-card .link-action-bar {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 8px 12px;
-            margin: 0;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            font-weight: 500;
-            font-size: 0.8rem;
-            color: var(--text-primary);
-        }
-        .rich-link-card .link-action-bar i {
-            font-size: 1.2rem;
-        }
-        .rich-link-card .link-action-bar span {
-            opacity: 0.8;
-        }
-
-        .border-glow-pulse {
-            border: 2px solid var(--cyan) !important;
-            animation: glowPulse 2.5s ease-in-out infinite;
-            position: relative;
-            z-index: 1;
-        }
-        @keyframes glowPulse {
-            0% { box-shadow: 0 0 5px rgba(0,242,254,0.3), inset 0 0 5px rgba(0,242,254,0.1); }
-            50% { box-shadow: 0 0 30px rgba(0,242,254,0.7), inset 0 0 20px rgba(0,242,254,0.3); }
-            100% { box-shadow: 0 0 5px rgba(0,242,254,0.3), inset 0 0 5px rgba(0,242,254,0.1); }
-        }
-
-        .card-highlight .highlight-badge {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: var(--cyan);
-            color: #0a0b10;
-            border-radius: 30px;
-            padding: 0.1rem 0.5rem;
-            font-size: 0.6rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.2rem;
-            box-shadow: 0 0 15px rgba(0,242,254,0.5);
-            animation: pulseBadge 1.5s ease-in-out infinite;
-            z-index: 2;
-        }
-        @keyframes pulseBadge {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); opacity: 0.9; }
-            100% { transform: scale(1); }
-        }
-
-        .public-section-title {
-            font-family: var(--font-heading);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            padding: 0.6rem 0.5rem 0.2rem 0.5rem;
-            margin: 0;
-            border-bottom: 1px solid var(--border-glow);
-            text-transform: uppercase;
-            opacity: 0.7;
-            text-align: left;
-            pointer-events: none;
-        }
-
-        .maintenance-message {
-            text-align: center;
-            padding: 3rem 1rem;
-        }
-        .maintenance-message i {
-            font-size: 4rem;
-            color: var(--cyan);
-            margin-bottom: 1rem;
-        }
-        .maintenance-message h2 {
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-        .maintenance-message p {
-            color: var(--text-secondary);
-        }
-
-        .theme-toggle {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 0.2rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-        }
-        .theme-toggle:hover {
-            color: var(--cyan);
-        }
-
+        /* ===== TOP NETWORKS ===== */
         .top-networks {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -1600,6 +1626,7 @@
             gap: 1.2rem;
             flex-wrap: wrap;
             font-size: 0.8rem;
+            color: var(--text-secondary);
         }
         .top-networks .rank-item {
             display: flex;
@@ -1609,208 +1636,13 @@
         }
         .top-networks .rank-item .rank-num {
             font-weight: 700;
+            color: var(--text-primary);
         }
         .top-networks .rank-item i {
             font-size: 1rem;
         }
 
-        /* ===== DASHBOARD ===== */
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            max-height: 100%;
-            padding: 0;
-            overflow: hidden;
-            border-radius: 0; /* Pas d'arrondi pour le plein écran */
-        }
-        .dashboard-container .dashboard-header {
-            padding: 1.2rem 1.8rem 0.5rem 1.8rem;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-glow);
-        }
-        .dashboard-container .dashboard-header .brand {
-            font-size: 1.3rem;
-            margin: 0;
-        }
-        .dashboard-container .dashboard-header .logout-btn {
-            padding: 0.3rem 0.8rem;
-            font-size: 0.8rem;
-        }
-
-        .share-module {
-            padding: 0.8rem 1.8rem;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-glow);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            flex-shrink: 0;
-        }
-        .share-module .share-link-wrapper {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: rgba(255,255,255,0.04);
-            border-radius: 30px;
-            padding: 0.2rem 0.6rem 0.2rem 0.8rem;
-            border: 1px solid var(--card-border);
-        }
-        .share-module .share-link-wrapper i {
-            color: var(--cyan);
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-        .share-module .share-link-wrapper .share-link-text {
-            font-size: 0.8rem;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 0.3rem 0;
-            flex: 1;
-            min-width: 0;
-        }
-        .share-module .share-actions {
-            display: flex;
-            gap: 0.4rem;
-            flex-shrink: 0;
-        }
-        .share-module .share-actions .btn {
-            padding: 0.3rem 0.6rem;
-            font-size: 0.7rem;
-            border-radius: 30px;
-            background: transparent;
-            border: 1px solid var(--card-border);
-            color: var(--text-secondary);
-            transition: all var(--transition);
-            min-width: 36px;
-        }
-        .share-module .share-actions .btn:hover {
-            border-color: var(--cyan);
-            color: var(--cyan);
-            background: rgba(0,242,254,0.05);
-        }
-        .share-module .share-actions .btn:active {
-            transform: scale(0.92);
-        }
-
-        .dashboard-nav {
-            display: flex;
-            justify-content: space-around;
-            padding: 0.5rem 0.8rem;
-            background: var(--nav-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            flex-shrink: 0;
-        }
-        .dashboard-nav .nav-item {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.2rem;
-            padding: 0.4rem 0.8rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all var(--transition);
-            font-family: var(--font-body);
-            position: relative;
-        }
-        .dashboard-nav .nav-item i {
-            font-size: 1.3rem;
-            transition: var(--transition);
-        }
-        .dashboard-nav .nav-item span {
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
-        .dashboard-nav .nav-item:hover {
-            color: var(--text-primary);
-        }
-        .dashboard-nav .nav-item.active {
-            color: var(--cyan);
-            background: rgba(0,242,254,0.08);
-        }
-        .dashboard-nav .nav-item.active i {
-            text-shadow: 0 0 12px var(--cyan);
-        }
-        .dashboard-nav .nav-item:active {
-            transform: scale(0.92);
-        }
-
-        .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem 1.8rem 1.8rem 1.8rem;
-            scroll-behavior: smooth;
-        }
-        .tab-content .tab-pane {
-            display: none;
-            animation: fadeSlideIn 0.25s ease-in-out;
-        }
-        .tab-content .tab-pane.active {
-            display: block;
-        }
-
-        .tab-pane h3 {
-            font-family: var(--font-heading);
-            font-size: 1rem;
-            margin-bottom: 0.8rem;
-            color: var(--cyan);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .tab-pane h3 i {
-            font-size: 1.2rem;
-        }
-
-        .tab-pane .seo-section,
-        .tab-pane .integrations-section,
-        .tab-pane .flash-section,
-        .tab-pane .subscribers-section {
-            border-top: 1px solid var(--border-glow);
-            padding-top: 1rem;
-            margin-top: 0.5rem;
-        }
-        .tab-pane .seo-section .input-group,
-        .tab-pane .integrations-section .input-group,
-        .tab-pane .flash-section .input-group {
-            margin-bottom: 0.8rem;
-        }
-        .tab-pane .flash-section .color-selector {
-            display: flex;
-            gap: 0.5rem;
-            margin: 0.3rem 0 0.5rem 0;
-        }
-        .tab-pane .flash-section .color-selector .color-option {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .tab-pane .flash-section .color-selector .color-option.active {
-            border-color: var(--cyan);
-            transform: scale(1.1);
-        }
-        .tab-pane .flash-section .color-selector .color-option.color-red { background: #ff1744; }
-        .tab-pane .flash-section .color-selector .color-option.color-cyan { background: #00e5ff; }
-        .tab-pane .flash-section .color-selector .color-option.color-orange { background: #ff9100; }
-
+        /* ===== SUBSCRIBERS ===== */
         .subscribers-list {
             max-height: 120px;
             overflow-y: auto;
@@ -1840,11 +1672,11 @@
             padding: 0.2rem 0.6rem;
             font-size: 0.7rem;
         }
-
         .export-report-btn {
             margin-top: 0.5rem;
         }
 
+        /* ===== GATED MODAL ===== */
         .gated-modal .modal-content {
             max-width: 360px;
         }
@@ -1873,86 +1705,7 @@
             display: none;
         }
 
-        /* ===== TÉMOIGNAGES, DONS, PLANIFICATEUR, ADMIN ===== */
-        .testimonials-carousel {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            margin-top: 0.8rem;
-            border-radius: 14px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 0.8rem 0.2rem;
-        }
-        .testimonials-carousel .carousel-track {
-            display: flex;
-            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            gap: 0.6rem;
-            padding: 0 0.4rem;
-        }
-        .testimonials-carousel .testimonial-slide {
-            min-width: calc(100% - 0.8rem);
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(6px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 1rem 0.8rem;
-            text-align: left;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s;
-        }
-        .testimonials-carousel .testimonial-slide .quote-icon {
-            color: var(--cyan);
-            font-size: 1.4rem;
-            opacity: 0.4;
-            margin-bottom: 0.2rem;
-        }
-        .testimonials-carousel .testimonial-slide .testimonial-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-        }
-        .testimonials-carousel .testimonial-slide .testimonial-message {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            font-style: italic;
-            margin: 0.3rem 0;
-        }
-        .testimonials-carousel .testimonial-slide .testimonial-stars {
-            color: #f1c40f;
-            letter-spacing: 2px;
-            font-size: 0.9rem;
-        }
-        .testimonials-carousel .testimonial-slide .testimonial-image {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--cyan);
-            margin-right: 0.6rem;
-            float: left;
-        }
-        .testimonials-carousel .carousel-controls {
-            display: flex;
-            justify-content: center;
-            gap: 0.8rem;
-            margin-top: 0.6rem;
-        }
-        .testimonials-carousel .carousel-controls button {
-            background: transparent;
-            border: 1px solid var(--card-border);
-            border-radius: 30px;
-            color: var(--text-secondary);
-            padding: 0.2rem 0.8rem;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 0.7rem;
-        }
-        .testimonials-carousel .carousel-controls button:hover {
-            border-color: var(--cyan);
-            color: var(--cyan);
-        }
-
+        /* ===== TESTIMONIAL ITEMS (admin) ===== */
         .testimonial-item {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -2007,6 +1760,7 @@
             color: var(--danger);
         }
 
+        /* ===== SCHEDULE ===== */
         .schedule-item {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -2044,7 +1798,7 @@
             color: var(--danger);
         }
 
-        /* ---- Admin Panel ---- */
+        /* ===== ADMIN PANEL ===== */
         .admin-panel .admin-field {
             margin-bottom: 1rem;
         }
@@ -2096,7 +1850,7 @@
             transform: scale(1.1);
         }
 
-        /* ---- Lightbox pour QR Code ---- */
+        /* ===== QR LIGHTBOX ===== */
         .qr-lightbox .modal-content {
             max-width: 500px;
             background: rgba(0,0,0,0.9);
@@ -2111,7 +1865,7 @@
             border-radius: 8px;
         }
 
-        /* ---- Gestionnaire de liens (Admin) ---- */
+        /* ===== ADMIN LINK ITEM ===== */
         .admin-link-item {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -2154,7 +1908,7 @@
             color: var(--danger);
         }
 
-        /* ---- Journal d'activité (paginé) ---- */
+        /* ===== ADMIN LOGS ===== */
         .admin-log-entry {
             display: flex;
             justify-content: space-between;
@@ -2205,7 +1959,7 @@
             color: var(--cyan);
         }
 
-        /* ---- Gestionnaire de thème (localStorage) ---- */
+        /* ===== THEME MANAGER ===== */
         .theme-manager .color-picker-row {
             display: flex;
             align-items: center;
@@ -2244,11 +1998,12 @@
             background: var(--bg-deep);
         }
 
-        /* === MODALE ADMIN (uniquement Backup) === */
+        /* ===== ADMIN GATE ===== */
         .admin-gate .modal-content {
             max-width: 380px;
         }
 
+        /* ===== DONATION ===== */
         .donate-btn {
             background: linear-gradient(135deg, #f7971e, #ffd200);
             color: #0a0b10;
@@ -2267,7 +2022,6 @@
             transform: scale(1.05);
             box-shadow: 0 0 30px rgba(255, 210, 0, 0.5);
         }
-
         .donation-popup .modal-content {
             max-width: 420px;
             text-align: left;
@@ -2325,25 +2079,69 @@
             box-shadow: 0 0 15px rgba(0,242,254,0.3);
         }
 
-        @media (max-width: 420px) {
-            .glass-card { padding: 1.2rem; }
+        /* ===== MAINTENANCE ===== */
+        .maintenance-message {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .maintenance-message i {
+            font-size: 4rem;
+            color: var(--cyan);
+            margin-bottom: 1rem;
+        }
+        .maintenance-message h2 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .maintenance-message p {
+            color: var(--text-secondary);
+        }
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .theme-toggle:hover {
+            color: var(--cyan);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .dashboard-container .dashboard-header { padding: 0.5rem 0.8rem; }
+            .share-module { padding: 0.3rem 0.8rem; flex-wrap: wrap; }
+            .tab-content { padding: 0.5rem 0.8rem 0.8rem 0.8rem; }
+            .dashboard-nav .nav-item { font-size: 0.5rem; padding: 0.2rem 0.3rem; min-width: 36px; }
+            .dashboard-nav .nav-item i { font-size: 1rem; }
+            .dashboard-nav .nav-item span { font-size: 0.5rem; }
+            .dashboard-actions .btn,
+            .dashboard-actions .donate-btn { font-size: 0.6rem; padding: 0.3rem 0.6rem; min-width: 60px; }
+            .dashboard-actions { padding: 0.2rem 0.3rem; }
+            .glass-card:not(.dashboard-container) { padding: 1rem; max-width: 100%; border-radius: 0; margin: 0; }
+            #view-dashboard { padding: 0 !important; }
+            #view-add-link .glass-card { padding: 0.8rem; }
             .public-header { padding: 0.8rem 1rem; }
-            .dashboard-container .dashboard-header { padding: 0.8rem 1rem; }
-            .share-module { padding: 0.5rem 1rem; flex-wrap: wrap; }
-            .dashboard-nav .nav-item { font-size: 0.6rem; padding: 0.2rem 0.4rem; }
-            .tab-content { padding: 0.8rem 1rem; }
-            .admin-panel .qr-upload-row { flex-direction: column; align-items: flex-start; }
-            .testimonial-item { flex-direction: column; align-items: stretch; }
-            .schedule-item { flex-direction: column; align-items: stretch; }
-            .admin-link-item { flex-direction: column; align-items: stretch; }
-            .theme-manager .color-picker-row { flex-wrap: wrap; }
+            #public-links { padding: 0 0.5rem; }
+            .testimonials-carousel .testimonial-slide { min-width: calc(100% - 0.4rem); padding: 0.8rem 0.6rem; }
+        }
+        @media (max-width: 380px) {
+            .dashboard-nav .nav-item { font-size: 0.45rem; padding: 0.1rem 0.2rem; min-width: 30px; }
+            .dashboard-nav .nav-item i { font-size: 0.8rem; }
+            .dashboard-nav .nav-item span { font-size: 0.4rem; }
         }
     </style>
 </head>
 <body>
 <div id="app">
 
-    <!-- ========== VUE CONSENTEMENT ========== -->
+    <!-- ===== VUE CONSENTEMENT ===== -->
     <div id="view-consent" class="view">
         <div class="glass-card">
             <div class="brand">LINKEXT</div>
@@ -2364,7 +2162,7 @@
         </div>
     </div>
 
-    <!-- ========== VUE AUTH ========== -->
+    <!-- ===== VUE AUTH ===== -->
     <div id="view-auth" class="view">
         <div class="glass-card">
             <div class="brand">LINKEXT</div>
@@ -2402,7 +2200,7 @@
         </div>
     </div>
 
-    <!-- ========== VUE ONBOARDING ========== -->
+    <!-- ===== VUE ONBOARDING ===== -->
     <div id="view-onboarding" class="view">
         <div class="glass-card">
             <div class="brand" style="font-size:1.8rem;">CONFIGURATION</div>
@@ -2418,18 +2216,17 @@
         </div>
     </div>
 
-    <!-- ========== VUE DASHBOARD (PLEIN ÉCRAN) ========== -->
+    <!-- ===== VUE DASHBOARD (PLEIN ÉCRAN) ===== -->
     <div id="view-dashboard" class="view">
-        <!-- Le conteneur principal occupe tout l'écran sans marges ni arrondis -->
         <div class="glass-card dashboard-container">
 
-            <!-- En‑tête du tableau de bord (resté en haut) -->
+            <!-- En‑tête -->
             <div class="dashboard-header">
                 <div class="brand" style="font-size:1.3rem; margin:0;">DASHBOARD</div>
                 <button class="btn btn-outline logout-btn" id="logout-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
 
-            <!-- Module de partage (juste sous le header) -->
+            <!-- Partage -->
             <div class="share-module" id="share-module">
                 <div class="share-link-wrapper">
                     <i class="fas fa-link"></i>
@@ -2441,16 +2238,16 @@
                 </div>
             </div>
 
-            <!-- Contenu principal (scrollable) -->
+            <!-- Contenu -->
             <div class="tab-content">
-                <!-- ===== ANALYTICS ===== -->
+                <!-- ANALYTICS -->
                 <div class="tab-pane active" id="tab-analytics">
                     <h3><i class="fas fa-chart-line"></i> Vue d'ensemble</h3>
                     <div class="stats-summary" id="stats-summary">
                         <div class="stat-card"><div class="stat-number" id="stat-views">0</div><div class="stat-label">Vues du profil</div></div>
                         <div class="stat-card"><div class="stat-number" id="stat-total-clicks">0</div><div class="stat-label">Clics totaux</div></div>
                         <div class="stat-card" style="grid-column: span 2;"><div class="stat-label" style="margin-bottom:0.3rem;">Répartition des clics</div><div id="stat-bars"></div></div>
-                        <div style="grid-column: span 2; margin-top:0.3rem;"><button class="btn btn-outline export-report-btn" id="export-report-btn" style="width:100%; padding:0.5rem; font-size:0.85rem;"><i class="fas fa-file-download"></i> Exporter le rapport (PDF)</button></div>
+                        <div style="grid-column: span 2; margin-top:0.3rem;"><button class="btn btn-outline export-report-btn" id="export-report-btn" style="width:100%; padding:0.5rem; font-size:0.85rem;"><i class="fas fa-file-download"></i> Exporter le rapport</button></div>
                     </div>
                     <div class="flex-between" style="margin-top:0.5rem;">
                         <span class="views-counter"><i class="fas fa-eye"></i> <span id="views-count-display">0</span> vues</span>
@@ -2459,7 +2256,7 @@
                     <div id="top-networks-container" class="top-networks"></div>
                 </div>
 
-                <!-- ===== LIENS ===== -->
+                <!-- LIENS -->
                 <div class="tab-pane" id="tab-links">
                     <h3><i class="fas fa-link"></i> Gestion des liens</h3>
                     <div class="flex-between" style="margin-bottom:0.8rem; border-bottom:1px solid var(--border-glow); padding-bottom:0.5rem;">
@@ -2480,7 +2277,7 @@
                     <div id="dashboard-links-container" style="display:flex; flex-direction:column; gap:0.4rem; max-height:220px; overflow-y:auto; padding-right:0.3rem;"></div>
                 </div>
 
-                <!-- ===== PROFIL ===== -->
+                <!-- PROFIL -->
                 <div class="tab-pane" id="tab-profile">
                     <h3><i class="fas fa-user-circle"></i> Profil & Style</h3>
                     <div class="profile-header">
@@ -2514,7 +2311,7 @@
                     </div>
                 </div>
 
-                <!-- ===== AVANCÉ ===== -->
+                <!-- AVANCÉ -->
                 <div class="tab-pane" id="tab-advanced">
                     <h3><i class="fas fa-cogs"></i> Outils Avancés</h3>
                     <div class="seo-section"><h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-search"></i> Optimisation SEO</h4>
@@ -2537,7 +2334,7 @@
                     </div>
                 </div>
 
-                <!-- ===== TÉMOIGNAGES ===== -->
+                <!-- TÉMOIGNAGES (admin) -->
                 <div class="tab-pane" id="tab-testimonials">
                     <h3><i class="fas fa-comments"></i> Témoignages</h3>
                     <p style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:0.5rem;">Gérez jusqu'à 5 témoignages qui apparaîtront sur votre page publique.</p>
@@ -2545,7 +2342,7 @@
                     <button class="btn btn-outline" id="add-testimonial-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem; margin-top:0.5rem;"><i class="fas fa-plus"></i> Ajouter un témoignage</button>
                 </div>
 
-                <!-- ===== ADMIN ===== -->
+                <!-- ADMIN -->
                 <div class="tab-pane" id="tab-admin">
                     <h3><i class="fas fa-shield-alt"></i> Administration</h3>
                     <div id="admin-status-control" style="display:none; margin-bottom:1.5rem; border:1px solid var(--border-glow); border-radius:12px; padding:0.8rem;">
@@ -2562,9 +2359,9 @@
                     </div>
                     <div id="admin-panel-container"></div>
                 </div>
-            </div> <!-- fin .tab-content -->
+            </div>
 
-            <!-- ===== BARRE DE NAVIGATION EN BAS (fixe) ===== -->
+            <!-- ===== BARRE DE NAVIGATION EN BAS ===== -->
             <nav class="dashboard-nav" id="dashboard-nav">
                 <button class="nav-item active" data-tab="analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></button>
                 <button class="nav-item" data-tab="links"><i class="fas fa-link"></i><span>Liens</span></button>
@@ -2574,16 +2371,16 @@
                 <button class="nav-item" data-tab="admin" id="admin-tab" style="display:none;"><i class="fas fa-shield-alt"></i><span>Admin</span></button>
             </nav>
 
-            <!-- ===== BOUTONS D'ACTION (Enregistrer / Soutenir) intégrés en bas ===== -->
+            <!-- ===== BOUTONS D'ACTION ===== -->
             <div class="dashboard-actions">
                 <button class="btn" id="save-dashboard-btn"><i class="fas fa-save"></i> Enregistrer</button>
                 <button class="donate-btn" id="donate-btn"><i class="fas fa-heart"></i> Soutenir</button>
             </div>
 
-        </div> <!-- fin .dashboard-container -->
-    </div> <!-- fin #view-dashboard -->
+        </div>
+    </div>
 
-    <!-- ========== VUE AJOUTER UN LIEN ========== -->
+    <!-- ===== VUE AJOUTER UN LIEN (plein écran) ===== -->
     <div id="view-add-link" class="view">
         <div class="glass-card">
             <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;">
@@ -2610,7 +2407,7 @@
         </div>
     </div>
 
-    <!-- ========== VUE PROFIL PUBLIC ========== -->
+    <!-- ===== VUE PROFIL PUBLIC (plein écran avec témoignages en bas) ===== -->
     <div id="view-profile-public" class="view">
         <div id="flash-banner-container"></div>
         <a id="public-wrapper-link" class="public-wrapper" href="#" target="_blank" rel="noopener noreferrer" style="display:block; text-decoration:none; color:inherit; width:100%;">
@@ -2630,17 +2427,18 @@
                 </div>
                 <div class="public-links-divider"></div>
                 <div id="public-links"></div>
-                <div id="public-testimonials" style="padding:0 1rem 0.5rem 1rem; margin-top:0.5rem;"></div>
+                <!-- ===== TÉMOIGNAGES DÉPLACÉS ICI (avant le pied de page) ===== -->
+                <div id="public-testimonials" style="padding:0.8rem 1rem 0.5rem 1rem; margin-top:0.5rem;"></div>
             </div>
         </a>
         <p class="text-center" style="font-size:0.7rem; color:var(--text-secondary); padding:0.4rem 0;">Propulsé par LinkExt</p>
     </div>
 
-    <!-- ========== MODALS ========== -->
+    <!-- ===== MODALS ===== -->
     <div class="modal-overlay" id="qr-modal"><div class="modal-content"><h3 style="margin-bottom:1rem; font-family:var(--font-heading);">QR Code du profil</h3><img id="qr-image" src="" alt="QR Code"><button class="close-modal" id="close-qr-modal">Fermer</button></div></div>
     <div class="modal-overlay gated-modal" id="gated-modal"><div class="modal-content"><h3 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:0.5rem;"><i class="fas fa-lock"></i> Accès verrouillé</h3><p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">Entrez votre adresse email pour accéder à ce lien.</p><input type="email" id="gated-email" placeholder="votre@email.com" autocomplete="email"><div class="error-msg" id="gated-error">Email invalide.</div><button class="btn" id="gated-submit-btn">Déverrouiller et accéder</button></div></div>
 
-    <!-- ===== MODALE ADMIN (uniquement Backup) ===== -->
+    <!-- ===== MODALE ADMIN ===== -->
     <div class="modal-overlay admin-gate" id="admin-gate-modal">
         <div class="modal-content">
             <h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-lock"></i> Accès Administrateur</h3>
@@ -2655,7 +2453,7 @@
         </div>
     </div>
 
-    <!-- ===== POPUP DONATIONS (lecture en temps réel) ===== -->
+    <!-- ===== POPUP DONATIONS ===== -->
     <div class="modal-overlay donation-popup" id="donation-modal">
         <div class="modal-content">
             <h3 style="font-family:var(--font-heading);"><i class="fas fa-hand-holding-heart"></i> Soutenir LinkExt</h3>
@@ -2665,7 +2463,7 @@
         </div>
     </div>
 
-    <!-- ===== LIGHTBOX POUR QR CODES ===== -->
+    <!-- ===== LIGHTBOX QR ===== -->
     <div class="modal-overlay qr-lightbox" id="qr-lightbox">
         <div class="modal-content">
             <img id="qr-lightbox-img" src="" alt="QR Code agrandi">
@@ -2677,7 +2475,7 @@
 
 <div id="toast-container"></div>
 
-<!-- Firebase Compat SDKs -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -2707,7 +2505,7 @@
         }
 
         // ============================================================
-        // CONSTANTES CLOUDINARY
+        // CONSTANTES
         // ============================================================
         const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
         const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
@@ -2746,6 +2544,8 @@
         let isAdmin = false;
         let profileListenerUnsubscribe = null;
         let profileListenerInitialized = false;
+        let carouselInterval = null;
+        let carouselCurrentIndex = 0;
 
         // ============================================================
         // VUES
@@ -2861,33 +2661,22 @@
         }
 
         // ============================================================
-        // ADMIN - VÉRIFICATION DES DROITS
+        // ADMIN
         // ============================================================
         async function checkIsAdmin(uid) {
-            if (!uid || uid === '') {
-                console.warn('checkIsAdmin: uid manquant');
-                return false;
-            }
+            if (!uid || uid === '') return false;
             try {
                 const docRef = db.collection('admin_config').doc('security');
                 const doc = await docRef.get();
-                if (!doc.exists) {
-                    console.warn('Document admin_config/security introuvable.');
-                    return false;
-                }
+                if (!doc.exists) return false;
                 const data = doc.data();
-                const isAdmin = data.adminUid === uid;
-                console.log('isAdmin =', isAdmin);
-                return isAdmin;
+                return data.adminUid === uid;
             } catch (e) {
                 console.error('Erreur de lecture admin_config/security :', e);
                 return false;
             }
         }
 
-        // ============================================================
-        // MODALE ADMIN - UNIQUEMENT BACKUP CODE
-        // ============================================================
         function openAdminGate() {
             return new Promise((resolve) => {
                 const modal = document.getElementById('admin-gate-modal');
@@ -2903,7 +2692,7 @@
                 db.collection('admin_config').doc('security').get()
                     .then((doc) => {
                         if (!doc.exists) {
-                            errorDiv.textContent = 'Configuration admin manquante. Contactez le support.';
+                            errorDiv.textContent = 'Configuration admin manquante.';
                             errorDiv.style.display = 'block';
                             return;
                         }
@@ -2948,7 +2737,7 @@
         }
 
         // ============================================================
-        // GESTION DES DONS
+        // DONATIONS
         // ============================================================
         async function loadDonationConfig() {
             try {
@@ -3080,33 +2869,8 @@
             }
         }
 
-        document.getElementById('close-donation-modal').addEventListener('click', () => {
-            document.getElementById('donation-modal').classList.remove('active');
-            if (donationUnsubscribe) {
-                donationUnsubscribe();
-                donationUnsubscribe = null;
-            }
-        });
-        document.getElementById('donation-modal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) {
-                e.currentTarget.classList.remove('active');
-                if (donationUnsubscribe) {
-                    donationUnsubscribe();
-                    donationUnsubscribe = null;
-                }
-            }
-        });
-        document.getElementById('close-qr-lightbox').addEventListener('click', () => {
-            document.getElementById('qr-lightbox').classList.remove('active');
-        });
-        document.getElementById('qr-lightbox').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) {
-                e.currentTarget.classList.remove('active');
-            }
-        });
-
         // ============================================================
-        // GESTION DU STATUT ADMINISTRATEUR (Firestore)
+        // STATUT ADMIN
         // ============================================================
         function listenAdminStatus() {
             if (adminStatusUnsubscribe) {
@@ -3159,7 +2923,7 @@
         }
 
         // ============================================================
-        // ADMIN - GESTIONNAIRE DE LIENS ET LOGS
+        // ADMIN - LIENS ET LOGS
         // ============================================================
         function renderAdminLinks() {
             const container = document.getElementById('admin-links-container');
@@ -3179,7 +2943,7 @@
                         if (snapshot.empty) {
                             html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucun lien configuré.</p>';
                         } else {
-                            snapshot.forEach((doc, index) => {
+                            snapshot.forEach((doc) => {
                                 const data = doc.data();
                                 const id = doc.id;
                                 html += `
@@ -3265,14 +3029,11 @@
             }
         }
 
-        // --- GESTION DES LOGS (avec suppression) ---
-
         async function deleteLog(docId) {
             if (!confirm('Supprimer ce log définitivement ?')) return;
             try {
                 await db.collection('admin_logs').doc(docId).delete();
                 showToast('Log supprimé.', 'info');
-                // Recharger la liste (pour mettre à jour)
                 loadAdminLogs(10);
             } catch (e) {
                 console.error('Erreur suppression log :', e);
@@ -3319,7 +3080,6 @@
                 }
 
                 adminLogsUnsubscribe = query.onSnapshot((snapshot) => {
-                    // Ajouter le bouton "Supprimer tout" en haut
                     let html = `
                         <div style="display:flex; justify-content:flex-end; margin-bottom:0.5rem;">
                             <button class="btn btn-outline" id="delete-all-logs-btn" style="padding:0.2rem 0.8rem; font-size:0.8rem; border-color:var(--danger); color:var(--danger);">
@@ -3345,7 +3105,6 @@
                     }
                     container.innerHTML = html;
 
-                    // Attacher les événements de suppression
                     container.querySelectorAll('.log-delete-btn').forEach(btn => {
                         btn.addEventListener('click', function(e) {
                             e.stopPropagation();
@@ -3392,7 +3151,7 @@
         }
 
         // ============================================================
-        // GESTION DU THÈME (localStorage)
+        // GESTION DU THÈME
         // ============================================================
         function applyUserTheme() {
             let themeData = { primaryColor: '#00f2fe', backgroundImage: '' };
@@ -3419,7 +3178,6 @@
             applyUserTheme();
         }
 
-        // Fonction pour appliquer immédiatement le thème visuel
         function applyVisualTheme(theme) {
             if (!theme) {
                 const select = document.getElementById('visual-theme-select');
@@ -3458,8 +3216,54 @@
             }
         }
 
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeIcons();
+            applyThemeToPrivateUI();
+        }
+
+        function applySavedTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light') {
+                document.body.classList.add('light-mode');
+            } else {
+                document.body.classList.remove('light-mode');
+            }
+            updateThemeIcons();
+            applyThemeToPrivateUI();
+        }
+
+        function updateThemeIcons() {
+            const isLight = document.body.classList.contains('light-mode');
+            const iconPublic = document.querySelector('#theme-toggle-btn i');
+            if (iconPublic) {
+                iconPublic.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            }
+            const sunIcon = document.getElementById('theme-private-icon');
+            const moonIcon = document.getElementById('theme-private-icon-moon');
+            if (sunIcon && moonIcon) {
+                sunIcon.style.color = isLight ? 'var(--cyan)' : 'var(--text-secondary)';
+                moonIcon.style.color = isLight ? 'var(--text-secondary)' : 'var(--cyan)';
+            }
+            const track = document.getElementById('theme-toggle-private');
+            if (track) {
+                track.classList.toggle('active', isLight);
+            }
+        }
+
+        function applyThemeToPrivateUI() {
+            const isLight = document.body.classList.contains('light-mode');
+            const track = document.getElementById('theme-toggle-private');
+            if (track) {
+                track.classList.toggle('active', isLight);
+            }
+            updateThemeIcons();
+        }
+
         // ============================================================
-        // GESTION DES TÉMOIGNAGES
+        // TÉMOIGNAGES (admin)
         // ============================================================
         function renderTestimonialsPrivate() {
             const container = document.getElementById('testimonials-list');
@@ -3538,6 +3342,169 @@
                     }
                 });
             });
+        }
+
+        // ============================================================
+        // CARROUSEL TÉMOIGNAGES (public) - auto-play + interactif
+        // ============================================================
+        function renderPublicTestimonials(testimonials) {
+            const container = document.getElementById('public-testimonials');
+            container.innerHTML = '';
+            if (!testimonials || testimonials.length === 0) return;
+
+            // Nettoyer l'ancien intervalle
+            if (carouselInterval) {
+                clearInterval(carouselInterval);
+                carouselInterval = null;
+            }
+            carouselCurrentIndex = 0;
+
+            const carousel = document.createElement('div');
+            carousel.className = 'testimonials-carousel';
+            carousel.id = 'public-carousel';
+            const track = document.createElement('div');
+            track.className = 'carousel-track';
+            track.id = 'carousel-track';
+
+            testimonials.forEach(t => {
+                const slide = document.createElement('div');
+                slide.className = 'testimonial-slide';
+                const stars = '★'.repeat(t.stars || 5) + '☆'.repeat(5 - (t.stars || 5));
+                slide.innerHTML = `
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    ${t.imageUrl ? `<img class="testimonial-image" src="${t.imageUrl}" alt="${t.name || 'Témoin'}">` : ''}
+                    <div class="testimonial-name">${t.name || 'Anonyme'}</div>
+                    <div class="testimonial-message">"${t.message || ''}"</div>
+                    <div class="testimonial-stars">${stars}</div>
+                `;
+                track.appendChild(slide);
+            });
+
+            carousel.appendChild(track);
+
+            // Contrôles
+            if (testimonials.length > 1) {
+                const controls = document.createElement('div');
+                controls.className = 'carousel-controls';
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                controls.appendChild(prevBtn);
+                controls.appendChild(nextBtn);
+                carousel.appendChild(controls);
+
+                const totalSlides = testimonials.length;
+                let isTransitioning = false;
+
+                function getSlideWidth() {
+                    const first = track.firstElementChild;
+                    return first ? first.offsetWidth + 12 : 0;
+                }
+
+                function goTo(index, smooth = true) {
+                    if (isTransitioning && smooth) return;
+                    isTransitioning = true;
+                    carouselCurrentIndex = (index + totalSlides) % totalSlides;
+                    const slideWidth = getSlideWidth();
+                    track.style.transition = smooth ? 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none';
+                    track.style.transform = `translateX(-${carouselCurrentIndex * slideWidth}px)`;
+                    if (!smooth) {
+                        // Forcer le reflow
+                        void track.offsetHeight;
+                        track.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    }
+                    setTimeout(() => {
+                        isTransitioning = false;
+                    }, 850);
+                }
+
+                function nextSlide() {
+                    goTo(carouselCurrentIndex + 1);
+                }
+
+                function prevSlide() {
+                    goTo(carouselCurrentIndex - 1);
+                }
+
+                prevBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    prevSlide();
+                    resetAutoPlay();
+                });
+                nextBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    nextSlide();
+                    resetAutoPlay();
+                });
+
+                // Auto-play
+                function startAutoPlay() {
+                    if (carouselInterval) clearInterval(carouselInterval);
+                    carouselInterval = setInterval(nextSlide, 5000);
+                }
+
+                function resetAutoPlay() {
+                    if (carouselInterval) {
+                        clearInterval(carouselInterval);
+                        carouselInterval = null;
+                    }
+                    startAutoPlay();
+                }
+
+                // Support du glissement (touch)
+                let touchStartX = 0;
+                let touchEndX = 0;
+                let isDragging = false;
+
+                carousel.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    isDragging = true;
+                }, { passive: true });
+
+                carousel.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    touchEndX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
+                carousel.addEventListener('touchend', (e) => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    const diff = touchStartX - (touchEndX || touchStartX);
+                    if (Math.abs(diff) > 30) {
+                        if (diff > 0) {
+                            nextSlide();
+                        } else {
+                            prevSlide();
+                        }
+                        resetAutoPlay();
+                    }
+                }, { passive: true });
+
+                // Pause au survol
+                carousel.addEventListener('mouseenter', () => {
+                    if (carouselInterval) {
+                        clearInterval(carouselInterval);
+                        carouselInterval = null;
+                    }
+                });
+                carousel.addEventListener('mouseleave', startAutoPlay);
+
+                // Ajustement au redimensionnement
+                window.addEventListener('resize', () => {
+                    goTo(carouselCurrentIndex, false);
+                });
+
+                // Démarrer l'auto-play
+                startAutoPlay();
+
+                // Initialiser la position
+                setTimeout(() => {
+                    goTo(0, false);
+                }, 100);
+            }
+
+            container.appendChild(carousel);
         }
 
         // ============================================================
@@ -3628,7 +3595,7 @@
         }
 
         // ============================================================
-        // ADMIN PANEL - RENDU COMPLET
+        // ADMIN PANEL
         // ============================================================
         function renderFullAdminPanel() {
             const container = document.getElementById('admin-panel-container');
@@ -3638,17 +3605,14 @@
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-coins"></i> Coordonnées de paiement</h4>
                         <div id="admin-donations-container"></div>
                     </div>
-
                     <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-link"></i> Liens du Dashboard</h4>
                         <div id="admin-links-container"></div>
                     </div>
-
                     <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-history"></i> Journal d'activité</h4>
                         <div id="admin-logs-container"></div>
                     </div>
-
                     <div class="admin-field" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-palette"></i> Gestionnaire de thème</h4>
                         <div id="theme-manager-container"></div>
@@ -3783,7 +3747,6 @@
             });
         }
 
-        // --- Gestionnaire de thème ADMIN avec sélecteur de style visuel ---
         function renderThemeManager() {
             const container = document.getElementById('theme-manager-container');
             if (!container) return;
@@ -3831,13 +3794,11 @@
                 </div>
             `;
 
-            // Événement pour le sélecteur de style visuel
             const adminThemeSelect = document.getElementById('admin-visual-theme-select');
             if (adminThemeSelect) {
                 adminThemeSelect.addEventListener('change', function() {
                     const theme = this.value;
                     applyVisualTheme(theme);
-                    // Sauvegarder aussi la couleur primaire et l'image (inchangées)
                     const color = document.getElementById('theme-primary-color').value;
                     const bgImg = container.querySelector('.bg-preview')?.src || '';
                     saveUserTheme(color, bgImg);
@@ -3885,7 +3846,6 @@
                 const color = document.getElementById('theme-primary-color').value;
                 const bgImg = container.querySelector('.bg-preview')?.src || '';
                 const visualTheme = document.getElementById('admin-visual-theme-select')?.value || 'cyberpunk';
-                // Appliquer le thème visuel
                 applyVisualTheme(visualTheme);
                 saveUserTheme(color, bgImg);
                 showToast('Thème enregistré !', 'info');
@@ -3894,7 +3854,7 @@
         }
 
         // ============================================================
-        // CLOUDINARY WIDGET - CORRECTION : suppression de .on, tout dans le callback
+        // CLOUDINARY WIDGET
         // ============================================================
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
@@ -3956,88 +3916,15 @@
         }
 
         // ============================================================
-        // CARROUSEL TÉMOIGNAGES (public)
-        // ============================================================
-        function renderPublicTestimonials(testimonials) {
-            const container = document.getElementById('public-testimonials');
-            container.innerHTML = '';
-            if (!testimonials || testimonials.length === 0) return;
-
-            const carousel = document.createElement('div');
-            carousel.className = 'testimonials-carousel';
-            const track = document.createElement('div');
-            track.className = 'carousel-track';
-
-            testimonials.forEach(t => {
-                const slide = document.createElement('div');
-                slide.className = 'testimonial-slide';
-                const stars = '★'.repeat(t.stars || 5) + '☆'.repeat(5 - (t.stars || 5));
-                slide.innerHTML = `
-                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-                    ${t.imageUrl ? `<img class="testimonial-image" src="${t.imageUrl}" alt="${t.name || 'Témoin'}">` : ''}
-                    <div class="testimonial-name">${t.name || 'Anonyme'}</div>
-                    <div class="testimonial-message">"${t.message || ''}"</div>
-                    <div class="testimonial-stars">${stars}</div>
-                `;
-                track.appendChild(slide);
-            });
-
-            carousel.appendChild(track);
-
-            if (testimonials.length > 1) {
-                const controls = document.createElement('div');
-                controls.className = 'carousel-controls';
-                const prevBtn = document.createElement('button');
-                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                const nextBtn = document.createElement('button');
-                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                controls.appendChild(prevBtn);
-                controls.appendChild(nextBtn);
-                carousel.appendChild(controls);
-
-                let currentIndex = 0;
-                const totalSlides = testimonials.length;
-                const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth + 12 : 0;
-
-                function goTo(index) {
-                    currentIndex = (index + totalSlides) % totalSlides;
-                    track.style.transform = `translateX(-${currentIndex * (slideWidth || 0)}px)`;
-                }
-
-                prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
-                nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
-
-                let autoInterval = setInterval(() => goTo(currentIndex + 1), 5000);
-                carousel.addEventListener('mouseenter', () => clearInterval(autoInterval));
-                carousel.addEventListener('mouseleave', () => {
-                    autoInterval = setInterval(() => goTo(currentIndex + 1), 5000);
-                });
-                window.addEventListener('resize', () => {
-                    const newWidth = track.firstElementChild ? track.firstElementChild.offsetWidth + 12 : 0;
-                    goTo(currentIndex);
-                });
-            }
-
-            container.appendChild(carousel);
-        }
-
-        // ============================================================
-        // FONCTIONS MÉTIERS - INCÉMENTATION PUBLIQUE SANS AUTH
+        // FONCTIONS MÉTIERS
         // ============================================================
         async function incrementViews(uid) {
-            if (!uid) {
-                console.warn('incrementViews: uid manquant');
-                return;
-            }
+            if (!uid) return;
             const key = 'viewCounted_' + uid;
-            if (sessionStorage.getItem(key) === 'true') {
-                console.log('Vue déjà comptée pour', uid);
-                return;
-            }
+            if (sessionStorage.getItem(key) === 'true') return;
             try {
                 const docRef = db.collection('users').doc(uid);
                 await docRef.update({ views: firebase.firestore.FieldValue.increment(1) });
-                console.log('Vue incrémentée pour', uid);
                 if (userProfile && userProfile._id === uid) {
                     userProfile.views = (userProfile.views || 0) + 1;
                 }
@@ -4048,28 +3935,16 @@
         }
 
         async function incrementLinkClick(uid, linkId) {
-            if (!uid || !linkId) {
-                console.warn('incrementLinkClick: uid ou linkId manquant');
-                return;
-            }
+            if (!uid || !linkId) return;
             const docRef = db.collection('users').doc(uid);
             try {
                 await db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(docRef);
-                    if (!doc.exists) {
-                        console.warn('Document utilisateur introuvable pour uid', uid);
-                        return;
-                    }
+                    if (!doc.exists) return;
                     const data = doc.data();
-                    if (!data.links) {
-                        console.warn('Aucun lien trouvé pour uid', uid);
-                        return;
-                    }
+                    if (!data.links) return;
                     const linkIndex = data.links.findIndex(l => l.id === linkId);
-                    if (linkIndex === -1) {
-                        console.warn('Lien introuvable dans le profil :', linkId);
-                        return;
-                    }
+                    if (linkIndex === -1) return;
                     const updatedLinks = [...data.links];
                     updatedLinks[linkIndex] = {
                         ...updatedLinks[linkIndex],
@@ -4077,12 +3952,9 @@
                     };
                     transaction.update(docRef, { links: updatedLinks });
                 });
-                console.log('Clic incrémenté pour le lien', linkId);
                 if (userProfile && userProfile._id === uid) {
                     const link = userProfile.links.find(l => l.id === linkId);
-                    if (link) {
-                        link.clicks = (link.clicks || 0) + 1;
-                    }
+                    if (link) link.clicks = (link.clicks || 0) + 1;
                     if (document.getElementById('view-dashboard').classList.contains('active')) {
                         updateStats();
                     }
@@ -4545,7 +4417,6 @@
 
             applyUserTheme();
 
-            // ---- Injection SEO et tracking ----
             if (userProfile.seo) {
                 injectSEO(userProfile.seo);
             }
@@ -4553,27 +4424,16 @@
                 injectTrackingScripts(userProfile.integrations);
             }
 
-            // ---- Firestore Real‑time Listener pour SEO & intégrations ----
             if (!profileListenerInitialized && currentUser) {
                 profileListenerInitialized = true;
                 profileListenerUnsubscribe = db.collection('users').doc(currentUser.uid)
                     .onSnapshot((doc) => {
                         if (doc.exists) {
                             const data = doc.data();
-                            // Fusionner les données mises à jour sans écraser les objets non présents
                             userProfile = { ...userProfile, ...data, _id: currentUser.uid };
-
-                            // Mettre à jour le SEO et les intégrations si présents
-                            if (data.seo) {
-                                injectSEO(data.seo);
-                            }
-                            if (data.integrations) {
-                                injectTrackingScripts(data.integrations);
-                            }
-
-                            // Optionnel : rafraîchir les champs du formulaire si la vue est active
+                            if (data.seo) injectSEO(data.seo);
+                            if (data.integrations) injectTrackingScripts(data.integrations);
                             if (document.getElementById('view-dashboard').classList.contains('active')) {
-                                // Met à jour les champs du formulaire pour refléter les nouvelles valeurs
                                 document.getElementById('seo-title').value = userProfile.seo?.title || '';
                                 document.getElementById('seo-description').value = userProfile.seo?.description || '';
                                 document.getElementById('seo-keywords').value = userProfile.seo?.keywords || '';
@@ -4586,7 +4446,6 @@
                     });
             }
 
-            // Gestion Admin
             const adminTab = document.getElementById('admin-tab');
             const adminStatusControl = document.getElementById('admin-status-control');
             try {
@@ -4752,54 +4611,8 @@
             });
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            updateThemeIcons();
-            applyThemeToPrivateUI();
-        }
-
-        function applySavedTheme() {
-            const saved = localStorage.getItem('theme');
-            if (saved === 'light') {
-                document.body.classList.add('light-mode');
-            } else {
-                document.body.classList.remove('light-mode');
-            }
-            updateThemeIcons();
-            applyThemeToPrivateUI();
-        }
-
-        function updateThemeIcons() {
-            const isLight = document.body.classList.contains('light-mode');
-            const iconPublic = document.querySelector('#theme-toggle-btn i');
-            if (iconPublic) {
-                iconPublic.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-            }
-            const sunIcon = document.getElementById('theme-private-icon');
-            const moonIcon = document.getElementById('theme-private-icon-moon');
-            if (sunIcon && moonIcon) {
-                sunIcon.style.color = isLight ? 'var(--cyan)' : 'var(--text-secondary)';
-                moonIcon.style.color = isLight ? 'var(--text-secondary)' : 'var(--cyan)';
-            }
-            const track = document.getElementById('theme-toggle-private');
-            if (track) {
-                track.classList.toggle('active', isLight);
-            }
-        }
-
-        function applyThemeToPrivateUI() {
-            const isLight = document.body.classList.contains('light-mode');
-            const track = document.getElementById('theme-toggle-private');
-            if (track) {
-                track.classList.toggle('active', isLight);
-            }
-            updateThemeIcons();
-        }
-
         // ============================================================
-        // SEO & TRACKING - FUNCTIONS
+        // SEO & TRACKING
         // ============================================================
         function injectSEO(seo) {
             let titleEl = document.querySelector('title');
@@ -5099,6 +4912,7 @@
                     });
                 }
 
+                // ===== TÉMOIGNAGES EN BAS =====
                 if (data.testimonials && data.testimonials.length > 0) {
                     renderPublicTestimonials(data.testimonials);
                 }
@@ -5621,11 +5435,14 @@
                     adminStatusUnsubscribe();
                     adminStatusUnsubscribe = null;
                 }
-                // Nettoyer le listener du profil
                 if (profileListenerUnsubscribe) {
                     profileListenerUnsubscribe();
                     profileListenerUnsubscribe = null;
                     profileListenerInitialized = false;
+                }
+                if (carouselInterval) {
+                    clearInterval(carouselInterval);
+                    carouselInterval = null;
                 }
                 showView('view-consent');
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
