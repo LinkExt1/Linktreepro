@@ -5955,6 +5955,18 @@ if (document.readyState === 'loading') {
 // ================================================================
     })();
 </script>
-
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function(reg) {
+                        console.log('Service Worker enregistré avec succès.');
+                    })
+                    .catch(function(err) {
+                        console.warn('Erreur lors de l\'enregistrement du Service Worker:', err);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
