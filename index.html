@@ -2591,7 +2591,7 @@
         }
 
         // ============================================================
-        // FIRESTORE - LECTURE / ÉCRITURE
+        // FIRESTORE - LECTURE / ÉCRITURE (CORRIGÉ)
         // ============================================================
         async function loadUserProfile(uid) {
             if (!uid || uid === '') {
@@ -2602,10 +2602,12 @@
                 const docRef = db.collection('users').doc(uid);
                 const doc = await docRef.get();
                 if (doc.exists) {
-                    userProfile = doc.data();
-                    userProfile._id = uid;
-                    if (userProfile.links && Array.isArray(userProfile.links)) {
-                        userProfile.links = userProfile.links.map(l => {
+                    const data = doc.data();
+                    // Fusionner intelligemment avec userProfile existant
+                    const merged = { ...userProfile, ...data, _id: uid };
+                    // S'assurer que les liens sont corrects
+                    if (merged.links && Array.isArray(merged.links)) {
+                        merged.links = merged.links.map(l => {
                             if (typeof l.clicks !== 'number') l.clicks = 0;
                             if (!l.id) l.id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
                             if (!l.description) l.description = '';
@@ -2618,24 +2620,33 @@
                             if (l.locked === undefined) l.locked = false;
                             return l;
                         });
-                        userProfile.links.sort((a, b) => (a.order || 0) - (b.order || 0));
+                        merged.links.sort((a, b) => (a.order || 0) - (b.order || 0));
+                    } else {
+                        merged.links = [];
                     }
-                    if (typeof userProfile.views !== 'number') userProfile.views = 0;
-                    if (typeof userProfile.redirectUnique !== 'boolean') userProfile.redirectUnique = false;
-                    if (!userProfile.seo) userProfile.seo = { title: '', description: '', keywords: '' };
-                    if (!userProfile.integrations) userProfile.integrations = { metaPixel: '', ga: '' };
-                    if (!userProfile.flash) userProfile.flash = { active: false, message: '', color: 'red' };
-                    if (!userProfile.subscribers) userProfile.subscribers = [];
-                    if (!userProfile.testimonials) userProfile.testimonials = [];
-                    if (!userProfile.schedules) userProfile.schedules = [];
+                    if (typeof merged.views !== 'number') merged.views = 0;
+                    if (typeof merged.redirectUnique !== 'boolean') merged.redirectUnique = false;
+                    if (!merged.seo) merged.seo = { title: '', description: '', keywords: '' };
+                    if (!merged.integrations) merged.integrations = { metaPixel: '', ga: '' };
+                    if (!merged.flash) merged.flash = { active: false, message: '', color: 'red' };
+                    if (!merged.subscribers) merged.subscribers = [];
+                    if (!merged.testimonials) merged.testimonials = [];
+                    if (!merged.schedules) merged.schedules = [];
+
+                    userProfile = merged;
                     return userProfile;
                 } else {
-                    userProfile = null;
+                    // Si le document n'existe pas, retourner null (mais ne pas écraser userProfile)
+                    console.warn('Document Firestore introuvable pour', uid);
                     return null;
                 }
             } catch (error) {
                 console.warn('Erreur Firestore (lecture) :', error);
-                userProfile = null;
+                // En cas d'erreur (hors ligne), retourner les données locales si elles existent
+                if (userProfile && userProfile._id === uid) {
+                    showToast('Profil chargé depuis le cache local.', 'info');
+                    return userProfile;
+                }
                 showToast('Profil non synchronisé. Mode hors-ligne actif.', 'error');
                 return null;
             }
@@ -2649,12 +2660,35 @@
             try {
                 const docRef = db.collection('users').doc(uid);
                 await docRef.set(data, { merge: true });
+                // Mise à jour locale réussie
                 userProfile = { ...userProfile, ...data, _id: uid };
                 return true;
             } catch (error) {
                 console.warn('Erreur Firestore (écriture) :', error);
+                // Échec de la sauvegarde cloud : on met à jour localement
                 userProfile = { ...userProfile, ...data, _id: uid };
                 showToast('Sauvegarde cloud échouée. Modifications locales conservées.', 'error');
+                return false;
+            }
+        }
+
+        /**
+         * Synchronise les données locales vers Firestore (appelé après reconnexion)
+         */
+        async function syncLocalProfileToFirebase() {
+            if (!currentUser || !userProfile) {
+                console.warn('Sync: Pas de données à synchroniser');
+                return;
+            }
+            try {
+                const docRef = db.collection('users').doc(currentUser.uid);
+                await docRef.set(userProfile, { merge: true });
+                console.log('Synchronisation réussie avec Firestore');
+                showToast('Données synchronisées avec le cloud.', 'info');
+                return true;
+            } catch (error) {
+                console.error('Erreur de synchronisation:', error);
+                showToast('Erreur lors de la synchronisation.', 'error');
                 return false;
             }
         }
@@ -5844,115 +5878,107 @@ URL:${urlProfil}
             applyVisualTheme();
             applyBackground();
         });
-// ================================================================
-// AJOUT : RECONNEXION INTELLIGENTE + BOUTON ACTUALISER
-// ================================================================
 
-// 1. Écouteur d'événement 'online' – ne recharge pas la page, 
-//    mais rafraîchit les données depuis Firebase
-window.addEventListener('online', function() {
-  console.log('[App] Reconnexion réseau détectée – Rafraîchissement des données');
+        // ============================================================
+        // RECONNEXION INTELLIGENTE + BOUTON ACTUALISER
+        // ============================================================
 
-  // Si l'utilisateur est sur le tableau de bord
-  const dashboardView = document.getElementById('view-dashboard');
-  if (dashboardView && dashboardView.classList.contains('active')) {
-    // Rafraîchir le profil complet (listeners Firestore déjà actifs,
-    // mais on force une relecture pour les données critiques)
-    if (currentUser) {
-      // Recharger le profil depuis Firestore
-      loadUserProfile(currentUser.uid).then(() => {
-        populateDashboard();
-        showToast('Données rafraîchies (réseau rétabli)');
-      }).catch(() => {
-        showToast('Erreur lors du rafraîchissement, réessayez.', 'error');
-      });
-    }
-  } else if (isPublicMode()) {
-    // Si on est sur le profil public
-    const uid = getPublicUid();
-    if (uid) {
-      loadPublicProfile(uid);
-      showToast('Profil public rafraîchi');
-    }
-  }
-});
+        // 1. Écouteur d'événement 'online' – synchronisation intelligente
+        window.addEventListener('online', async function() {
+            console.log('[App] Reconnexion réseau détectée – Synchronisation des données');
 
-// 2. Bouton "Actualiser" ajouté dynamiquement dans le share-module
-function addRefreshButton() {
-  const shareModule = document.getElementById('share-module');
-  if (!shareModule) return;
-
-  // Vérifier si le bouton existe déjà
-  if (document.getElementById('refresh-data-btn')) return;
-
-  const refreshBtn = document.createElement('button');
-  refreshBtn.id = 'refresh-data-btn';
-  refreshBtn.className = 'btn';
-  refreshBtn.title = 'Actualiser les données depuis Firebase';
-  refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
-  refreshBtn.style.padding = '0.3rem 0.6rem';
-  refreshBtn.style.fontSize = '0.8rem';
-  refreshBtn.style.borderRadius = '30px';
-  refreshBtn.style.background = 'transparent';
-  refreshBtn.style.border = '1px solid var(--card-border)';
-  refreshBtn.style.color = 'var(--text-secondary)';
-  refreshBtn.style.transition = 'all var(--transition)';
-
-  // Ajouter l'événement de clic
-  refreshBtn.addEventListener('click', function() {
-    this.disabled = true;
-    this.innerHTML = '<span class="spinner" style="width:14px;height:14px;"></span>';
-
-    const dashboardView = document.getElementById('view-dashboard');
-    if (dashboardView && dashboardView.classList.contains('active')) {
-      if (currentUser) {
-        loadUserProfile(currentUser.uid).then(() => {
-          populateDashboard();
-          showToast('Données actualisées !');
-        }).catch(() => {
-          showToast('Erreur lors de l\'actualisation.', 'error');
-        }).finally(() => {
-          this.disabled = false;
-          this.innerHTML = '<i class="fas fa-sync-alt"></i>';
+            // Tentative de synchronisation des données locales vers Firestore
+            if (currentUser && userProfile) {
+                const synced = await syncLocalProfileToFirebase();
+                if (synced) {
+                    // Si la synchro a réussi, on rafraîchit le profil depuis Firestore
+                    await loadUserProfile(currentUser.uid);
+                    if (document.getElementById('view-dashboard').classList.contains('active')) {
+                        populateDashboard();
+                    }
+                }
+            } else if (isPublicMode()) {
+                // Rechargement du profil public si nécessaire
+                const uid = getPublicUid();
+                if (uid) {
+                    await loadPublicProfile(uid);
+                    showToast('Profil public rafraîchi');
+                }
+            }
         });
-      }
-    } else if (isPublicMode()) {
-      const uid = getPublicUid();
-      if (uid) {
-        loadPublicProfile(uid);
-        showToast('Profil public actualisé !');
-        this.disabled = false;
-        this.innerHTML = '<i class="fas fa-sync-alt"></i>';
-      }
-    } else {
-      this.disabled = false;
-      this.innerHTML = '<i class="fas fa-sync-alt"></i>';
-      showToast('Aucune donnée à actualiser.', 'info');
-    }
-  });
 
-  // Insérer le bouton après le share-link-wrapper (ou dans les share-actions)
-  const shareActions = shareModule.querySelector('.share-actions');
-  if (shareActions) {
-    // Insérer avant le premier bouton existant
-    shareActions.insertBefore(refreshBtn, shareActions.firstChild);
-  } else {
-    // Fallback : ajouter à la fin du module
-    shareModule.appendChild(refreshBtn);
-  }
-}
+        // 2. Bouton "Actualiser" ajouté dynamiquement dans le share-module
+        function addRefreshButton() {
+            const shareModule = document.getElementById('share-module');
+            if (!shareModule) return;
 
-// Appeler la fonction d'ajout du bouton après le chargement du DOM
-// (si le module share est déjà présent)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', addRefreshButton);
-} else {
-  addRefreshButton();
-}
+            if (document.getElementById('refresh-data-btn')) return;
 
-// ================================================================
-// FIN DES AJOUTS
-// ================================================================
+            const refreshBtn = document.createElement('button');
+            refreshBtn.id = 'refresh-data-btn';
+            refreshBtn.className = 'btn';
+            refreshBtn.title = 'Actualiser les données depuis Firebase';
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+            refreshBtn.style.padding = '0.3rem 0.6rem';
+            refreshBtn.style.fontSize = '0.8rem';
+            refreshBtn.style.borderRadius = '30px';
+            refreshBtn.style.background = 'transparent';
+            refreshBtn.style.border = '1px solid var(--card-border)';
+            refreshBtn.style.color = 'var(--text-secondary)';
+            refreshBtn.style.transition = 'all var(--transition)';
+
+            refreshBtn.addEventListener('click', function() {
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner" style="width:14px;height:14px;"></span>';
+
+                const dashboardView = document.getElementById('view-dashboard');
+                if (dashboardView && dashboardView.classList.contains('active')) {
+                    if (currentUser) {
+                        // Réinitialiser le listener pour forcer le rechargement
+                        if (profileListenerUnsubscribe) {
+                            profileListenerUnsubscribe();
+                            profileListenerUnsubscribe = null;
+                            profileListenerInitialized = false;
+                        }
+                        loadUserProfile(currentUser.uid).then(() => {
+                            populateDashboard();
+                            showToast('Données actualisées !');
+                        }).catch(() => {
+                            showToast('Erreur lors de l\'actualisation.', 'error');
+                        }).finally(() => {
+                            this.disabled = false;
+                            this.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                        });
+                    }
+                } else if (isPublicMode()) {
+                    const uid = getPublicUid();
+                    if (uid) {
+                        loadPublicProfile(uid);
+                        showToast('Profil public actualisé !');
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                    }
+                } else {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                    showToast('Aucune donnée à actualiser.', 'info');
+                }
+            });
+
+            const shareActions = shareModule.querySelector('.share-actions');
+            if (shareActions) {
+                shareActions.insertBefore(refreshBtn, shareActions.firstChild);
+            } else {
+                shareModule.appendChild(refreshBtn);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', addRefreshButton);
+        } else {
+            addRefreshButton();
+        }
+
     })();
 </script>
     <script>
