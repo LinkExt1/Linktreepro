@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    
+    <!-- ===== TITRE DYNAMIQUE (sera mis à jour par JS) ===== -->
     <title>LinkExt - Centralisez vos réseaux et projets en un clic</title>
     <meta name="description" content="Découvrez LinkExt, la plateforme rapide et fluide pour regrouper tous vos canaux importants. Partagez votre profil facilement, accédez à vos canaux officiels.">
     <meta name="google-site-verification" content="ooXwXN9-cj9un9be55b_NAz3CdF_vx8r1pLHjxXBuA4" />
@@ -24,13 +26,24 @@
     </script>
 
     <!-- ============================================================ -->
-    <!-- BALISES OPEN GRAPH (DYNAMIQUES - SERONT MISES À JOUR PAR JS) -->
+    <!-- BALISES OPEN GRAPH - SERONT MISES À JOUR DYNAMIQUEMENT        -->
     <!-- ============================================================ -->
-    <meta property="og:title" content="LinkExt - Espace Personnel">
+    <!-- Ces balises sont statiques mais leur contenu sera remplacé   -->
+    <!-- par JavaScript via le DOM pour le partage social.            -->
+    <!-- L'image utilise Vercel OG Image pour générer une image       -->
+    <!-- dynamique avec le nom et la photo de l'utilisateur.          -->
+    <!-- ============================================================ -->
+    <meta property="og:title" content="LinkExt - Profil">
     <meta property="og:description" content="Bienvenue sur mon profil LinkExt. Découvrez mes liens et projets.">
-    <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
+    <meta property="og:image" content="https://og-image.vercel.app/LinkExt.png?theme=dark&md=1&fontSize=50px&images=https%3A%2F%2Fui-avatars.com%2Fapi%2F%3Fname%3DLinkExt%26background%3D0a0b10%26color%3D00f2fe%26size%3D200&width=1200&height=630">
     <meta property="og:url" content="https://linkext.example.com">
     <meta property="og:type" content="website">
+    
+    <!-- Twitter Cards (pour une meilleure compatibilité) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LinkExt - Profil">
+    <meta name="twitter:description" content="Bienvenue sur mon profil LinkExt.">
+    <meta name="twitter:image" content="https://og-image.vercel.app/LinkExt.png?theme=dark&md=1&fontSize=50px&images=https%3A%2F%2Fui-avatars.com%2Fapi%2F%3Fname%3DLinkExt%26background%3D0a0b10%26color%3D00f2fe%26size%3D200&width=1200&height=630">
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -510,8 +523,6 @@
             transform: scale(1.02);
             box-shadow: 0 0 30px rgba(255, 210, 0, 0.5);
         }
-
-        /* --- Bouton Signaler un bug (ajout) --- */
         .dashboard-actions .bug-report-btn {
             background: transparent;
             border: 1px solid var(--text-secondary);
@@ -1871,7 +1882,7 @@
             transform: scale(1.1);
         }
 
-        /* ===== ADMIN DASHBOARD (NOUVEAU) ===== */
+        /* ===== ADMIN DASHBOARD ===== */
         .admin-dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -2231,9 +2242,7 @@
             color: var(--cyan);
         }
 
-        /* ============================================================ */
-        /* STYLES POUR LA MODALE DE SIGNALEMENT DE BUG                   */
-        /* ============================================================ */
+        /* ===== BUG REPORT MODAL ===== */
         .bug-report-modal .modal-content {
             max-width: 420px;
             text-align: left;
@@ -2540,7 +2549,6 @@
             <!-- ===== BOUTONS D'ACTION ===== -->
             <div class="dashboard-actions">
                 <button class="btn" id="save-dashboard-btn"><i class="fas fa-save"></i> Enregistrer</button>
-                <!-- ===== BOUTON SIGNALER UN BUG (AJOUT) ===== -->
                 <button class="bug-report-btn" id="bug-report-btn"><i class="fas fa-bug"></i> Bug</button>
                 <button class="donate-btn" id="donate-btn"><i class="fas fa-heart"></i> Soutenir</button>
             </div>
@@ -2631,7 +2639,7 @@
         </div>
     </div>
 
-    <!-- ===== MODALE SIGNALEMENT DE BUG (AJOUT) ===== -->
+    <!-- ===== MODALE SIGNALEMENT DE BUG ===== -->
     <div class="modal-overlay bug-report-modal" id="bug-report-modal">
         <div class="modal-content">
             <h3 style="font-family:var(--font-heading);"><i class="fas fa-bug"></i> Signaler un bug</h3>
@@ -2895,7 +2903,7 @@
         }
 
         // ============================================================
-        // ANALYTICS (SYSTÈME DE SUIVI) - NOUVEAU
+        // ANALYTICS (SYSTÈME DE SUIVI)
         // ============================================================
         async function logAnalyticsEvent(eventType, details = {}) {
             try {
@@ -2906,7 +2914,6 @@
                     userAgent: navigator.userAgent,
                     ...details
                 };
-                // Ajouter l'URL de la page si disponible
                 eventData.pageUrl = window.location.href;
 
                 await db.collection('analytics_events').add(eventData);
@@ -3611,7 +3618,7 @@
         }
 
         // ============================================================
-        // CARROUSEL TÉMOIGNAGES (public) - auto-play + interactif
+        // CARROUSEL TÉMOIGNAGES (public)
         // ============================================================
         function renderPublicTestimonials(testimonials) {
             const container = document.getElementById('public-testimonials');
@@ -3854,13 +3861,12 @@
         }
 
         // ============================================================
-        // ADMIN PANEL COMPLET AVEC TABLEAU DE BORD ADMIN (NOUVEAU)
+        // ADMIN PANEL COMPLET AVEC TABLEAU DE BORD ADMIN
         // ============================================================
         function renderFullAdminPanel() {
             const container = document.getElementById('admin-panel-container');
             container.innerHTML = `
                 <div class="admin-panel">
-                    <!-- ===== TABLEAU DE BORD ADMIN (NOUVEAU) ===== -->
                     <div class="admin-field" style="border-bottom:1px solid var(--border-glow); padding-bottom:0.8rem; margin-bottom:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-dashboard"></i> Tableau de bord administrateur</h4>
                         <div id="admin-dashboard-stats" class="admin-dashboard-grid">
@@ -3887,7 +3893,6 @@
                         </div>
                     </div>
 
-                    <!-- ===== LISTE DES RAPPORTS DE BUGS (NOUVEAU) ===== -->
                     <div class="admin-field" style="border-bottom:1px solid var(--border-glow); padding-bottom:0.8rem; margin-bottom:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-list-ul"></i> Rapports de bugs</h4>
                         <div id="admin-bug-reports-container">
@@ -3914,12 +3919,8 @@
                 </div>
             `;
 
-            // Charger les données du tableau de bord admin
             loadAdminDashboardStats();
-
-            // Charger les rapports de bugs
             loadBugReports();
-
             loadDonationAdminPanel();
             renderAdminLinks();
             loadAdminLogs(10);
@@ -3927,12 +3928,11 @@
         }
 
         // ============================================================
-        // TABLEAU DE BORD ADMIN - STATISTIQUES (NOUVEAU)
+        // TABLEAU DE BORD ADMIN - STATISTIQUES
         // ============================================================
         let adminStatsUnsubscribe = null;
 
         function loadAdminDashboardStats() {
-            // Charger le nombre d'utilisateurs
             db.collection('users').get().then((snapshot) => {
                 const count = snapshot.size;
                 document.getElementById('admin-stat-users').textContent = count;
@@ -3940,7 +3940,6 @@
                 document.getElementById('admin-stat-users').textContent = '?';
             });
 
-            // Charger le nombre d'événements analytics
             db.collection('analytics_events').get().then((snapshot) => {
                 document.getElementById('admin-stat-events').textContent = snapshot.size;
             }).catch(() => {
@@ -3949,7 +3948,7 @@
         }
 
         // ============================================================
-        // GESTION DES RAPPORTS DE BUGS (NOUVEAU)
+        // GESTION DES RAPPORTS DE BUGS
         // ============================================================
         let bugReportsUnsubscribe = null;
 
@@ -4003,13 +4002,11 @@
                             });
                         }
 
-                        // Mettre à jour les statistiques
                         document.getElementById('admin-stat-bugs').textContent = total;
                         document.getElementById('admin-stat-resolved').textContent = resolved;
 
                         container.innerHTML = html;
 
-                        // Événements pour les boutons
                         container.querySelectorAll('.resolve-btn').forEach(btn => {
                             btn.addEventListener('click', function() {
                                 const id = this.dataset.id;
@@ -4061,7 +4058,7 @@
         }
 
         // ============================================================
-        // MODALE DE SIGNALEMENT DE BUG (NOUVEAU)
+        // MODALE DE SIGNALEMENT DE BUG
         // ============================================================
         function setupBugReportModal() {
             const modal = document.getElementById('bug-report-modal');
@@ -4072,7 +4069,6 @@
             const submitBtn = document.getElementById('bug-report-submit');
             const closeBtn = document.getElementById('bug-report-close');
 
-            // Compteur de caractères
             textarea.addEventListener('input', function() {
                 charCount.textContent = this.value.length;
                 if (this.value.length >= 10) {
@@ -4084,7 +4080,6 @@
                 }
             });
 
-            // Bouton Signaler un bug dans le dashboard
             document.getElementById('bug-report-btn').addEventListener('click', function() {
                 if (!currentUser) {
                     showToast('Connectez-vous pour signaler un bug.', 'error');
@@ -4098,7 +4093,6 @@
                 modal.classList.add('active');
             });
 
-            // Soumettre le rapport
             submitBtn.addEventListener('click', async function() {
                 const message = textarea.value.trim();
                 if (message.length < 10) {
@@ -4121,7 +4115,6 @@
                         pageUrl: window.location.href
                     });
 
-                    // Log analytics
                     logAnalyticsEvent('modification_profil', { action: 'submit_bug_report' });
 
                     successDiv.style.display = 'block';
@@ -4145,7 +4138,6 @@
                 }
             });
 
-            // Fermeture
             closeBtn.addEventListener('click', function() {
                 modal.classList.remove('active');
                 textarea.value = '';
@@ -4168,7 +4160,6 @@
                 }
             });
 
-            // Fermeture avec Échap
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && modal.classList.contains('active')) {
                     modal.classList.remove('active');
@@ -5257,7 +5248,7 @@
         }
 
         // ============================================================
-        // ROUTAGE PUBLIC AVEC OPEN GRAPH DYNAMIQUE (NOUVEAU)
+        // ROUTAGE PUBLIC AVEC OPEN GRAPH DYNAMIQUE (CORRIGÉ)
         // ============================================================
         async function loadPublicProfile(uid) {
             if (!uid || uid === '') {
@@ -5274,36 +5265,92 @@
                 const data = doc.data();
                 await incrementViews(uid);
 
-                // ===== MISE À JOUR OPEN GRAPH (NOUVEAU) =====
+                // ==========================================================
+                // 1. Récupération des données utilisateur
+                // ==========================================================
+                const displayName = data.displayName || 'Utilisateur';
+                const bio = data.bio || '';
+                const avatarUrl = data.photoURL || generateAvatarUrl(displayName);
+
+                // ==========================================================
+                // 2. Construction de l'URL de l'image dynamique (Vercel OG Image)
+                // ==========================================================
+                // On encode correctement les paramètres pour l'URL
+                const encodedName = encodeURIComponent(displayName);
+                const encodedBio = encodeURIComponent(bio);
+                const encodedAvatar = encodeURIComponent(avatarUrl);
+
+                // On utilise Vercel OG Image avec un template personnalisé
+                // qui inclut le nom, la bio et l'avatar de l'utilisateur.
+                // L'image sera générée en temps réel.
+                const ogImageUrl = `https://og-image.vercel.app/${encodedName}%20-%20LinkExt.png?theme=dark&md=1&fontSize=50px&images=${encodedAvatar}&description=${encodedBio}&width=1200&height=630`;
+
+                // ==========================================================
+                // 3. Mise à jour des balises <meta> dans le <head>
+                // ==========================================================
+                // Titre de la page
+                document.title = displayName + ' - LinkExt';
+
+                // Balises Open Graph
                 const ogTitle = document.querySelector('meta[property="og:title"]');
-                const ogDesc = document.querySelector('meta[property="og:description"]');
-                const ogImage = document.querySelector('meta[property="og:image"]');
-
                 if (ogTitle) {
-                    ogTitle.content = data.displayName + ' - LinkExt' || 'LinkExt - Profil';
+                    ogTitle.content = displayName + ' - LinkExt';
                 }
+
+                const ogDesc = document.querySelector('meta[property="og:description"]');
                 if (ogDesc) {
-                    ogDesc.content = data.bio || 'Découvrez le profil de ' + (data.displayName || 'cet utilisateur') + ' sur LinkExt.';
+                    ogDesc.content = bio || 'Découvrez le profil de ' + displayName + ' sur LinkExt.';
                 }
+
+                const ogImage = document.querySelector('meta[property="og:image"]');
                 if (ogImage) {
-                    ogImage.content = data.photoURL || generateAvatarUrl(data.displayName || 'User');
+                    ogImage.content = ogImageUrl;
                 }
 
-                // Mise à jour du titre de la page
-                document.title = data.displayName + ' - LinkExt' || 'LinkExt | Profil';
+                const ogUrl = document.querySelector('meta[property="og:url"]');
+                if (ogUrl) {
+                    ogUrl.content = window.location.href;
+                }
 
-                // Mise à jour des autres métadonnées
+                // Balises Twitter Card
+                const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+                if (twitterTitle) {
+                    twitterTitle.content = displayName + ' - LinkExt';
+                }
+
+                const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+                if (twitterDesc) {
+                    twitterDesc.content = bio || 'Découvrez le profil de ' + displayName + ' sur LinkExt.';
+                }
+
+                const twitterImage = document.querySelector('meta[name="twitter:image"]');
+                if (twitterImage) {
+                    twitterImage.content = ogImageUrl;
+                }
+
+                // ==========================================================
+                // 4. Mise à jour du meta description standard
+                // ==========================================================
                 const descMeta = document.querySelector('meta[name="description"]');
                 if (descMeta) {
-                    descMeta.content = data.bio || 'Découvrez le profil de ' + (data.displayName || 'cet utilisateur') + ' sur LinkExt.';
+                    descMeta.content = bio || 'Découvrez le profil de ' + displayName + ' sur LinkExt.';
                 }
 
+                // ==========================================================
+                // 5. Injection des paramètres SEO avancés si présents
+                // ==========================================================
                 const seo = data.seo || { title: '', description: '', keywords: '' };
                 injectSEO(seo);
 
+                // ==========================================================
+                // 6. Injection des scripts de tracking
+                // ==========================================================
                 const integrations = data.integrations || { metaPixel: '', ga: '' };
                 injectTrackingScripts(integrations);
 
+                // ==========================================================
+                // 7. Vérification du mode maintenance
+                // ==========================================================
                 if (data.maintenance === true) {
                     const publicView = document.getElementById('view-profile-public');
                     publicView.innerHTML = `
@@ -5316,12 +5363,15 @@
                     return;
                 }
 
+                // ==========================================================
+                // 8. Rendu du profil public (avatar, nom, bio, liens...)
+                // ==========================================================
                 const avatar = document.getElementById('public-avatar');
-                avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
+                avatar.src = avatarUrl;
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
 
-                document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
-                document.getElementById('public-bio-text').textContent = data.bio || '';
+                document.getElementById('public-name').textContent = displayName;
+                document.getElementById('public-bio-text').textContent = bio;
 
                 const isOwnerAdmin = await checkIsAdmin(uid);
                 let statusBadge = document.getElementById('public-status-badge');
@@ -5523,7 +5573,7 @@
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
 
                 window._vcardData = {
-                    displayName: data.displayName || 'Utilisateur',
+                    displayName: displayName,
                     links: data.links || []
                 };
 
@@ -6154,12 +6204,8 @@
                 modal.classList.remove('active');
             });
 
-            // ===== CONFIGURATION DE LA MODALE DE SIGNALEMENT DE BUG =====
             setupBugReportModal();
 
-            // ============================================================
-            // CORRECTION : BOUTON FERMER DE LA MODALE DONATION
-            // ============================================================
             const closeDonationBtn = document.getElementById('close-donation-modal');
             const donationModal = document.getElementById('donation-modal');
 
@@ -6607,18 +6653,18 @@ URL:${urlProfil}
 
     })();
 </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(function(reg) {
-                        console.log('Service Worker enregistré avec succès.');
-                    })
-                    .catch(function(err) {
-                        console.warn('Erreur lors de l\'enregistrement du Service Worker:', err);
-                    });
-            });
-        }
-    </script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function(reg) {
+                    console.log('Service Worker enregistré avec succès.');
+                })
+                .catch(function(err) {
+                    console.warn('Erreur lors de l\'enregistrement du Service Worker:', err);
+                });
+        });
+    }
+</script>
 </body>
-</html>
+</html>z
