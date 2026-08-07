@@ -23,9 +23,11 @@
         }
     </script>
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="Mon Site - Espace Personnel & Dashboard">
-    <meta property="og:description" content="Bienvenue sur mon site internet. Découvrez mon profil, mes projets et mes liens officiels.">
+    <!-- ============================================================ -->
+    <!-- BALISES OPEN GRAPH (DYNAMIQUES - SERONT MISES À JOUR PAR JS) -->
+    <!-- ============================================================ -->
+    <meta property="og:title" content="LinkExt - Espace Personnel">
+    <meta property="og:description" content="Bienvenue sur mon profil LinkExt. Découvrez mes liens et projets.">
     <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
     <meta property="og:url" content="https://linkext.example.com">
     <meta property="og:type" content="website">
@@ -507,6 +509,26 @@
         .dashboard-actions .donate-btn:hover {
             transform: scale(1.02);
             box-shadow: 0 0 30px rgba(255, 210, 0, 0.5);
+        }
+
+        /* --- Bouton Signaler un bug (ajout) --- */
+        .dashboard-actions .bug-report-btn {
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            flex: 0.5;
+            min-width: 60px;
+            justify-content: center;
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+        .dashboard-actions .bug-report-btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(0,242,254,0.05);
         }
 
         /* ===== VUE AJOUT DE LIEN (plein écran) ===== */
@@ -1849,6 +1871,103 @@
             transform: scale(1.1);
         }
 
+        /* ===== ADMIN DASHBOARD (NOUVEAU) ===== */
+        .admin-dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+        .admin-dashboard-grid .admin-stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.8rem;
+            text-align: center;
+        }
+        .admin-dashboard-grid .admin-stat-card .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            color: var(--cyan);
+        }
+        .admin-dashboard-grid .admin-stat-card .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .admin-dashboard-grid .admin-stat-card .stat-icon {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+
+        .bug-report-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+        .bug-report-item .bug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+        .bug-report-item .bug-message {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+        .bug-report-item .bug-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.3rem;
+        }
+        .bug-report-item .bug-actions button {
+            background: transparent;
+            border: none;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .bug-report-item .bug-actions .resolve-btn {
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        .bug-report-item .bug-actions .resolve-btn:hover {
+            background: var(--success);
+            color: #0a0b10;
+        }
+        .bug-report-item .bug-actions .delete-bug-btn {
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        .bug-report-item .bug-actions .delete-bug-btn:hover {
+            background: var(--danger);
+            color: #0a0b10;
+        }
+        .bug-report-item .bug-status {
+            font-size: 0.65rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+        }
+        .bug-report-item .bug-status.resolved {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        .bug-report-item .bug-status.pending {
+            background: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+        }
+
         /* ===== QR LIGHTBOX ===== */
         .qr-lightbox .modal-content {
             max-width: 500px;
@@ -2112,6 +2231,51 @@
             color: var(--cyan);
         }
 
+        /* ============================================================ */
+        /* STYLES POUR LA MODALE DE SIGNALEMENT DE BUG                   */
+        /* ============================================================ */
+        .bug-report-modal .modal-content {
+            max-width: 420px;
+            text-align: left;
+        }
+        .bug-report-modal .modal-content textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 0.8rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: var(--font-body);
+            outline: none;
+            transition: var(--transition);
+            resize: vertical;
+            margin: 0.5rem 0 1rem 0;
+        }
+        .bug-report-modal .modal-content textarea:focus {
+            border-color: var(--cyan);
+        }
+        .bug-report-modal .modal-content .btn {
+            width: 100%;
+        }
+        .bug-report-modal .modal-content .close-modal {
+            margin-top: 0.5rem;
+        }
+        .bug-report-modal .modal-content .char-counter {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: -0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .bug-report-modal .modal-content .bug-success {
+            color: var(--success);
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .dashboard-container .dashboard-header { padding: 0.5rem 0.8rem; }
@@ -2123,17 +2287,20 @@
             .dashboard-actions .btn,
             .dashboard-actions .donate-btn { font-size: 0.6rem; padding: 0.3rem 0.6rem; min-width: 60px; }
             .dashboard-actions { padding: 0.2rem 0.3rem; }
+            .dashboard-actions .bug-report-btn { font-size: 0.55rem; padding: 0.25rem 0.4rem; min-width: 50px; }
             .glass-card:not(.dashboard-container) { padding: 1rem; max-width: 100%; border-radius: 0; margin: 0; }
             #view-dashboard { padding: 0 !important; }
             #view-add-link .glass-card { padding: 0.8rem; }
             .public-header { padding: 0.8rem 1rem; }
             #public-links { padding: 0 0.5rem; }
             .testimonials-carousel .testimonial-slide { min-width: calc(100% - 0.4rem); padding: 0.8rem 0.6rem; }
+            .admin-dashboard-grid { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
         }
         @media (max-width: 380px) {
             .dashboard-nav .nav-item { font-size: 0.45rem; padding: 0.1rem 0.2rem; min-width: 30px; }
             .dashboard-nav .nav-item i { font-size: 0.8rem; }
             .dashboard-nav .nav-item span { font-size: 0.4rem; }
+            .admin-dashboard-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -2373,6 +2540,8 @@
             <!-- ===== BOUTONS D'ACTION ===== -->
             <div class="dashboard-actions">
                 <button class="btn" id="save-dashboard-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                <!-- ===== BOUTON SIGNALER UN BUG (AJOUT) ===== -->
+                <button class="bug-report-btn" id="bug-report-btn"><i class="fas fa-bug"></i> Bug</button>
                 <button class="donate-btn" id="donate-btn"><i class="fas fa-heart"></i> Soutenir</button>
             </div>
 
@@ -2459,6 +2628,20 @@
             <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1rem;">Merci de soutenir la plateforme ! Voici les coordonnées de don.</p>
             <div id="donation-methods-container"><span class="spinner"></span> Chargement...</div>
             <button class="close-modal" id="close-donation-modal">Fermer</button>
+        </div>
+    </div>
+
+    <!-- ===== MODALE SIGNALEMENT DE BUG (AJOUT) ===== -->
+    <div class="modal-overlay bug-report-modal" id="bug-report-modal">
+        <div class="modal-content">
+            <h3 style="font-family:var(--font-heading);"><i class="fas fa-bug"></i> Signaler un bug</h3>
+            <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:0.5rem;">Décrivez précisément le problème rencontré. Nous vous remercions de votre aide !</p>
+            <textarea id="bug-report-text" placeholder="Décrivez le bug ou votre suggestion... (min. 10 caractères)" maxlength="1000"></textarea>
+            <div class="char-counter"><span id="bug-char-count">0</span> / 1000 caractères</div>
+            <div id="bug-report-error" style="color:var(--danger); font-size:0.8rem; display:none; margin-bottom:0.5rem;">Veuillez décrire le problème (minimum 10 caractères).</div>
+            <div id="bug-report-success" class="bug-success">✅ Rapport envoyé ! Merci pour votre aide.</div>
+            <button class="btn" id="bug-report-submit"><i class="fas fa-paper-plane"></i> Envoyer</button>
+            <button class="close-modal" id="bug-report-close">Fermer</button>
         </div>
     </div>
 
@@ -2589,35 +2772,23 @@
             const trimmed = url.trim();
             if (!trimmed) return false;
 
-            // Autoriser explicitement les liens Telegram avec le format t.me/+...
             if (/^https?:\/\/t\.me\/\+?[A-Za-z0-9_\-]+$/.test(trimmed)) {
                 return true;
             }
-
-            // Autoriser les liens Telegram classiques
             if (/^https?:\/\/t\.me\/[A-Za-z0-9_\-]+$/.test(trimmed)) {
                 return true;
             }
-
-            // Autoriser les liens avec des paramètres de requête (ex: ?start=...)
             if (/^https?:\/\/t\.me\/[A-Za-z0-9_\-]+\?[A-Za-z0-9_\-=&]+$/.test(trimmed)) {
                 return true;
             }
 
-            // Validation générique d'URL pour les autres services
             try {
                 const urlObj = new URL(trimmed);
-                // Vérifier que le protocole est http ou https
                 if (!['http:', 'https:'].includes(urlObj.protocol)) return false;
-                // Vérifier que le domaine est valide (au moins un point ou localhost)
                 const hostname = urlObj.hostname;
                 if (!hostname || hostname === '') return false;
-                // Autoriser localhost pour le développement
                 if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
-                // Vérifier qu'il y a au moins un point dans le domaine (domaine valide)
-                // Et qu'il n'y a pas de caractères dangereux
                 if (!hostname.includes('.') && hostname !== 'localhost') return false;
-                // Vérifier que le domaine ne contient pas de caractères interdits
                 if (/[<>{}|\\^~\[\]`]/.test(hostname)) return false;
                 return true;
             } catch (e) {
@@ -2642,9 +2813,7 @@
                 const doc = await docRef.get();
                 if (doc.exists) {
                     const data = doc.data();
-                    // Fusionner intelligemment avec userProfile existant
                     const merged = { ...userProfile, ...data, _id: uid };
-                    // S'assurer que les liens sont corrects
                     if (merged.links && Array.isArray(merged.links)) {
                         merged.links = merged.links.map(l => {
                             if (typeof l.clicks !== 'number') l.clicks = 0;
@@ -2675,13 +2844,11 @@
                     userProfile = merged;
                     return userProfile;
                 } else {
-                    // Si le document n'existe pas, retourner null (mais ne pas écraser userProfile)
                     console.warn('Document Firestore introuvable pour', uid);
                     return null;
                 }
             } catch (error) {
                 console.warn('Erreur Firestore (lecture) :', error);
-                // En cas d'erreur (hors ligne), retourner les données locales si elles existent
                 if (userProfile && userProfile._id === uid) {
                     showToast('Profil chargé depuis le cache local.', 'info');
                     return userProfile;
@@ -2699,21 +2866,16 @@
             try {
                 const docRef = db.collection('users').doc(uid);
                 await docRef.set(data, { merge: true });
-                // Mise à jour locale réussie
                 userProfile = { ...userProfile, ...data, _id: uid };
                 return true;
             } catch (error) {
                 console.warn('Erreur Firestore (écriture) :', error);
-                // Échec de la sauvegarde cloud : on met à jour localement
                 userProfile = { ...userProfile, ...data, _id: uid };
                 showToast('Sauvegarde cloud échouée. Modifications locales conservées.', 'error');
                 return false;
             }
         }
 
-        /**
-         * Synchronise les données locales vers Firestore (appelé après reconnexion)
-         */
         async function syncLocalProfileToFirebase() {
             if (!currentUser || !userProfile) {
                 console.warn('Sync: Pas de données à synchroniser');
@@ -2729,6 +2891,28 @@
                 console.error('Erreur de synchronisation:', error);
                 showToast('Erreur lors de la synchronisation.', 'error');
                 return false;
+            }
+        }
+
+        // ============================================================
+        // ANALYTICS (SYSTÈME DE SUIVI) - NOUVEAU
+        // ============================================================
+        async function logAnalyticsEvent(eventType, details = {}) {
+            try {
+                const eventData = {
+                    event: eventType,
+                    userId: currentUser ? currentUser.uid : 'anonymous',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    userAgent: navigator.userAgent,
+                    ...details
+                };
+                // Ajouter l'URL de la page si disponible
+                eventData.pageUrl = window.location.href;
+
+                await db.collection('analytics_events').add(eventData);
+                console.log('[Analytics] Événement enregistré:', eventType);
+            } catch (e) {
+                console.warn('[Analytics] Erreur lors de l\'enregistrement:', e);
             }
         }
 
@@ -2988,6 +3172,7 @@
                 await db.collection('admin_config').doc('status').set({ currentStatus: newStatus }, { merge: true });
                 showToast('Statut administrateur mis à jour !', 'info');
                 addAdminLog('Changement de statut administrateur : ' + newStatus);
+                logAnalyticsEvent('changement_theme', { theme: 'admin_status', status: newStatus });
             } catch (e) {
                 console.error('Erreur mise à jour statut admin:', e);
                 showToast('Erreur lors de la mise à jour du statut.', 'error');
@@ -3056,6 +3241,7 @@
                                 try {
                                     await db.collection('links').doc(id).update({ label, url, icon });
                                     showToast('Lien mis à jour !', 'info');
+                                    logAnalyticsEvent('modification_profil', { action: 'admin_update_link' });
                                 } catch (e) {
                                     console.error(e);
                                     showToast('Erreur de mise à jour.', 'error');
@@ -3069,6 +3255,7 @@
                                 try {
                                     await db.collection('links').doc(id).delete();
                                     showToast('Lien supprimé.', 'info');
+                                    logAnalyticsEvent('modification_profil', { action: 'admin_delete_link' });
                                 } catch (e) {
                                     console.error(e);
                                     showToast('Erreur de suppression.', 'error');
@@ -3086,6 +3273,7 @@
                                     order: order
                                 });
                                 showToast('Lien ajouté.', 'info');
+                                logAnalyticsEvent('ajout_lien', { action: 'admin_add_link' });
                             } catch (e) {
                                 console.error(e);
                                 showToast('Erreur d\'ajout.', 'error');
@@ -3294,6 +3482,7 @@
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             updateThemeIcons();
             applyThemeToPrivateUI();
+            logAnalyticsEvent('changement_theme', { theme: isLight ? 'light' : 'dark' });
         }
 
         function applySavedTheme() {
@@ -3374,6 +3563,7 @@
                     const idx = parseInt(this.dataset.index);
                     userProfile.testimonials[idx].name = this.value;
                     saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
+                    logAnalyticsEvent('modification_profil', { action: 'edit_testimonial' });
                 });
             });
             container.querySelectorAll('.testimonial-msg-input').forEach(inp => {
@@ -3381,6 +3571,7 @@
                     const idx = parseInt(this.dataset.index);
                     userProfile.testimonials[idx].message = this.value;
                     saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
+                    logAnalyticsEvent('modification_profil', { action: 'edit_testimonial' });
                 });
             });
             container.querySelectorAll('.testimonial-stars-select').forEach(sel => {
@@ -3388,6 +3579,7 @@
                     const idx = parseInt(this.dataset.index);
                     userProfile.testimonials[idx].stars = parseInt(this.value);
                     saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
+                    logAnalyticsEvent('modification_profil', { action: 'edit_testimonial' });
                 });
             });
             container.querySelectorAll('.testimonial-upload-img').forEach(btn => {
@@ -3400,6 +3592,7 @@
                             saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
                             renderTestimonialsPrivate();
                             showToast('Image ajoutée au témoignage !', 'info');
+                            logAnalyticsEvent('modification_profil', { action: 'edit_testimonial' });
                         }
                     });
                 });
@@ -3411,6 +3604,7 @@
                         userProfile.testimonials.splice(idx, 1);
                         saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
                         renderTestimonialsPrivate();
+                        logAnalyticsEvent('modification_profil', { action: 'delete_testimonial' });
                     }
                 });
             });
@@ -3424,7 +3618,6 @@
             container.innerHTML = '';
             if (!testimonials || testimonials.length === 0) return;
 
-            // Nettoyer l'ancien intervalle
             if (carouselInterval) {
                 clearInterval(carouselInterval);
                 carouselInterval = null;
@@ -3454,7 +3647,6 @@
 
             carousel.appendChild(track);
 
-            // Contrôles
             if (testimonials.length > 1) {
                 const controls = document.createElement('div');
                 controls.className = 'carousel-controls';
@@ -3482,7 +3674,6 @@
                     track.style.transition = smooth ? 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none';
                     track.style.transform = `translateX(-${carouselCurrentIndex * slideWidth}px)`;
                     if (!smooth) {
-                        // Forcer le reflow
                         void track.offsetHeight;
                         track.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                     }
@@ -3510,7 +3701,6 @@
                     resetAutoPlay();
                 });
 
-                // Auto-play
                 function startAutoPlay() {
                     if (carouselInterval) clearInterval(carouselInterval);
                     carouselInterval = setInterval(nextSlide, 5000);
@@ -3524,7 +3714,6 @@
                     startAutoPlay();
                 }
 
-                // Support du glissement (touch)
                 let touchStartX = 0;
                 let touchEndX = 0;
                 let isDragging = false;
@@ -3553,7 +3742,6 @@
                     }
                 }, { passive: true });
 
-                // Pause au survol
                 carousel.addEventListener('mouseenter', () => {
                     if (carouselInterval) {
                         clearInterval(carouselInterval);
@@ -3562,15 +3750,12 @@
                 });
                 carousel.addEventListener('mouseleave', startAutoPlay);
 
-                // Ajustement au redimensionnement
                 window.addEventListener('resize', () => {
                     goTo(carouselCurrentIndex, false);
                 });
 
-                // Démarrer l'auto-play
                 startAutoPlay();
 
-                // Initialiser la position
                 setTimeout(() => {
                     goTo(0, false);
                 }, 100);
@@ -3616,6 +3801,7 @@
                     else if (this.classList.contains('schedule-end')) schedule.end = this.value;
                     saveUserProfile(currentUser.uid, { schedules: userProfile.schedules }).catch(() => {});
                     updateScheduledStatus();
+                    logAnalyticsEvent('modification_profil', { action: 'edit_schedule' });
                 });
             });
 
@@ -3627,6 +3813,7 @@
                         saveUserProfile(currentUser.uid, { schedules: userProfile.schedules }).catch(() => {});
                         renderSchedules();
                         updateScheduledStatus();
+                        logAnalyticsEvent('modification_profil', { action: 'delete_schedule' });
                     }
                 });
             });
@@ -3667,12 +3854,47 @@
         }
 
         // ============================================================
-        // ADMIN PANEL
+        // ADMIN PANEL COMPLET AVEC TABLEAU DE BORD ADMIN (NOUVEAU)
         // ============================================================
         function renderFullAdminPanel() {
             const container = document.getElementById('admin-panel-container');
             container.innerHTML = `
                 <div class="admin-panel">
+                    <!-- ===== TABLEAU DE BORD ADMIN (NOUVEAU) ===== -->
+                    <div class="admin-field" style="border-bottom:1px solid var(--border-glow); padding-bottom:0.8rem; margin-bottom:0.8rem;">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-dashboard"></i> Tableau de bord administrateur</h4>
+                        <div id="admin-dashboard-stats" class="admin-dashboard-grid">
+                            <div class="admin-stat-card">
+                                <div class="stat-icon"><i class="fas fa-bug"></i></div>
+                                <div class="stat-number" id="admin-stat-bugs">0</div>
+                                <div class="stat-label">Rapports de bugs</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="stat-icon"><i class="fas fa-flag"></i></div>
+                                <div class="stat-number" id="admin-stat-resolved">0</div>
+                                <div class="stat-label">Résolus</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                                <div class="stat-number" id="admin-stat-users">0</div>
+                                <div class="stat-label">Utilisateurs</div>
+                            </div>
+                            <div class="admin-stat-card">
+                                <div class="stat-icon"><i class="fas fa-chart-simple"></i></div>
+                                <div class="stat-number" id="admin-stat-events">0</div>
+                                <div class="stat-label">Événements</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== LISTE DES RAPPORTS DE BUGS (NOUVEAU) ===== -->
+                    <div class="admin-field" style="border-bottom:1px solid var(--border-glow); padding-bottom:0.8rem; margin-bottom:0.8rem;">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-list-ul"></i> Rapports de bugs</h4>
+                        <div id="admin-bug-reports-container">
+                            <span class="spinner"></span> Chargement...
+                        </div>
+                    </div>
+
                     <div class="admin-field" id="admin-donations-section">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-coins"></i> Coordonnées de paiement</h4>
                         <div id="admin-donations-container"></div>
@@ -3692,12 +3914,277 @@
                 </div>
             `;
 
+            // Charger les données du tableau de bord admin
+            loadAdminDashboardStats();
+
+            // Charger les rapports de bugs
+            loadBugReports();
+
             loadDonationAdminPanel();
             renderAdminLinks();
             loadAdminLogs(10);
             renderThemeManager();
         }
 
+        // ============================================================
+        // TABLEAU DE BORD ADMIN - STATISTIQUES (NOUVEAU)
+        // ============================================================
+        let adminStatsUnsubscribe = null;
+
+        function loadAdminDashboardStats() {
+            // Charger le nombre d'utilisateurs
+            db.collection('users').get().then((snapshot) => {
+                const count = snapshot.size;
+                document.getElementById('admin-stat-users').textContent = count;
+            }).catch(() => {
+                document.getElementById('admin-stat-users').textContent = '?';
+            });
+
+            // Charger le nombre d'événements analytics
+            db.collection('analytics_events').get().then((snapshot) => {
+                document.getElementById('admin-stat-events').textContent = snapshot.size;
+            }).catch(() => {
+                document.getElementById('admin-stat-events').textContent = '?';
+            });
+        }
+
+        // ============================================================
+        // GESTION DES RAPPORTS DE BUGS (NOUVEAU)
+        // ============================================================
+        let bugReportsUnsubscribe = null;
+
+        function loadBugReports() {
+            const container = document.getElementById('admin-bug-reports-container');
+            if (!container) return;
+
+            if (bugReportsUnsubscribe) {
+                bugReportsUnsubscribe();
+                bugReportsUnsubscribe = null;
+            }
+
+            container.innerHTML = '<span class="spinner"></span> Chargement des rapports...';
+
+            try {
+                bugReportsUnsubscribe = db.collection('bug_reports')
+                    .orderBy('timestamp', 'desc')
+                    .onSnapshot((snapshot) => {
+                        let html = '';
+                        let total = 0;
+                        let resolved = 0;
+
+                        if (snapshot.empty) {
+                            html = '<p style="color:var(--text-secondary); font-size:0.8rem;">Aucun rapport de bug pour le moment.</p>';
+                        } else {
+                            snapshot.forEach((doc) => {
+                                const data = doc.data();
+                                const id = doc.id;
+                                total++;
+                                if (data.status === 'resolved') resolved++;
+
+                                const date = data.timestamp?.toDate?.() || new Date(data.timestamp);
+                                const timeStr = date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                                const statusClass = data.status === 'resolved' ? 'resolved' : 'pending';
+                                const statusLabel = data.status === 'resolved' ? '✅ Résolu' : '⏳ En attente';
+
+                                html += `
+                                    <div class="bug-report-item" data-id="${id}">
+                                        <div class="bug-header">
+                                            <span><i class="fas fa-user"></i> ${data.userId || 'Anonyme'}</span>
+                                            <span>${timeStr}</span>
+                                            <span class="bug-status ${statusClass}">${statusLabel}</span>
+                                        </div>
+                                        <div class="bug-message">${data.message || 'Aucun message'}</div>
+                                        <div class="bug-actions">
+                                            ${data.status !== 'resolved' ? `<button class="resolve-btn" data-id="${id}"><i class="fas fa-check"></i> Marquer comme résolu</button>` : ''}
+                                            <button class="delete-bug-btn" data-id="${id}"><i class="fas fa-trash"></i> Supprimer</button>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        }
+
+                        // Mettre à jour les statistiques
+                        document.getElementById('admin-stat-bugs').textContent = total;
+                        document.getElementById('admin-stat-resolved').textContent = resolved;
+
+                        container.innerHTML = html;
+
+                        // Événements pour les boutons
+                        container.querySelectorAll('.resolve-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const id = this.dataset.id;
+                                resolveBugReport(id);
+                            });
+                        });
+                        container.querySelectorAll('.delete-bug-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const id = this.dataset.id;
+                                if (confirm('Supprimer ce rapport de bug définitivement ?')) {
+                                    deleteBugReport(id);
+                                }
+                            });
+                        });
+                    }, (err) => {
+                        console.error('Erreur listener bug_reports:', err);
+                        container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des rapports.</p>';
+                    });
+            } catch (e) {
+                console.error('Erreur lors de l\'écoute des rapports de bugs:', e);
+                container.innerHTML = '<p style="color:var(--text-secondary);">Erreur de chargement des rapports.</p>';
+            }
+        }
+
+        async function resolveBugReport(docId) {
+            try {
+                await db.collection('bug_reports').doc(docId).update({
+                    status: 'resolved',
+                    resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showToast('Rapport marqué comme résolu.', 'info');
+                addAdminLog('Rapport de bug résolu: ' + docId);
+                logAnalyticsEvent('modification_profil', { action: 'resolve_bug_report' });
+            } catch (e) {
+                console.error('Erreur lors de la résolution du bug:', e);
+                showToast('Erreur lors de la mise à jour.', 'error');
+            }
+        }
+
+        async function deleteBugReport(docId) {
+            try {
+                await db.collection('bug_reports').doc(docId).delete();
+                showToast('Rapport supprimé.', 'info');
+                addAdminLog('Rapport de bug supprimé: ' + docId);
+            } catch (e) {
+                console.error('Erreur lors de la suppression du rapport:', e);
+                showToast('Erreur lors de la suppression.', 'error');
+            }
+        }
+
+        // ============================================================
+        // MODALE DE SIGNALEMENT DE BUG (NOUVEAU)
+        // ============================================================
+        function setupBugReportModal() {
+            const modal = document.getElementById('bug-report-modal');
+            const textarea = document.getElementById('bug-report-text');
+            const charCount = document.getElementById('bug-char-count');
+            const errorDiv = document.getElementById('bug-report-error');
+            const successDiv = document.getElementById('bug-report-success');
+            const submitBtn = document.getElementById('bug-report-submit');
+            const closeBtn = document.getElementById('bug-report-close');
+
+            // Compteur de caractères
+            textarea.addEventListener('input', function() {
+                charCount.textContent = this.value.length;
+                if (this.value.length >= 10) {
+                    errorDiv.style.display = 'none';
+                }
+                if (this.value.length > 1000) {
+                    this.value = this.value.substring(0, 1000);
+                    charCount.textContent = 1000;
+                }
+            });
+
+            // Bouton Signaler un bug dans le dashboard
+            document.getElementById('bug-report-btn').addEventListener('click', function() {
+                if (!currentUser) {
+                    showToast('Connectez-vous pour signaler un bug.', 'error');
+                    return;
+                }
+                textarea.value = '';
+                charCount.textContent = '0';
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+                submitBtn.style.display = 'flex';
+                modal.classList.add('active');
+            });
+
+            // Soumettre le rapport
+            submitBtn.addEventListener('click', async function() {
+                const message = textarea.value.trim();
+                if (message.length < 10) {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'Veuillez décrire le problème (minimum 10 caractères).';
+                    return;
+                }
+
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner"></span> Envoi...';
+
+                try {
+                    await db.collection('bug_reports').add({
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email || 'unknown',
+                        message: message,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: 'pending',
+                        userAgent: navigator.userAgent,
+                        pageUrl: window.location.href
+                    });
+
+                    // Log analytics
+                    logAnalyticsEvent('modification_profil', { action: 'submit_bug_report' });
+
+                    successDiv.style.display = 'block';
+                    errorDiv.style.display = 'none';
+                    textarea.value = '';
+                    charCount.textContent = '0';
+
+                    setTimeout(() => {
+                        modal.classList.remove('active');
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer';
+                        successDiv.style.display = 'none';
+                    }, 2000);
+
+                } catch (e) {
+                    console.error('Erreur lors de l\'envoi du rapport:', e);
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'Erreur lors de l\'envoi. Veuillez réessayer.';
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer';
+                }
+            });
+
+            // Fermeture
+            closeBtn.addEventListener('click', function() {
+                modal.classList.remove('active');
+                textarea.value = '';
+                charCount.textContent = '0';
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer';
+            });
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    modal.classList.remove('active');
+                    textarea.value = '';
+                    charCount.textContent = '0';
+                    errorDiv.style.display = 'none';
+                    successDiv.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer';
+                }
+            });
+
+            // Fermeture avec Échap
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    modal.classList.remove('active');
+                    textarea.value = '';
+                    charCount.textContent = '0';
+                    errorDiv.style.display = 'none';
+                    successDiv.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer';
+                }
+            });
+        }
+
+        // ============================================================
+        // ADMIN - DONATIONS
+        // ============================================================
         function loadDonationAdminPanel() {
             const container = document.getElementById('admin-donations-container');
             loadDonationConfig().then((data) => {
@@ -3875,6 +4362,7 @@
                     const bgImg = container.querySelector('.bg-preview')?.src || '';
                     saveUserTheme(color, bgImg);
                     showToast('Style visuel appliqué !', 'info');
+                    logAnalyticsEvent('changement_theme', { theme: theme });
                 });
             }
 
@@ -3903,6 +4391,7 @@
                             });
                         }
                         showToast('Image de fond téléversée.', 'info');
+                        logAnalyticsEvent('changement_theme', { action: 'upload_background' });
                     }
                 });
             });
@@ -3912,6 +4401,7 @@
                 renderThemeManager();
                 applyUserTheme();
                 showToast('Image de fond supprimée.', 'info');
+                logAnalyticsEvent('changement_theme', { action: 'remove_background' });
             });
 
             document.getElementById('save-theme-btn')?.addEventListener('click', function() {
@@ -3922,6 +4412,7 @@
                 saveUserTheme(color, bgImg);
                 showToast('Thème enregistré !', 'info');
                 addAdminLog('Mise à jour du thème (admin)');
+                logAnalyticsEvent('changement_theme', { theme: visualTheme, color: color });
             });
         }
 
@@ -4031,6 +4522,7 @@
                         updateStats();
                     }
                 }
+                logAnalyticsEvent('clic_reseau_social', { linkId: linkId });
             } catch (error) {
                 console.warn('Impossible d\'incrémenter le clic :', error);
             }
@@ -4054,6 +4546,7 @@
                 if (userProfile && userProfile._id === uid) {
                     userProfile.subscribers = updated;
                 }
+                logAnalyticsEvent('modification_profil', { action: 'add_subscriber' });
                 return true;
             } catch (error) {
                 console.warn('Impossible d\'ajouter l\'abonné :', error);
@@ -4116,6 +4609,7 @@
             await saveUserProfile(currentUser.uid, { redirectUnique: newState });
             updateRedirectToggleState();
             showToast(newState ? 'Redirection unique activée !' : 'Redirection unique désactivée.', 'info');
+            logAnalyticsEvent('modification_profil', { action: 'toggle_redirect', state: newState });
         }
 
         // ============================================================
@@ -4263,6 +4757,7 @@
                             updateRedirectToggleState();
                             updateStats();
                             saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                            logAnalyticsEvent('modification_profil', { action: 'toggle_link', linkId: id });
                         }
                     } else if (btn.dataset.action === 'delete') {
                         if (confirm('Supprimer ce lien ?')) {
@@ -4273,6 +4768,7 @@
                             updateRedirectToggleState();
                             updateStats();
                             saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                            logAnalyticsEvent('modification_profil', { action: 'delete_link' });
                         }
                     }
                     return;
@@ -4290,6 +4786,7 @@
                     }
                     renderDashboardLinks();
                     saveUserProfile(currentUser.uid, { featuredLink: userProfile.featuredLink }).catch(() => {});
+                    logAnalyticsEvent('modification_profil', { action: 'feature_link' });
                     return;
                 }
                 const orderBtn = e.target.closest('[data-dir]');
@@ -4311,6 +4808,7 @@
                     renderDashboardLinks();
                     renderTopNetworks();
                     saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                    logAnalyticsEvent('modification_profil', { action: 'reorder_link' });
                 }
                 const resetBtn = e.target.closest('.reset-clicks-btn');
                 if (resetBtn) {
@@ -4327,6 +4825,7 @@
                         link.locked = !link.locked;
                         renderDashboardLinks();
                         saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                        logAnalyticsEvent('modification_profil', { action: 'toggle_lock', linkId: id });
                     }
                     return;
                 }
@@ -4340,6 +4839,7 @@
                             section.title = newTitle.trim() || 'Section';
                             renderDashboardLinks();
                             saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                            logAnalyticsEvent('modification_profil', { action: 'edit_section' });
                         }
                     }
                 }
@@ -4351,6 +4851,7 @@
                         renderDashboardLinks();
                         renderTopNetworks();
                         saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                        logAnalyticsEvent('modification_profil', { action: 'delete_section' });
                     }
                 }
             };
@@ -4555,6 +5056,7 @@
                             adminTab.classList.add('active');
                             document.getElementById('tab-admin').classList.add('active');
                             showToast('Accès administrateur accordé.', 'info');
+                            logAnalyticsEvent('modification_profil', { action: 'admin_login' });
                         } else {
                             adminTab.style.display = 'none';
                             if (adminStatusControl) adminStatusControl.style.display = 'none';
@@ -4594,6 +5096,7 @@
             } else {
                 if (currentUser) {
                     saveUserProfile(currentUser.uid, { status: value }).catch(() => {});
+                    logAnalyticsEvent('modification_profil', { action: 'change_status', status: value });
                 }
             }
         }
@@ -4607,6 +5110,7 @@
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(publicLink).then(() => {
                         showToast('Lien copié !', 'info');
+                        logAnalyticsEvent('clic_reseau_social', { action: 'copy_link' });
                     }).catch(() => {
                         copyFallback(publicLink);
                     });
@@ -4618,6 +5122,7 @@
             openBtn.onclick = function(e) {
                 e.preventDefault();
                 window.open(publicLink, '_blank');
+                logAnalyticsEvent('clic_reseau_social', { action: 'open_profile' });
             };
         }
 
@@ -4752,7 +5257,7 @@
         }
 
         // ============================================================
-        // ROUTAGE PUBLIC
+        // ROUTAGE PUBLIC AVEC OPEN GRAPH DYNAMIQUE (NOUVEAU)
         // ============================================================
         async function loadPublicProfile(uid) {
             if (!uid || uid === '') {
@@ -4768,6 +5273,30 @@
                 }
                 const data = doc.data();
                 await incrementViews(uid);
+
+                // ===== MISE À JOUR OPEN GRAPH (NOUVEAU) =====
+                const ogTitle = document.querySelector('meta[property="og:title"]');
+                const ogDesc = document.querySelector('meta[property="og:description"]');
+                const ogImage = document.querySelector('meta[property="og:image"]');
+
+                if (ogTitle) {
+                    ogTitle.content = data.displayName + ' - LinkExt' || 'LinkExt - Profil';
+                }
+                if (ogDesc) {
+                    ogDesc.content = data.bio || 'Découvrez le profil de ' + (data.displayName || 'cet utilisateur') + ' sur LinkExt.';
+                }
+                if (ogImage) {
+                    ogImage.content = data.photoURL || generateAvatarUrl(data.displayName || 'User');
+                }
+
+                // Mise à jour du titre de la page
+                document.title = data.displayName + ' - LinkExt' || 'LinkExt | Profil';
+
+                // Mise à jour des autres métadonnées
+                const descMeta = document.querySelector('meta[name="description"]');
+                if (descMeta) {
+                    descMeta.content = data.bio || 'Découvrez le profil de ' + (data.displayName || 'cet utilisateur') + ' sur LinkExt.';
+                }
 
                 const seo = data.seo || { title: '', description: '', keywords: '' };
                 injectSEO(seo);
@@ -4928,6 +5457,7 @@
 
                             window.open(sanitizeUrl(item.url), '_blank');
                             incrementLinkClick(uid, item.id).catch(() => {});
+                            logAnalyticsEvent('clic_reseau_social', { linkId: item.id, platform: item.platform });
                         };
                         card.addEventListener('click', handleCardClick);
 
@@ -4984,7 +5514,6 @@
                     });
                 }
 
-                // ===== TÉMOIGNAGES EN BAS =====
                 if (data.testimonials && data.testimonials.length > 0) {
                     renderPublicTestimonials(data.testimonials);
                 }
@@ -5039,6 +5568,7 @@
                 renderTopNetworks();
                 updateStats();
                 showToast('Clics du lien réinitialisés !', 'info');
+                logAnalyticsEvent('modification_profil', { action: 'reset_clicks' });
             } catch (error) {
                 console.error('Erreur lors de la réinitialisation du lien :', error);
                 showToast('Erreur lors de la réinitialisation.', 'error');
@@ -5061,6 +5591,7 @@
                 document.getElementById('views-count-display').textContent = '0';
                 updateStats();
                 showToast('Vues globales réinitialisées !', 'info');
+                logAnalyticsEvent('modification_profil', { action: 'reset_views' });
             } catch (error) {
                 console.error('Erreur lors de la réinitialisation :', error);
                 showToast('Erreur lors de la réinitialisation.', 'error');
@@ -5104,6 +5635,7 @@
             link.click();
             document.body.removeChild(link);
             showToast('Rapport exporté !', 'info');
+            logAnalyticsEvent('modification_profil', { action: 'export_report' });
         }
 
         // ============================================================
@@ -5168,15 +5700,18 @@
                 renderOnboardingGrid();
                 document.getElementById('onboarding-bio').value = '';
                 showView('view-onboarding');
+                logAnalyticsEvent('modification_profil', { action: 'onboarding_start' });
             } else if (profile.onboardingCompleted !== true) {
                 selectedOnboardingPlatforms.clear();
                 onboardingUrls = {};
                 renderOnboardingGrid();
                 document.getElementById('onboarding-bio').value = profile.bio || '';
                 showView('view-onboarding');
+                logAnalyticsEvent('modification_profil', { action: 'onboarding_resume' });
             } else {
                 showView('view-dashboard');
                 await populateDashboard();
+                logAnalyticsEvent('modification_profil', { action: 'dashboard_load' });
             }
         }
 
@@ -5355,6 +5890,7 @@
                 showView('view-dashboard');
                 await populateDashboard();
                 showToast('Profil créé avec succès (sauvegarde en cours).', 'info');
+                logAnalyticsEvent('modification_profil', { action: 'onboarding_skip' });
             });
 
             document.getElementById('finish-onboarding-btn').addEventListener('click', async () => {
@@ -5408,6 +5944,7 @@
                 }
                 showView('view-dashboard');
                 await populateDashboard();
+                logAnalyticsEvent('ajout_lien', { count: links.length, action: 'onboarding_finish' });
             });
 
             document.getElementById('add-link-btn').addEventListener('click', () => {
@@ -5482,6 +6019,7 @@
                     updateRedirectToggleState();
                     updateStats();
                     renderSubscribers();
+                    logAnalyticsEvent('modification_profil', { action: 'save_dashboard' });
                 }
             });
 
@@ -5516,8 +6054,13 @@
                     clearInterval(carouselInterval);
                     carouselInterval = null;
                 }
+                if (bugReportsUnsubscribe) {
+                    bugReportsUnsubscribe();
+                    bugReportsUnsubscribe = null;
+                }
                 showView('view-consent');
                 showToast('Déconnecté. Vous devrez accepter les CGU à la prochaine connexion.', 'info');
+                logAnalyticsEvent('modification_profil', { action: 'logout' });
             });
 
             setupAvatarUpload();
@@ -5528,6 +6071,7 @@
                 updateMaintenanceUI(enabled);
                 if (currentUser) {
                     saveUserProfile(currentUser.uid, { maintenance: enabled }).catch(() => {});
+                    logAnalyticsEvent('modification_profil', { action: 'toggle_maintenance', state: enabled });
                 }
             });
 
@@ -5542,9 +6086,11 @@
 
             document.getElementById('visual-theme-select').addEventListener('change', function() {
                 applyVisualTheme(this.value);
+                logAnalyticsEvent('changement_theme', { theme: this.value });
             });
             document.getElementById('background-select').addEventListener('change', function() {
                 applyBackground(this.value);
+                logAnalyticsEvent('changement_theme', { background: this.value });
             });
 
             document.getElementById('flash-toggle').addEventListener('click', function() {
@@ -5588,6 +6134,7 @@
                 userProfile.testimonials.push({ name: '', message: '', stars: 5, imageUrl: '' });
                 renderTestimonialsPrivate();
                 saveUserProfile(currentUser.uid, { testimonials: userProfile.testimonials }).catch(() => {});
+                logAnalyticsEvent('modification_profil', { action: 'add_testimonial' });
             });
 
             document.getElementById('add-schedule-btn').addEventListener('click', () => {
@@ -5597,6 +6144,7 @@
                 renderSchedules();
                 saveUserProfile(currentUser.uid, { schedules: userProfile.schedules }).catch(() => {});
                 updateScheduledStatus();
+                logAnalyticsEvent('modification_profil', { action: 'add_schedule' });
             });
 
             document.getElementById('donate-btn').addEventListener('click', showDonationPopup);
@@ -5606,17 +6154,18 @@
                 modal.classList.remove('active');
             });
 
+            // ===== CONFIGURATION DE LA MODALE DE SIGNALEMENT DE BUG =====
+            setupBugReportModal();
+
             // ============================================================
             // CORRECTION : BOUTON FERMER DE LA MODALE DONATION
             // ============================================================
             const closeDonationBtn = document.getElementById('close-donation-modal');
             const donationModal = document.getElementById('donation-modal');
 
-            // Fonction de fermeture unifiée
             function closeDonationModal() {
                 if (donationModal) {
                     donationModal.classList.remove('active');
-                    // Nettoyer le listener de donation si nécessaire
                     if (donationUnsubscribe) {
                         donationUnsubscribe();
                         donationUnsubscribe = null;
@@ -5624,7 +6173,6 @@
                 }
             }
 
-            // Écouteur pour le bouton "Fermer"
             if (closeDonationBtn) {
                 closeDonationBtn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -5633,7 +6181,6 @@
                 });
             }
 
-            // Fermeture en cliquant sur l'arrière-plan sombre
             if (donationModal) {
                 donationModal.addEventListener('click', function(e) {
                     if (e.target === this) {
@@ -5642,7 +6189,6 @@
                 });
             }
 
-            // Fermeture avec la touche Échap (Escape)
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && donationModal && donationModal.classList.contains('active')) {
                     closeDonationModal();
@@ -5662,6 +6208,7 @@
                         document.getElementById('dashboard-avatar').src = url;
                         saveUserProfile(currentUser.uid, { photoURL: url }).catch(() => {});
                         showToast('Photo de profil mise à jour !', 'info');
+                        logAnalyticsEvent('modification_profil', { action: 'change_avatar' });
                     }
                 });
             });
@@ -5779,6 +6326,7 @@
                 showToast('Lien ajouté avec succès !', 'info');
                 showView('view-dashboard');
                 await populateDashboard();
+                logAnalyticsEvent('ajout_lien', { platform: selectedNetworkType });
             } catch (error) {
                 console.error('Erreur lors de l\'ajout :', error);
                 showToast('Erreur lors de l\'ajout du lien.', 'error');
@@ -5814,6 +6362,7 @@
             updateStats();
             saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
             showToast('Section ajoutée !', 'info');
+            logAnalyticsEvent('modification_profil', { action: 'add_section' });
         }
 
         function setupQRModal() {
@@ -5923,6 +6472,7 @@ URL:${urlProfil}
                 if (document.getElementById('view-dashboard').classList.contains('active')) {
                     renderSubscribers();
                 }
+                logAnalyticsEvent('clic_reseau_social', { action: 'gated_link_open' });
             });
 
             modal.addEventListener('click', (e) => {
@@ -5965,22 +6515,18 @@ URL:${urlProfil}
         // RECONNEXION INTELLIGENTE + BOUTON ACTUALISER
         // ============================================================
 
-        // 1. Écouteur d'événement 'online' – synchronisation intelligente
         window.addEventListener('online', async function() {
             console.log('[App] Reconnexion réseau détectée – Synchronisation des données');
 
-            // Tentative de synchronisation des données locales vers Firestore
             if (currentUser && userProfile) {
                 const synced = await syncLocalProfileToFirebase();
                 if (synced) {
-                    // Si la synchro a réussi, on rafraîchit le profil depuis Firestore
                     await loadUserProfile(currentUser.uid);
                     if (document.getElementById('view-dashboard').classList.contains('active')) {
                         populateDashboard();
                     }
                 }
             } else if (isPublicMode()) {
-                // Rechargement du profil public si nécessaire
                 const uid = getPublicUid();
                 if (uid) {
                     await loadPublicProfile(uid);
@@ -5989,7 +6535,6 @@ URL:${urlProfil}
             }
         });
 
-        // 2. Bouton "Actualiser" ajouté dynamiquement dans le share-module
         function addRefreshButton() {
             const shareModule = document.getElementById('share-module');
             if (!shareModule) return;
@@ -6016,7 +6561,6 @@ URL:${urlProfil}
                 const dashboardView = document.getElementById('view-dashboard');
                 if (dashboardView && dashboardView.classList.contains('active')) {
                     if (currentUser) {
-                        // Réinitialiser le listener pour forcer le rechargement
                         if (profileListenerUnsubscribe) {
                             profileListenerUnsubscribe();
                             profileListenerUnsubscribe = null;
