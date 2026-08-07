@@ -24,24 +24,13 @@
     </script>
 
     <!-- ============================================================ -->
-    <!-- BALISES OPEN GRAPH (STATIQUES PAR DÉFAUT - SERONT DYNAMISÉES PAR JS POUR LE PARTAGE) -->
+    <!-- BALISES OPEN GRAPH (DYNAMIQUES - SERONT MISES À JOUR PAR JS) -->
     <!-- ============================================================ -->
-    <!-- og:title sera mis à jour dynamiquement avec le nom de l'utilisateur -->
     <meta property="og:title" content="LinkExt - Espace Personnel">
-    <!-- og:description sera mis à jour dynamiquement avec la bio de l'utilisateur -->
     <meta property="og:description" content="Bienvenue sur mon profil LinkExt. Découvrez mes liens et projets.">
-    <!-- og:image utilisera un service d'image dynamique avec les paramètres de l'utilisateur -->
-    <meta property="og:image" content="https://og-image.vercel.app/LinkExt%20-%20Profil%20Utilisateur.png?theme=dark&md=1&fontSize=100px&images=https%3A%2F%2Fui-avatars.com%2Fapi%2F%3Fname%3DUser%26background%3D0a0b10%26color%3D00f2fe%26size%3D200">
-    <!-- og:url sera mis à jour dynamiquement avec l'URL complète -->
+    <meta property="og:image" content="https://ui-avatars.com/api/?name=LinkExt&background=0a0b10&color=00f2fe&size=200">
     <meta property="og:url" content="https://linkext.example.com">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="LinkExt">
-
-    <!-- Twitter Card (pour Twitter/X) -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="LinkExt - Espace Personnel">
-    <meta name="twitter:description" content="Bienvenue sur mon profil LinkExt. Découvrez mes liens et projets.">
-    <meta name="twitter:image" content="https://og-image.vercel.app/LinkExt%20-%20Profil%20Utilisateur.png?theme=dark&md=1&fontSize=100px&images=https%3A%2F%2Fui-avatars.com%2Fapi%2F%3Fname%3DUser%26background%3D0a0b10%26color%3D00f2fe%26size%3D200">
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2741,25 +2730,78 @@
         let carouselCurrentIndex = 0;
 
         // ============================================================
-        // FONCTION D'UTILITÉ POUR GÉNÉRER L'URL DE L'IMAGE OG DYNAMIQUE (NOUVEAU)
+        // VUES
         // ============================================================
-        function generateOgImageUrl(displayName, bio, photoURL) {
-            // Encoder les paramètres pour l'URL
-            const name = encodeURIComponent(displayName || 'Utilisateur LinkExt');
-            const description = encodeURIComponent(bio || 'Découvrez mon profil sur LinkExt');
-            
-            // Utiliser l'avatar de l'utilisateur ou un avatar par défaut
-            const avatarUrl = photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName || 'User')}&background=0a0b10&color=00f2fe&size=200`;
-            
-            // Construire l'URL de l'image dynamique avec Vercel OG Image
-            // On utilise une mise en page personnalisée avec le nom, la bio et l'avatar
-            const ogImageUrl = `https://og-image.vercel.app/${name}.png?theme=dark&md=1&fontSize=100px&images=${encodeURIComponent(avatarUrl)}&widths=200&heights=200&captions=${description}`;
-            
-            return ogImageUrl;
+        const views = {
+            consent: document.getElementById('view-consent'),
+            auth: document.getElementById('view-auth'),
+            onboarding: document.getElementById('view-onboarding'),
+            dashboard: document.getElementById('view-dashboard'),
+            addLink: document.getElementById('view-add-link'),
+            publicProfile: document.getElementById('view-profile-public')
+        };
+
+        function showView(viewId) {
+            const target = document.getElementById(viewId);
+            if (!target) return;
+            Object.values(views).forEach(v => v.classList.remove('active'));
+            target.classList.add('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function sanitizeUrl(url) {
+            if (!url) return '';
+            url = url.trim();
+            if (!/^https?:\/\//i.test(url)) return 'https://' + url;
+            return url;
         }
 
         // ============================================================
-        // FIRESTORE - LECTURE / ÉCRITURE
+        // CORRECTION : VALIDATION D'URL AMÉLIORÉE
+        // ============================================================
+        function isValidUrl(url) {
+            if (!url || typeof url !== 'string') return false;
+            const trimmed = url.trim();
+            if (!trimmed) return false;
+
+            if (/^https?:\/\/t\.me\/\+?[A-Za-z0-9_\-]+$/.test(trimmed)) {
+                return true;
+            }
+            if (/^https?:\/\/t\.me\/[A-Za-z0-9_\-]+$/.test(trimmed)) {
+                return true;
+            }
+            if (/^https?:\/\/t\.me\/[A-Za-z0-9_\-]+\?[A-Za-z0-9_\-=&]+$/.test(trimmed)) {
+                return true;
+            }
+
+            try {
+                const urlObj = new URL(trimmed);
+                if (!['http:', 'https:'].includes(urlObj.protocol)) return false;
+                const hostname = urlObj.hostname;
+                if (!hostname || hostname === '') return false;
+                if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+                if (!hostname.includes('.') && hostname !== 'localhost') return false;
+                if (/[<>{}|\\^~\[\]`]/.test(hostname)) return false;
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function generateAvatarUrl(name) {
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0a0b10&color=00f2fe&size=200`;
+        }
+
+        // ============================================================
+        // FIRESTORE - LECTURE / ÉCRITURE (CORRIGÉ)
         // ============================================================
         async function loadUserProfile(uid) {
             if (!uid || uid === '') {
@@ -2853,7 +2895,7 @@
         }
 
         // ============================================================
-        // ANALYTICS (SYSTÈME DE SUIVI)
+        // ANALYTICS (SYSTÈME DE SUIVI) - NOUVEAU
         // ============================================================
         async function logAnalyticsEvent(eventType, details = {}) {
             try {
@@ -2864,6 +2906,7 @@
                     userAgent: navigator.userAgent,
                     ...details
                 };
+                // Ajouter l'URL de la page si disponible
                 eventData.pageUrl = window.location.href;
 
                 await db.collection('analytics_events').add(eventData);
@@ -3568,7 +3611,7 @@
         }
 
         // ============================================================
-        // CARROUSEL TÉMOIGNAGES (public)
+        // CARROUSEL TÉMOIGNAGES (public) - auto-play + interactif
         // ============================================================
         function renderPublicTestimonials(testimonials) {
             const container = document.getElementById('public-testimonials');
@@ -3811,13 +3854,13 @@
         }
 
         // ============================================================
-        // ADMIN PANEL COMPLET AVEC TABLEAU DE BORD ADMIN
+        // ADMIN PANEL COMPLET AVEC TABLEAU DE BORD ADMIN (NOUVEAU)
         // ============================================================
         function renderFullAdminPanel() {
             const container = document.getElementById('admin-panel-container');
             container.innerHTML = `
                 <div class="admin-panel">
-                    <!-- ===== TABLEAU DE BORD ADMIN ===== -->
+                    <!-- ===== TABLEAU DE BORD ADMIN (NOUVEAU) ===== -->
                     <div class="admin-field" style="border-bottom:1px solid var(--border-glow); padding-bottom:0.8rem; margin-bottom:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-dashboard"></i> Tableau de bord administrateur</h4>
                         <div id="admin-dashboard-stats" class="admin-dashboard-grid">
@@ -3844,7 +3887,7 @@
                         </div>
                     </div>
 
-                    <!-- ===== LISTE DES RAPPORTS DE BUGS ===== -->
+                    <!-- ===== LISTE DES RAPPORTS DE BUGS (NOUVEAU) ===== -->
                     <div class="admin-field" style="border-bottom:1px solid var(--border-glow); padding-bottom:0.8rem; margin-bottom:0.8rem;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-list-ul"></i> Rapports de bugs</h4>
                         <div id="admin-bug-reports-container">
@@ -3871,8 +3914,12 @@
                 </div>
             `;
 
+            // Charger les données du tableau de bord admin
             loadAdminDashboardStats();
+
+            // Charger les rapports de bugs
             loadBugReports();
+
             loadDonationAdminPanel();
             renderAdminLinks();
             loadAdminLogs(10);
@@ -3880,11 +3927,12 @@
         }
 
         // ============================================================
-        // TABLEAU DE BORD ADMIN - STATISTIQUES
+        // TABLEAU DE BORD ADMIN - STATISTIQUES (NOUVEAU)
         // ============================================================
         let adminStatsUnsubscribe = null;
 
         function loadAdminDashboardStats() {
+            // Charger le nombre d'utilisateurs
             db.collection('users').get().then((snapshot) => {
                 const count = snapshot.size;
                 document.getElementById('admin-stat-users').textContent = count;
@@ -3892,6 +3940,7 @@
                 document.getElementById('admin-stat-users').textContent = '?';
             });
 
+            // Charger le nombre d'événements analytics
             db.collection('analytics_events').get().then((snapshot) => {
                 document.getElementById('admin-stat-events').textContent = snapshot.size;
             }).catch(() => {
@@ -3900,7 +3949,7 @@
         }
 
         // ============================================================
-        // GESTION DES RAPPORTS DE BUGS
+        // GESTION DES RAPPORTS DE BUGS (NOUVEAU)
         // ============================================================
         let bugReportsUnsubscribe = null;
 
@@ -3954,11 +4003,13 @@
                             });
                         }
 
+                        // Mettre à jour les statistiques
                         document.getElementById('admin-stat-bugs').textContent = total;
                         document.getElementById('admin-stat-resolved').textContent = resolved;
 
                         container.innerHTML = html;
 
+                        // Événements pour les boutons
                         container.querySelectorAll('.resolve-btn').forEach(btn => {
                             btn.addEventListener('click', function() {
                                 const id = this.dataset.id;
@@ -4010,7 +4061,7 @@
         }
 
         // ============================================================
-        // MODALE DE SIGNALEMENT DE BUG
+        // MODALE DE SIGNALEMENT DE BUG (NOUVEAU)
         // ============================================================
         function setupBugReportModal() {
             const modal = document.getElementById('bug-report-modal');
@@ -4021,6 +4072,7 @@
             const submitBtn = document.getElementById('bug-report-submit');
             const closeBtn = document.getElementById('bug-report-close');
 
+            // Compteur de caractères
             textarea.addEventListener('input', function() {
                 charCount.textContent = this.value.length;
                 if (this.value.length >= 10) {
@@ -4032,6 +4084,7 @@
                 }
             });
 
+            // Bouton Signaler un bug dans le dashboard
             document.getElementById('bug-report-btn').addEventListener('click', function() {
                 if (!currentUser) {
                     showToast('Connectez-vous pour signaler un bug.', 'error');
@@ -4045,6 +4098,7 @@
                 modal.classList.add('active');
             });
 
+            // Soumettre le rapport
             submitBtn.addEventListener('click', async function() {
                 const message = textarea.value.trim();
                 if (message.length < 10) {
@@ -4067,6 +4121,7 @@
                         pageUrl: window.location.href
                     });
 
+                    // Log analytics
                     logAnalyticsEvent('modification_profil', { action: 'submit_bug_report' });
 
                     successDiv.style.display = 'block';
@@ -4090,6 +4145,7 @@
                 }
             });
 
+            // Fermeture
             closeBtn.addEventListener('click', function() {
                 modal.classList.remove('active');
                 textarea.value = '';
@@ -4112,6 +4168,7 @@
                 }
             });
 
+            // Fermeture avec Échap
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && modal.classList.contains('active')) {
                     modal.classList.remove('active');
@@ -5200,7 +5257,7 @@
         }
 
         // ============================================================
-        // ROUTAGE PUBLIC AVEC OPEN GRAPH DYNAMIQUE (CORRIGÉ)
+        // ROUTAGE PUBLIC AVEC OPEN GRAPH DYNAMIQUE (NOUVEAU)
         // ============================================================
         async function loadPublicProfile(uid) {
             if (!uid || uid === '') {
@@ -5217,59 +5274,28 @@
                 const data = doc.data();
                 await incrementViews(uid);
 
-                // ===== MISE À JOUR OPEN GRAPH AVEC IMAGE DYNAMIQUE (CORRIGÉ) =====
-                const displayName = data.displayName || 'Utilisateur LinkExt';
-                const bio = data.bio || 'Découvrez mon profil sur LinkExt';
-                const photoURL = data.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0a0b10&color=00f2fe&size=200`;
-                const fullUrl = window.location.href;
-
-                // Générer l'URL de l'image OG dynamique
-                const ogImageUrl = generateOgImageUrl(displayName, bio, photoURL);
-
-                // Mettre à jour les balises OG
+                // ===== MISE À JOUR OPEN GRAPH (NOUVEAU) =====
                 const ogTitle = document.querySelector('meta[property="og:title"]');
-                if (ogTitle) {
-                    ogTitle.content = displayName + ' - LinkExt';
-                }
-
                 const ogDesc = document.querySelector('meta[property="og:description"]');
-                if (ogDesc) {
-                    ogDesc.content = bio;
-                }
-
                 const ogImage = document.querySelector('meta[property="og:image"]');
+
+                if (ogTitle) {
+                    ogTitle.content = data.displayName + ' - LinkExt' || 'LinkExt - Profil';
+                }
+                if (ogDesc) {
+                    ogDesc.content = data.bio || 'Découvrez le profil de ' + (data.displayName || 'cet utilisateur') + ' sur LinkExt.';
+                }
                 if (ogImage) {
-                    ogImage.content = ogImageUrl;
-                }
-
-                const ogUrl = document.querySelector('meta[property="og:url"]');
-                if (ogUrl) {
-                    ogUrl.content = fullUrl;
-                }
-
-                // Mise à jour des Twitter Cards
-                const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-                if (twitterTitle) {
-                    twitterTitle.content = displayName + ' - LinkExt';
-                }
-
-                const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-                if (twitterDesc) {
-                    twitterDesc.content = bio;
-                }
-
-                const twitterImage = document.querySelector('meta[name="twitter:image"]');
-                if (twitterImage) {
-                    twitterImage.content = ogImageUrl;
+                    ogImage.content = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 }
 
                 // Mise à jour du titre de la page
-                document.title = displayName + ' - LinkExt';
+                document.title = data.displayName + ' - LinkExt' || 'LinkExt | Profil';
 
-                // Mise à jour de la méta-description
+                // Mise à jour des autres métadonnées
                 const descMeta = document.querySelector('meta[name="description"]');
                 if (descMeta) {
-                    descMeta.content = bio;
+                    descMeta.content = data.bio || 'Découvrez le profil de ' + (data.displayName || 'cet utilisateur') + ' sur LinkExt.';
                 }
 
                 const seo = data.seo || { title: '', description: '', keywords: '' };
@@ -6128,8 +6154,12 @@
                 modal.classList.remove('active');
             });
 
+            // ===== CONFIGURATION DE LA MODALE DE SIGNALEMENT DE BUG =====
             setupBugReportModal();
 
+            // ============================================================
+            // CORRECTION : BOUTON FERMER DE LA MODALE DONATION
+            // ============================================================
             const closeDonationBtn = document.getElementById('close-donation-modal');
             const donationModal = document.getElementById('donation-modal');
 
