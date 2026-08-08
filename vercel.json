@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "functions": {
+    "api/og.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 10
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/og",
+      "dest": "/api/og.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/og.js"
+    }
+  ]
+}
