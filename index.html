@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     
-    <!-- ===== TITRE DYNAMIQUE (sera mis à jour par JS) ===== -->
+    <!-- ===== TITRE DYNAMIQUE (sera mis à jour par JS côté client) ===== -->
     <title>LinkExt - Centralisez vos réseaux et projets en un clic</title>
     <meta name="description" content="Découvrez LinkExt, la plateforme rapide et fluide pour regrouper tous vos canaux importants. Partagez votre profil facilement, accédez à vos canaux officiels.">
     <meta name="google-site-verification" content="ooXwXN9-cj9un9be55b_NAz3CdF_vx8r1pLHjxXBuA4" />
@@ -26,24 +26,19 @@
     </script>
 
     <!-- ============================================================ -->
-    <!-- BALISES OPEN GRAPH - SERONT MISES À JOUR DYNAMIQUEMENT        -->
+    <!-- BALISES OPEN GRAPH - PLACEHOLDERS (SERONT REMPLACÉES SERVEUR) -->
     <!-- ============================================================ -->
-    <!-- Ces balises sont statiques mais leur contenu sera remplacé   -->
-    <!-- par JavaScript via le DOM pour le partage social.            -->
-    <!-- L'image utilise Vercel OG Image pour générer une image       -->
-    <!-- dynamique avec le nom et la photo de l'utilisateur.          -->
-    <!-- ============================================================ -->
-    <meta property="og:title" content="LinkExt - Profil">
-    <meta property="og:description" content="Bienvenue sur mon profil LinkExt. Découvrez mes liens et projets.">
-    <meta property="og:image" content="https://og-image.vercel.app/LinkExt.png?theme=dark&md=1&fontSize=50px&images=https%3A%2F%2Fui-avatars.com%2Fapi%2F%3Fname%3DLinkExt%26background%3D0a0b10%26color%3D00f2fe%26size%3D200&width=1200&height=630">
+    <meta property="og:title" content="LinkExt - Placeholder">
+    <meta property="og:description" content="Placeholder - sera remplacé par le serveur">
+    <meta property="og:image" content="https://ui-avatars.com/api/?name=Placeholder&background=0a0b10&color=00f2fe&size=200">
     <meta property="og:url" content="https://linkext.example.com">
     <meta property="og:type" content="website">
     
     <!-- Twitter Cards (pour une meilleure compatibilité) -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="LinkExt - Profil">
-    <meta name="twitter:description" content="Bienvenue sur mon profil LinkExt.">
-    <meta name="twitter:image" content="https://og-image.vercel.app/LinkExt.png?theme=dark&md=1&fontSize=50px&images=https%3A%2F%2Fui-avatars.com%2Fapi%2F%3Fname%3DLinkExt%26background%3D0a0b10%26color%3D00f2fe%26size%3D200&width=1200&height=630">
+    <meta name="twitter:title" content="LinkExt - Placeholder">
+    <meta name="twitter:description" content="Placeholder - sera remplacé par le serveur">
+    <meta name="twitter:image" content="https://ui-avatars.com/api/?name=Placeholder&background=0a0b10&color=00f2fe&size=200">
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -5248,7 +5243,7 @@
         }
 
         // ============================================================
-        // ROUTAGE PUBLIC AVEC OPEN GRAPH DYNAMIQUE (CORRIGÉ)
+        // ROUTAGE PUBLIC AVEC OPEN GRAPH DYNAMIQUE (DÉSACTIVÉ CÔTÉ CLIENT)
         // ============================================================
         async function loadPublicProfile(uid) {
             if (!uid || uid === '') {
@@ -5266,91 +5261,14 @@
                 await incrementViews(uid);
 
                 // ==========================================================
-                // 1. Récupération des données utilisateur
+                // NOTE: Les balises Open Graph sont déjà injectées côté serveur
+                // par la fonction Vercel /api/og.js.
+                // Nous ne les modifions plus ici pour éviter les conflits.
                 // ==========================================================
-                const displayName = data.displayName || 'Utilisateur';
-                const bio = data.bio || '';
-                const avatarUrl = data.photoURL || generateAvatarUrl(displayName);
 
-                // ==========================================================
-                // 2. Construction de l'URL de l'image dynamique (Vercel OG Image)
-                // ==========================================================
-                // On encode correctement les paramètres pour l'URL
-                const encodedName = encodeURIComponent(displayName);
-                const encodedBio = encodeURIComponent(bio);
-                const encodedAvatar = encodeURIComponent(avatarUrl);
-
-                // On utilise Vercel OG Image avec un template personnalisé
-                // qui inclut le nom, la bio et l'avatar de l'utilisateur.
-                // L'image sera générée en temps réel.
-                const ogImageUrl = `https://og-image.vercel.app/${encodedName}%20-%20LinkExt.png?theme=dark&md=1&fontSize=50px&images=${encodedAvatar}&description=${encodedBio}&width=1200&height=630`;
-
-                // ==========================================================
-                // 3. Mise à jour des balises <meta> dans le <head>
-                // ==========================================================
-                // Titre de la page
-                document.title = displayName + ' - LinkExt';
-
-                // Balises Open Graph
-                const ogTitle = document.querySelector('meta[property="og:title"]');
-                if (ogTitle) {
-                    ogTitle.content = displayName + ' - LinkExt';
-                }
-
-                const ogDesc = document.querySelector('meta[property="og:description"]');
-                if (ogDesc) {
-                    ogDesc.content = bio || 'Découvrez le profil de ' + displayName + ' sur LinkExt.';
-                }
-
-                const ogImage = document.querySelector('meta[property="og:image"]');
-                if (ogImage) {
-                    ogImage.content = ogImageUrl;
-                }
-
-                const ogUrl = document.querySelector('meta[property="og:url"]');
-                if (ogUrl) {
-                    ogUrl.content = window.location.href;
-                }
-
-                // Balises Twitter Card
-                const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-                if (twitterTitle) {
-                    twitterTitle.content = displayName + ' - LinkExt';
-                }
-
-                const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-                if (twitterDesc) {
-                    twitterDesc.content = bio || 'Découvrez le profil de ' + displayName + ' sur LinkExt.';
-                }
-
-                const twitterImage = document.querySelector('meta[name="twitter:image"]');
-                if (twitterImage) {
-                    twitterImage.content = ogImageUrl;
-                }
-
-                // ==========================================================
-                // 4. Mise à jour du meta description standard
-                // ==========================================================
-                const descMeta = document.querySelector('meta[name="description"]');
-                if (descMeta) {
-                    descMeta.content = bio || 'Découvrez le profil de ' + displayName + ' sur LinkExt.';
-                }
-
-                // ==========================================================
-                // 5. Injection des paramètres SEO avancés si présents
-                // ==========================================================
-                const seo = data.seo || { title: '', description: '', keywords: '' };
-                injectSEO(seo);
-
-                // ==========================================================
-                // 6. Injection des scripts de tracking
-                // ==========================================================
                 const integrations = data.integrations || { metaPixel: '', ga: '' };
                 injectTrackingScripts(integrations);
 
-                // ==========================================================
-                // 7. Vérification du mode maintenance
-                // ==========================================================
                 if (data.maintenance === true) {
                     const publicView = document.getElementById('view-profile-public');
                     publicView.innerHTML = `
@@ -5363,15 +5281,12 @@
                     return;
                 }
 
-                // ==========================================================
-                // 8. Rendu du profil public (avatar, nom, bio, liens...)
-                // ==========================================================
                 const avatar = document.getElementById('public-avatar');
-                avatar.src = avatarUrl;
+                avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
 
-                document.getElementById('public-name').textContent = displayName;
-                document.getElementById('public-bio-text').textContent = bio;
+                document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
+                document.getElementById('public-bio-text').textContent = data.bio || '';
 
                 const isOwnerAdmin = await checkIsAdmin(uid);
                 let statusBadge = document.getElementById('public-status-badge');
@@ -5573,7 +5488,7 @@
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(urlProfil)}`;
 
                 window._vcardData = {
-                    displayName: displayName,
+                    displayName: data.displayName || 'Utilisateur',
                     links: data.links || []
                 };
 
