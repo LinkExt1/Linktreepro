@@ -1,14 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "query",
-          "key": "id"
-        }
-      ],
-      "destination": "/api/og"
+      "source": "/",
+      "destination": "/api/og.js"
+    },
+    {
+      "source": "/index.html",
+      "destination": "/api/og.js"
     }
   ]
 }
