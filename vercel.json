@@ -1,8 +1,19 @@
 {
-  "rewrites": [
+  "version": 2,
+  "routes": [
     {
-      "source": "/",
-      "destination": "/api/og"
+      "src": "/api/og.js",
+      "dest": "/api/og.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/og.js": {
+      "maxDuration": 10,
+      "memory": 256
+    }
+  }
 }
