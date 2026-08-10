@@ -1,73 +1,25 @@
 {
   "name": "LinkExt - Centralisez vos réseaux",
   "short_name": "LinkExt",
-  "description": "Regroupez tous vos canaux importants en un seul lien. Profil personnalisé, statistiques et partage facile.",
-  "start_url": "/?utm_source=pwa",
+  "description": "Centralisez tous vos liens et réseaux sociaux en un seul endroit.",
+  "start_url": "/Linktreepro/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0b10",
   "theme_color": "#00f2fe",
-  "categories": ["social", "productivity", "business"],
   "icons": [
     {
-      "src": "/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-192x192.png",
+      "src": "/Linktreepro/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512x512.png",
+      "src": "/Linktreepro/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshot-1.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide"
-    },
-    {
-      "src": "/screenshot-2.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "platform": "narrow"
-    }
-  ],
-  "related_applications": [],
-  "prefer_related_applications": false,
-  "display_override": ["standalone", "fullscreen"]
+  "prefer_related_applications": false
 }
