@@ -1,7 +1,15 @@
 {
-  "name": "linktreepro",
+  "name": "linkext-backend",
   "version": "1.0.0",
+  "description": "Serverless functions pour LinkExt - Vercel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
-    "firebase-admin": "^11.11.0"
+    "firebase-admin": "^11.11.1"
+  },
+  "devDependencies": {
+    "@vercel/node": "^2.15.10"
   }
 }
