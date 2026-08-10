@@ -11,14 +11,24 @@
     <meta name="robots" content="index, follow">
     <meta name="keywords" content="Dashboard, LinkExt, Projets, Contact">
     
-    <!-- ===== PWA - MANIFESTE CORRIGÉ ===== -->
-    <link rel="manifest" href="/Linktreepro/manifest.json">
+    <!-- ============================================================ -->
+    <!-- PWA - MANIFESTE ET SERVICE WORKER (INTÉGRÉS)                  -->
+    <!-- ============================================================ -->
+    <link rel="manifest" href="/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LinkExt">
     <link rel="apple-touch-icon" href="/icon-192x192.png">
+    
+    <!-- ===== THÈME DE LA BARRE D'ÉTAT ===== -->
+    <meta name="theme-color" content="#0a0b10">
+    <meta name="msapplication-TileColor" content="#0a0b10">
+    <meta name="msapplication-TileImage" content="/icon-192x192.png">
     
     <!-- ===== SÉCURITÉ ===== -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <script>
         if (window.top !== window.self) {
             window.top.location = window.self.location;
@@ -33,12 +43,15 @@
     <meta property="og:image" content="https://ui-avatars.com/api/?name=Placeholder&background=0a0b10&color=00f2fe&size=200">
     <meta property="og:url" content="https://linkext.example.com">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LinkExt">
+    <meta property="og:locale" content="fr_FR">
     
     <!-- Twitter Cards (pour une meilleure compatibilité) -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="LinkExt - Placeholder">
     <meta name="twitter:description" content="Placeholder - sera remplacé par le serveur">
     <meta name="twitter:image" content="https://ui-avatars.com/api/?name=Placeholder&background=0a0b10&color=00f2fe&size=200">
+    <meta name="twitter:site" content="@LinkExt">
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2306,6 +2319,17 @@
             .dashboard-nav .nav-item span { font-size: 0.4rem; }
             .admin-dashboard-grid { grid-template-columns: 1fr; }
         }
+
+        /* ===== STYLE PWA : MODE STANDALONE ===== */
+        body.pwa-standalone .dashboard-container .dashboard-header {
+            padding-top: env(safe-area-inset-top, 0.8rem);
+        }
+        body.pwa-standalone .dashboard-nav {
+            padding-bottom: env(safe-area-inset-bottom, 0.3rem);
+        }
+        body.pwa-standalone #view-profile-public .glass-card {
+            padding-bottom: env(safe-area-inset-bottom, 1.2rem);
+        }
     </style>
 </head>
 <body>
@@ -2666,10 +2690,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
+    // ============================================================
+    // VOTRE CODE JAVASCRIPT COMPLET ICI
+    // (Je conserve l'intégralité de votre code JS existant)
+    // ============================================================
     (function() {
-        // ============================================================
         // CONFIGURATION FIREBASE
-        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyD5nsm14JGZfjgQE1iDogJAEF6VV_gEHxw",
             authDomain: "linkext-83984.firebaseapp.com",
@@ -2767,9 +2793,6 @@
             return url;
         }
 
-        // ============================================================
-        // CORRECTION : VALIDATION D'URL AMÉLIORÉE
-        // ============================================================
         function isValidUrl(url) {
             if (!url || typeof url !== 'string') return false;
             const trimmed = url.trim();
@@ -2804,7 +2827,7 @@
         }
 
         // ============================================================
-        // FIRESTORE - LECTURE / ÉCRITURE (CORRIGÉ)
+        // FIRESTORE - LECTURE / ÉCRITURE
         // ============================================================
         async function loadUserProfile(uid) {
             if (!uid || uid === '') {
@@ -2898,7 +2921,7 @@
         }
 
         // ============================================================
-        // ANALYTICS (SYSTÈME DE SUIVI)
+        // ANALYTICS
         // ============================================================
         async function logAnalyticsEvent(eventType, details = {}) {
             try {
@@ -5260,11 +5283,7 @@
                 const data = doc.data();
                 await incrementViews(uid);
 
-                // ==========================================================
-                // NOTE: Les balises Open Graph sont déjà injectées côté serveur
-                // par la fonction Vercel /api/og.js.
-                // Nous ne les modifions plus ici pour éviter les conflits.
-                // ==========================================================
+                // NOTE: Les balises Open Graph sont injectées côté serveur
 
                 const integrations = data.integrations || { metaPixel: '', ga: '' };
                 injectTrackingScripts(integrations);
@@ -6568,18 +6587,79 @@ URL:${urlProfil}
 
     })();
 </script>
+
+<!-- ============================================================ -->
+<!-- ENREGISTREMENT DU SERVICE WORKER (PWA)                        -->
+<!-- ============================================================ -->
 <script>
+    // Enregistrement du Service Worker pour l'installation PWA
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/service-worker.js')
+            navigator.serviceWorker.register('/sw.js')
                 .then(function(reg) {
-                    console.log('Service Worker enregistré avec succès.');
+                    console.log('✅ Service Worker enregistré avec succès.');
+                    
+                    // Vérifier les mises à jour
+                    reg.addEventListener('updatefound', function() {
+                        const installingWorker = reg.installing;
+                        installingWorker.addEventListener('statechange', function() {
+                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('🔄 Nouvelle version disponible !');
+                                // Afficher une notification pour mettre à jour
+                                if (confirm('Une nouvelle version de l\'application est disponible. Voulez-vous la charger ?')) {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
                 })
                 .catch(function(err) {
-                    console.warn('Erreur lors de l\'enregistrement du Service Worker:', err);
+                    console.warn('⚠️ Erreur lors de l\'enregistrement du Service Worker:', err);
                 });
         });
     }
+
+    // Détection de l'installation PWA pour analytics
+    window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window.deferredPrompt = e;
+        console.log('📱 L\'application peut être installée');
+        
+        // Optionnel : Afficher un bouton personnalisé "Installer"
+        const installBtn = document.getElementById('install-app-btn');
+        if (installBtn) {
+            installBtn.style.display = 'flex';
+            installBtn.addEventListener('click', function() {
+                if (window.deferredPrompt) {
+                    window.deferredPrompt.prompt();
+                    window.deferredPrompt.userChoice.then(function(result) {
+                        if (result.outcome === 'accepted') {
+                            console.log('✅ Application installée avec succès');
+                            // Envoyer un événement analytics
+                            if (typeof gtag !== 'undefined') {
+                                gtag('event', 'pwa_install', { 'method': 'prompt' });
+                            }
+                        } else {
+                            console.log('❌ Installation refusée');
+                        }
+                        window.deferredPrompt = null;
+                    });
+                }
+            });
+        }
+    });
+
+    // Détecter l'ouverture depuis l'application installée
+    if (window.navigator.standalone) {
+        console.log('📱 Application ouverte en mode standalone (iOS)');
+        document.body.classList.add('pwa-standalone');
+    }
+    
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('📱 Application ouverte en mode standalone');
+        document.body.classList.add('pwa-standalone');
+    }
 </script>
+
 </body>
 </html>
