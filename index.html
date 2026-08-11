@@ -626,6 +626,13 @@
             border-radius: 30px;
             pointer-events: auto !important;
         }
+        .public-name-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
         .public-name {
             font-family: var(--font-heading);
             font-size: 1.4rem;
@@ -633,6 +640,20 @@
             text-align: center;
             margin: 0.2rem 0 0.05rem 0;
             letter-spacing: 0.5px;
+            display: inline;
+        }
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-left: 0.15rem;
+        }
+        .verified-badge svg {
+            width: 22px;
+            height: 22px;
+            fill: #1b8cff;
+            filter: drop-shadow(0 0 6px rgba(27, 140, 255, 0.5));
         }
         .public-bio-text {
             color: var(--text-secondary);
@@ -656,6 +677,65 @@
             margin: 0.6rem auto 0.8rem auto;
             opacity: 0.3;
             pointer-events: none;
+        }
+
+        /* ===== COMPTE À REBOURS SMART LINK ===== */
+        .smart-redirect-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+        .smart-redirect-overlay.active {
+            display: flex;
+        }
+        .smart-redirect-overlay .countdown-number {
+            font-family: var(--font-heading);
+            font-size: 6rem;
+            font-weight: 700;
+            color: var(--cyan);
+            text-shadow: 0 0 40px rgba(0, 242, 254, 0.5);
+            animation: countdownPulse 1s ease-in-out infinite;
+        }
+        @keyframes countdownPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+        .smart-redirect-overlay .countdown-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            text-align: center;
+        }
+        .smart-redirect-overlay .countdown-text .target-url {
+            color: var(--text-primary);
+            word-break: break-all;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            opacity: 0.7;
+        }
+        .smart-redirect-overlay .countdown-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .smart-redirect-overlay .countdown-progress .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--violet));
+            border-radius: 4px;
+            transition: width 0.1s linear;
+            width: 100%;
         }
 
         /* ===== LIENS PUBLICS ===== */
@@ -2237,6 +2317,88 @@
             color: var(--cyan);
         }
 
+        /* ===== BADGE ADMIN DANS L'ESPACE ADMIN ===== */
+        .badge-management {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+        .badge-management .search-user-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+        .badge-management .search-user-row input {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.5rem 0.8rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .badge-management .search-user-row input:focus {
+            border-color: var(--cyan);
+        }
+        .badge-management .search-user-row .btn {
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+        }
+        .badge-management .user-result-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.6rem 0.4rem;
+            border-bottom: 1px solid var(--border-glow);
+        }
+        .badge-management .user-result-item:last-child {
+            border-bottom: none;
+        }
+        .badge-management .user-result-item .user-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+        .badge-management .user-result-item .user-info .user-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .badge-management .user-result-item .user-info .user-id {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        .badge-management .user-result-item .badge-status {
+            font-size: 0.7rem;
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+        }
+        .badge-management .user-result-item .badge-status.verified {
+            background: rgba(27, 140, 255, 0.2);
+            color: #1b8cff;
+        }
+        .badge-management .user-result-item .badge-status.unverified {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-secondary);
+        }
+        .badge-management .user-result-item .btn {
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+        .badge-management .no-result {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 0.5rem 0;
+        }
+
         /* ===== BUG REPORT MODAL ===== */
         .bug-report-modal .modal-content {
             max-width: 420px;
@@ -2527,6 +2689,16 @@
                             Statut actuel : <span id="admin-current-status-display">-</span>
                         </div>
                     </div>
+                    <!-- ===== GESTION DES BADGES (NOUVEAU) ===== -->
+                    <div id="badge-management-container" class="badge-management" style="display:none;">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-certificate"></i> Gestion des Badges</h4>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.5rem;">Recherchez un utilisateur par son ID public pour attribuer ou retirer le badge de certification.</p>
+                        <div class="search-user-row">
+                            <input type="text" id="badge-search-input" placeholder="ID public de l'utilisateur...">
+                            <button class="btn btn-outline" id="badge-search-btn"><i class="fas fa-search"></i> Rechercher</button>
+                        </div>
+                        <div id="badge-search-results"></div>
+                    </div>
                     <div id="admin-panel-container"></div>
                 </div>
             </div>
@@ -2592,7 +2764,14 @@
                             <button class="btn btn-outline exclude-click" id="vcard-btn" style="padding:0.3rem 0.8rem;"><i class="fas fa-user-plus"></i></button>
                         </div>
                     </div>
-                    <h2 id="public-name" class="public-name">Utilisateur</h2>
+                    <div class="public-name-wrapper">
+                        <h2 id="public-name" class="public-name">Utilisateur</h2>
+                        <span id="public-verified-badge" class="verified-badge" style="display:none;">
+                            <svg viewBox="0 0 24 24" aria-label="Compte vérifié">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </span>
+                    </div>
                     <p id="public-bio-text" class="public-bio-text">Bio du profil</p>
                     <div class="public-status-wrap"><span id="public-status-badge" class="status-badge disponible"><span class="dot"></span> Disponible</span></div>
                 </div>
@@ -2603,6 +2782,21 @@
             </div>
         </a>
         <p class="text-center" style="font-size:0.7rem; color:var(--text-secondary); padding:0.4rem 0;">Propulsé par LinkExt</p>
+    </div>
+
+    <!-- ===== SMART LINK OVERLAY (COMPTE À REBOURS) ===== -->
+    <div class="smart-redirect-overlay" id="smart-redirect-overlay">
+        <div class="countdown-number" id="countdown-number">2</div>
+        <div class="countdown-text">
+            Redirection automatique vers votre lien...
+            <div class="target-url" id="countdown-target-url"></div>
+        </div>
+        <div class="countdown-progress">
+            <div class="progress-fill" id="countdown-progress-fill" style="width:100%;"></div>
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-secondary); opacity:0.5; margin-top:0.5rem;">
+            Cliquez sur le lien pour annuler et rediriger immédiatement
+        </div>
     </div>
 
     <!-- ===== MODALS ===== -->
@@ -2837,6 +3031,9 @@
                     }
                     if (typeof merged.views !== 'number') merged.views = 0;
                     if (typeof merged.redirectUnique !== 'boolean') merged.redirectUnique = false;
+                    if (typeof merged.verified !== 'boolean') merged.verified = false;
+                    if (typeof merged.total_views_month !== 'number') merged.total_views_month = 0;
+                    if (typeof merged.monthly_views_reset !== 'string') merged.monthly_views_reset = new Date().toISOString().slice(0, 7);
                     if (!merged.seo) merged.seo = { title: '', description: '', keywords: '' };
                     if (!merged.integrations) merged.integrations = { metaPixel: '', ga: '' };
                     if (!merged.flash) merged.flash = { active: false, message: '', color: 'red' };
@@ -3856,6 +4053,244 @@
         }
 
         // ============================================================
+        // BADGE DE CERTIFICATION - GESTION ADMIN
+        // ============================================================
+        function setupBadgeManagement() {
+            const searchInput = document.getElementById('badge-search-input');
+            const searchBtn = document.getElementById('badge-search-btn');
+            const resultsContainer = document.getElementById('badge-search-results');
+
+            if (!searchInput || !searchBtn || !resultsContainer) return;
+
+            async function searchUser() {
+                const query = searchInput.value.trim();
+                if (!query) {
+                    resultsContainer.innerHTML = '<div class="no-result">Veuillez saisir un ID public.</div>';
+                    return;
+                }
+
+                resultsContainer.innerHTML = '<span class="spinner"></span> Recherche...';
+
+                try {
+                    const snapshot = await db.collection('users').where('publicId', '==', query).limit(1).get();
+                    if (snapshot.empty) {
+                        resultsContainer.innerHTML = '<div class="no-result">Aucun utilisateur trouvé avec cet ID.</div>';
+                        return;
+                    }
+
+                    const doc = snapshot.docs[0];
+                    const data = doc.data();
+                    const uid = doc.id;
+                    const isVerified = data.verified === true;
+
+                    let html = `
+                        <div class="user-result-item">
+                            <div class="user-info">
+                                <div class="user-name">${data.displayName || 'Sans nom'}</div>
+                                <div class="user-id">ID: ${data.publicId || uid}</div>
+                                <div class="user-id" style="font-size:0.65rem; color:var(--text-secondary);">UID: ${uid}</div>
+                            </div>
+                            <span class="badge-status ${isVerified ? 'verified' : 'unverified'}">
+                                ${isVerified ? '✅ Vérifié' : '❌ Non vérifié'}
+                            </span>
+                            <button class="btn ${isVerified ? 'btn-outline' : ''}" id="toggle-badge-btn" style="padding:0.2rem 0.8rem; font-size:0.7rem; ${isVerified ? 'border-color:var(--danger); color:var(--danger);' : ''}">
+                                ${isVerified ? 'Retirer le badge' : 'Attribuer le badge'}
+                            </button>
+                        </div>
+                    `;
+                    resultsContainer.innerHTML = html;
+
+                    document.getElementById('toggle-badge-btn').addEventListener('click', async function() {
+                        const newState = !isVerified;
+                        try {
+                            await db.collection('users').doc(uid).update({ verified: newState });
+                            showToast(newState ? 'Badge attribué avec succès !' : 'Badge retiré avec succès.', 'info');
+                            addAdminLog(newState ? 'Badge attribué à ' + uid : 'Badge retiré de ' + uid);
+                            searchUser();
+                        } catch (err) {
+                            console.error(err);
+                            showToast('Erreur lors de la mise à jour du badge.', 'error');
+                        }
+                    });
+
+                } catch (err) {
+                    console.error(err);
+                    resultsContainer.innerHTML = '<div class="no-result">Erreur lors de la recherche.</div>';
+                }
+            }
+
+            searchBtn.addEventListener('click', searchUser);
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchUser();
+            });
+        }
+
+        // ============================================================
+        // BADGE DE CERTIFICATION - AFFICHAGE PUBLIC
+        // ============================================================
+        function updatePublicVerifiedBadge(verified) {
+            const badge = document.getElementById('public-verified-badge');
+            if (verified === true) {
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        // SMART LINK - REDIRECTION AUTOMATIQUE AVEC ANALYTICS
+        // ============================================================
+        let smartRedirectTimer = null;
+        let smartRedirectCountdown = null;
+        let smartRedirectCancelled = false;
+
+        function startSmartRedirect(uid, linkId, targetUrl) {
+            const overlay = document.getElementById('smart-redirect-overlay');
+            const numberEl = document.getElementById('countdown-number');
+            const progressEl = document.getElementById('countdown-progress-fill');
+            const targetUrlEl = document.getElementById('countdown-target-url');
+
+            // Annuler toute redirection précédente
+            cancelSmartRedirect();
+
+            smartRedirectCancelled = false;
+            targetUrlEl.textContent = targetUrl;
+            overlay.classList.add('active');
+
+            let countdown = 2;
+            numberEl.textContent = countdown;
+            progressEl.style.width = '100%';
+
+            // Incrémenter la vue du profil instantanément
+            incrementViews(uid).catch(() => {});
+
+            // Incrémenter le compteur mensuel pour le badge automatique
+            incrementMonthlyViews(uid).catch(() => {});
+
+            // Journaliser l'événement
+            logAnalyticsEvent('smart_redirect_start', { linkId: linkId });
+
+            smartRedirectTimer = setInterval(() => {
+                countdown -= 0.05;
+                if (countdown <= 0) {
+                    // Redirection terminée
+                    clearInterval(smartRedirectTimer);
+                    smartRedirectTimer = null;
+                    overlay.classList.remove('active');
+
+                    if (!smartRedirectCancelled) {
+                        // Incrémenter le clic avant la redirection
+                        incrementLinkClick(uid, linkId).catch(() => {});
+                        logAnalyticsEvent('smart_redirect_complete', { linkId: linkId });
+                        window.location.href = targetUrl;
+                    }
+                } else {
+                    numberEl.textContent = Math.ceil(countdown);
+                    progressEl.style.width = (countdown / 2 * 100) + '%';
+                }
+            }, 50);
+
+            // Gestionnaire pour annuler si l'utilisateur clique
+            const cancelHandler = (e) => {
+                if (!smartRedirectCancelled) {
+                    smartRedirectCancelled = true;
+                    cancelSmartRedirect();
+                    overlay.classList.remove('active');
+
+                    // Incrémenter le clic normalement
+                    incrementLinkClick(uid, linkId).catch(() => {});
+                    logAnalyticsEvent('smart_redirect_manual_click', { linkId: linkId });
+
+                    // Rediriger immédiatement
+                    window.location.href = targetUrl;
+                }
+            };
+
+            // Ajouter des écouteurs sur tous les liens cliquables de la page
+            const clickables = document.querySelectorAll('#public-links a, #public-links .rich-link-card, #public-links .link-action-bar');
+            clickables.forEach(el => {
+                el.addEventListener('click', cancelHandler, { once: true });
+            });
+
+            // Écouter aussi le clic sur l'overlay lui-même
+            overlay.addEventListener('click', cancelHandler, { once: true });
+
+            // Stocker les références pour nettoyage
+            overlay._cancelHandlers = clickables;
+            overlay._cancelHandler = cancelHandler;
+        }
+
+        function cancelSmartRedirect() {
+            if (smartRedirectTimer) {
+                clearInterval(smartRedirectTimer);
+                smartRedirectTimer = null;
+            }
+            const overlay = document.getElementById('smart-redirect-overlay');
+            overlay.classList.remove('active');
+
+            // Nettoyer les écouteurs
+            if (overlay._cancelHandlers) {
+                overlay._cancelHandlers.forEach(el => {
+                    el.removeEventListener('click', overlay._cancelHandler);
+                });
+                overlay._cancelHandlers = null;
+            }
+            if (overlay._cancelHandler) {
+                overlay._cancelHandler = null;
+            }
+        }
+
+        // ============================================================
+        // INCRÉMENTATION MENSUELLE DES VUES (pour badge automatique)
+        // ============================================================
+        async function incrementMonthlyViews(uid) {
+            if (!uid) return;
+            try {
+                const docRef = db.collection('users').doc(uid);
+                const doc = await docRef.get();
+                if (!doc.exists) return;
+
+                const data = doc.data();
+                const currentMonth = new Date().toISOString().slice(0, 7);
+                let totalViewsMonth = data.total_views_month || 0;
+                let monthlyReset = data.monthly_views_reset || currentMonth;
+
+                // Réinitialiser si le mois a changé
+                if (monthlyReset !== currentMonth) {
+                    totalViewsMonth = 0;
+                    monthlyReset = currentMonth;
+                }
+
+                totalViewsMonth += 1;
+
+                // Mettre à jour
+                await docRef.update({
+                    total_views_month: totalViewsMonth,
+                    monthly_views_reset: monthlyReset
+                });
+
+                // Vérifier si le seuil de 100 est atteint
+                if (totalViewsMonth >= 100 && data.verified !== true) {
+                    await docRef.update({ verified: true });
+                    showToast('🎉 Félicitations ! Vous avez dépassé 100 vues ce mois-ci. Badge de certification attribué automatiquement !', 'info');
+                    addAdminLog('Badge automatique attribué à ' + uid + ' (100+ vues mensuelles)');
+                    logAnalyticsEvent('auto_verified_badge', { uid: uid, views: totalViewsMonth });
+                }
+
+                if (userProfile && userProfile._id === uid) {
+                    userProfile.total_views_month = totalViewsMonth;
+                    userProfile.monthly_views_reset = monthlyReset;
+                    if (totalViewsMonth >= 100 && userProfile.verified !== true) {
+                        userProfile.verified = true;
+                    }
+                }
+
+            } catch (error) {
+                console.warn('Impossible d\'incrémenter les vues mensuelles :', error);
+            }
+        }
+
+        // ============================================================
         // ADMIN PANEL COMPLET AVEC TABLEAU DE BORD ADMIN
         // ============================================================
         function renderFullAdminPanel() {
@@ -3920,6 +4355,13 @@
             renderAdminLinks();
             loadAdminLogs(10);
             renderThemeManager();
+
+            // Afficher la gestion des badges
+            const badgeContainer = document.getElementById('badge-management-container');
+            if (badgeContainer) {
+                badgeContainer.style.display = 'block';
+                setupBadgeManagement();
+            }
         }
 
         // ============================================================
@@ -4666,7 +5108,7 @@
         }
 
         // ============================================================
-        // AFFICHAGE DES LIENS DANS LE DASHBOARD
+        // AFFICHAGE DES LIENS DANS LE DASHBOARD (AVEC BOUTON MODIFIER L'IMAGE)
         // ============================================================
         function renderDashboardLinks() {
             const container = document.getElementById('dashboard-links-container');
@@ -4724,6 +5166,11 @@
                         <button class="btn btn-outline lock-toggle-btn" data-id="${item.id}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
                             ${item.locked ? '🔓 Déverrouiller' : '🔒 Verrouiller'}
                         </button>
+                        <!-- NOUVEAU : Bouton Modifier l'image -->
+                        <button class="btn btn-outline change-link-image-btn" data-id="${item.id}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
+                            <i class="fas fa-image"></i> Image
+                        </button>
+                        ${item.imageUrl ? `<img src="${item.imageUrl}" style="width:24px; height:24px; border-radius:4px; object-fit:cover; border:1px solid var(--card-border);">` : ''}
                     `;
                     container.appendChild(div);
                 }
@@ -4812,6 +5259,26 @@
                         renderDashboardLinks();
                         saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                         logAnalyticsEvent('modification_profil', { action: 'toggle_lock', linkId: id });
+                    }
+                    return;
+                }
+                // NOUVEAU : Gestion du bouton "Modifier l'image"
+                const changeImageBtn = e.target.closest('.change-link-image-btn');
+                if (changeImageBtn) {
+                    const id = changeImageBtn.dataset.id;
+                    if (!id) return;
+                    const link = userProfile.links.find(l => l.id === id);
+                    if (link && !link.isSection) {
+                        openCloudinaryWidget({
+                            button: changeImageBtn,
+                            onSuccess: (url) => {
+                                link.imageUrl = url;
+                                saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                                renderDashboardLinks();
+                                showToast('Image du lien mise à jour !', 'info');
+                                logAnalyticsEvent('modification_profil', { action: 'change_link_image', linkId: id });
+                            }
+                        });
                     }
                     return;
                 }
@@ -4923,6 +5390,9 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    verified: false,
+                    total_views_month: 0,
+                    monthly_views_reset: new Date().toISOString().slice(0, 7),
                     seo: { title: '', description: '', keywords: '' },
                     integrations: { metaPixel: '', ga: '' },
                     flash: { active: false, message: '', color: 'red' },
@@ -5258,13 +5728,10 @@
                     return;
                 }
                 const data = doc.data();
-                await incrementViews(uid);
 
-                // ==========================================================
-                // NOTE: Les balises Open Graph sont déjà injectées côté serveur
-                // par la fonction Vercel /api/og.js.
-                // Nous ne les modifions plus ici pour éviter les conflits.
-                // ==========================================================
+                // Incrémenter les vues globales et mensuelles
+                await incrementViews(uid);
+                await incrementMonthlyViews(uid);
 
                 const integrations = data.integrations || { metaPixel: '', ga: '' };
                 injectTrackingScripts(integrations);
@@ -5287,6 +5754,9 @@
 
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
+
+                // Affichage du badge de certification
+                updatePublicVerifiedBadge(data.verified === true);
 
                 const isOwnerAdmin = await checkIsAdmin(uid);
                 let statusBadge = document.getElementById('public-status-badge');
@@ -5356,6 +5826,9 @@
                     wrapperLink.href = targetUrl;
                     wrapperLink.style.pointerEvents = 'auto';
                     wrapperLink.style.cursor = 'pointer';
+
+                    // Démarrer le compte à rebours SMART LINK
+                    startSmartRedirect(uid, activeLinks[0].id, targetUrl);
                 } else {
                     wrapperLink.href = '#';
                     wrapperLink.style.pointerEvents = 'none';
@@ -5408,7 +5881,18 @@
                         }
 
                         const handleCardClick = (e) => {
-                            if (isRedirectActive) return;
+                            if (isRedirectActive) {
+                                // Si la redirection automatique est active, annuler le compte à rebours
+                                // et rediriger immédiatement
+                                if (!smartRedirectCancelled) {
+                                    smartRedirectCancelled = true;
+                                    cancelSmartRedirect();
+                                    incrementLinkClick(uid, item.id).catch(() => {});
+                                    logAnalyticsEvent('smart_redirect_manual_click', { linkId: item.id });
+                                    window.open(sanitizeUrl(item.url), '_blank');
+                                }
+                                return;
+                            }
                             e.preventDefault();
 
                             if (item.locked) {
@@ -5427,7 +5911,8 @@
                         card.addEventListener('click', handleCardClick);
 
                         if (isRedirectActive) {
-                            card.style.pointerEvents = 'none';
+                            card.style.pointerEvents = 'auto';
+                            card.style.cursor = 'pointer';
                         } else {
                             card.style.pointerEvents = 'auto';
                             card.style.cursor = 'pointer';
@@ -5468,7 +5953,7 @@
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
                             <i class="${platform.icon}"></i>
-                            <span>${item.locked ? '🔒 Déverrouiller' : (isRedirectActive ? 'Redirection active' : 'Cliqué ici pour rejoindre')}</span>
+                            <span>${item.locked ? '🔒 Déverrouiller' : (isRedirectActive ? 'Redirection automatique...' : 'Cliquez ici pour rejoindre')}</span>
                         `;
 
                         card.appendChild(desc);
@@ -5651,6 +6136,9 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    verified: false,
+                    total_views_month: 0,
+                    monthly_views_reset: new Date().toISOString().slice(0, 7),
                     seo: { title: '', description: '', keywords: '' },
                     integrations: { metaPixel: '', ga: '' },
                     flash: { active: false, message: '', color: 'red' },
@@ -5843,6 +6331,9 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    verified: false,
+                    total_views_month: 0,
+                    monthly_views_reset: new Date().toISOString().slice(0, 7),
                     seo: { title: '', description: '', keywords: '' },
                     integrations: { metaPixel: '', ga: '' },
                     flash: { active: false, message: '', color: 'red' },
@@ -5893,6 +6384,9 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    verified: false,
+                    total_views_month: 0,
+                    monthly_views_reset: new Date().toISOString().slice(0, 7),
                     seo: { title: '', description: '', keywords: '' },
                     integrations: { metaPixel: '', ga: '' },
                     flash: { active: false, message: '', color: 'red' },
@@ -5993,6 +6487,7 @@
                 auth.signOut();
                 currentUser = null;
                 userProfile = null;
+                cancelSmartRedirect();
                 if (scheduleInterval) clearInterval(scheduleInterval);
                 if (donationUnsubscribe) {
                     donationUnsubscribe();
