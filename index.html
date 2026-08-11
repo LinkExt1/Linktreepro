@@ -6569,17 +6569,13 @@ URL:${urlProfil}
     })();
 </script>
 <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(function(reg) {
-                    console.log('Service Worker enregistré avec succès.');
-                })
-                .catch(function(err) {
-                    console.warn/service-worker.js('Erreur lors de l\'enregistrement du Service Worker:', err);
-                });
-        });
-    }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker PWA actif !', reg))
+        .catch(err => console.error('Erreur Service Worker :', err));
+    });
+  }
 </script>
 </body>
 </html>
