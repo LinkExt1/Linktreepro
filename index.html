@@ -2692,9 +2692,9 @@
                     <!-- ===== GESTION DES BADGES (NOUVEAU) ===== -->
                     <div id="badge-management-container" class="badge-management" style="display:none;">
                         <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-certificate"></i> Gestion des Badges</h4>
-                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.5rem;">Recherchez un utilisateur par son ID public pour attribuer ou retirer le badge de certification.</p>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.5rem;">Recherchez un utilisateur par son UID Firebase (ex: TquBTa8J...).</p>
                         <div class="search-user-row">
-                            <input type="text" id="badge-search-input" placeholder="ID public de l'utilisateur...">
+                            <input type="text" id="badge-search-input" placeholder="UID Firebase de l'utilisateur...">
                             <button class="btn btn-outline" id="badge-search-btn"><i class="fas fa-search"></i> Rechercher</button>
                         </div>
                         <div id="badge-search-results"></div>
@@ -4053,7 +4053,8 @@
         }
 
         // ============================================================
-        // BADGE DE CERTIFICATION - GESTION ADMIN
+        // BADGE DE CERTIFICATION - GESTION ADMIN (CORRIGÉ)
+        // RECHERCHE DIRECTEMENT PAR L'ID DU DOCUMENT (UID FIREBASE)
         // ============================================================
         function setupBadgeManagement() {
             const searchInput = document.getElementById('badge-search-input');
@@ -4065,20 +4066,22 @@
             async function searchUser() {
                 const query = searchInput.value.trim();
                 if (!query) {
-                    resultsContainer.innerHTML = '<div class="no-result">Veuillez saisir un ID public.</div>';
+                    resultsContainer.innerHTML = '<div class="no-result">Veuillez saisir un UID Firebase.</div>';
                     return;
                 }
 
                 resultsContainer.innerHTML = '<span class="spinner"></span> Recherche...';
 
                 try {
-                    const snapshot = await db.collection('users').where('publicId', '==', query).limit(1).get();
-                    if (snapshot.empty) {
-                        resultsContainer.innerHTML = '<div class="no-result">Aucun utilisateur trouvé avec cet ID.</div>';
+                    // RECHERCHE DIRECTE PAR L'ID DU DOCUMENT (UID FIREBASE)
+                    const docRef = db.collection('users').doc(query);
+                    const doc = await docRef.get();
+
+                    if (!doc.exists) {
+                        resultsContainer.innerHTML = '<div class="no-result">❌ Aucun utilisateur trouvé avec cet UID.</div>';
                         return;
                     }
 
-                    const doc = snapshot.docs[0];
                     const data = doc.data();
                     const uid = doc.id;
                     const isVerified = data.verified === true;
@@ -4087,8 +4090,8 @@
                         <div class="user-result-item">
                             <div class="user-info">
                                 <div class="user-name">${data.displayName || 'Sans nom'}</div>
-                                <div class="user-id">ID: ${data.publicId || uid}</div>
                                 <div class="user-id" style="font-size:0.65rem; color:var(--text-secondary);">UID: ${uid}</div>
+                                ${data.email ? `<div class="user-id" style="font-size:0.65rem; color:var(--text-secondary);">Email: ${data.email}</div>` : ''}
                             </div>
                             <span class="badge-status ${isVerified ? 'verified' : 'unverified'}">
                                 ${isVerified ? '✅ Vérifié' : '❌ Non vérifié'}
@@ -4104,8 +4107,9 @@
                         const newState = !isVerified;
                         try {
                             await db.collection('users').doc(uid).update({ verified: newState });
-                            showToast(newState ? 'Badge attribué avec succès !' : 'Badge retiré avec succès.', 'info');
+                            showToast(newState ? '✅ Badge attribué avec succès !' : '❌ Badge retiré avec succès.', 'info');
                             addAdminLog(newState ? 'Badge attribué à ' + uid : 'Badge retiré de ' + uid);
+                            // Recharger le résultat
                             searchUser();
                         } catch (err) {
                             console.error(err);
@@ -4115,7 +4119,7 @@
 
                 } catch (err) {
                     console.error(err);
-                    resultsContainer.innerHTML = '<div class="no-result">Erreur lors de la recherche.</div>';
+                    resultsContainer.innerHTML = '<div class="no-result">❌ Erreur lors de la recherche. Vérifiez l\'UID.</div>';
                 }
             }
 
