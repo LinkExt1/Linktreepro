@@ -682,12 +682,7 @@
         /* ===== COMPTE À REBOURS SMART LINK ===== */
         .smart-redirect-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
+            inset: 0;
             display: none;
             align-items: center;
             justify-content: center;
@@ -695,9 +690,41 @@
             flex-direction: column;
             gap: 1.5rem;
             padding: 2rem;
+            overflow: hidden;
+            isolation: isolate;
+            background: rgba(0, 0, 0, 0.82);
         }
         .smart-redirect-overlay.active {
             display: flex;
+        }
+        .smart-redirect-overlay .redirect-background {
+            position: absolute;
+            inset: -24px;
+            z-index: -2;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            filter: blur(8px);
+            transform: scale(1.08);
+            opacity: 0.72;
+        }
+        .smart-redirect-overlay::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: rgba(0, 0, 0, 0.62);
+            backdrop-filter: blur(10px);
+        }
+        .smart-redirect-overlay .redirect-card {
+            width: min(92vw, 430px);
+            padding: 2rem 1.5rem;
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            background: rgba(10, 11, 16, 0.72);
+            box-shadow: 0 20px 70px rgba(0,0,0,0.45);
+            backdrop-filter: blur(14px);
+            text-align: center;
         }
         .smart-redirect-overlay .countdown-number {
             font-family: var(--font-heading);
@@ -716,12 +743,12 @@
             font-size: 1rem;
             text-align: center;
         }
-        .smart-redirect-overlay .countdown-text .target-url {
+        .smart-redirect-overlay .redirect-message {
             color: var(--text-primary);
-            word-break: break-all;
-            font-size: 0.85rem;
-            margin-top: 0.3rem;
-            opacity: 0.7;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-top: 0.35rem;
+            word-break: break-word;
         }
         .smart-redirect-overlay .countdown-progress {
             width: 200px;
@@ -729,6 +756,7 @@
             background: rgba(255,255,255,0.1);
             border-radius: 4px;
             overflow: hidden;
+            margin: 1rem auto 0;
         }
         .smart-redirect-overlay .countdown-progress .progress-fill {
             height: 100%;
@@ -2599,6 +2627,11 @@
                         </div>
                         <span style="font-size:0.6rem; color:var(--text-secondary);" id="redirect-hint">(nécessite 1 lien actif)</span>
                     </div>
+                    <div id="redirect-message-group" class="input-group" style="display:none; margin-bottom:0.7rem;">
+                        <label><i class="fas fa-comment-dots"></i> Message de redirection personnalisé</label>
+                        <input type="text" class="input-field" id="redirect-message-input" maxlength="160"
+                               placeholder="Redirection sécurisée en cours...">
+                    </div>
                     <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:0.5rem;">
                         <span style="font-family:var(--font-heading); font-size:0.9rem; color:var(--text-secondary);"><i class="fas fa-list"></i> Mes liens</span>
                         <div style="display:flex; gap:0.4rem;">
@@ -2618,6 +2651,18 @@
                     </div>
                     <div class="input-group mt-1"><label>Photo de profil</label><button class="btn btn-outline" id="btn-change-photo" style="justify-content: center; padding:0.4rem;"><i class="fas fa-camera"></i> Changer la photo</button></div>
                     <div class="input-group mt-1"><label>Biographie</label><textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea></div>
+                    <div class="input-group mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
+                        <label><i class="fas fa-database"></i> Sauvegarde de configuration</label>
+                        <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+                            <button class="btn btn-outline" id="export-profile-config-btn" type="button" style="flex:1; min-width:180px;">
+                                <i class="fas fa-file-export"></i> Exporter ma configuration (JSON)
+                            </button>
+                            <button class="btn btn-outline" id="import-profile-config-btn" type="button" style="flex:1; min-width:180px;">
+                                <i class="fas fa-file-import"></i> Importer une configuration
+                            </button>
+                            <input type="file" id="import-profile-config-input" accept=".json,application/json" style="display:none;">
+                        </div>
+                    </div>
                     <div class="mt-1">
                         <label style="font-size:0.8rem; color:var(--text-secondary);">Statut Flash</label>
                         <div class="status-selector" id="status-selector">
@@ -2785,17 +2830,19 @@
     </div>
 
     <!-- ===== SMART LINK OVERLAY (COMPTE À REBOURS) ===== -->
-    <div class="smart-redirect-overlay" id="smart-redirect-overlay">
-        <div class="countdown-number" id="countdown-number">2</div>
-        <div class="countdown-text">
-            Redirection automatique vers votre lien...
-            <div class="target-url" id="countdown-target-url"></div>
-        </div>
-        <div class="countdown-progress">
-            <div class="progress-fill" id="countdown-progress-fill" style="width:100%;"></div>
-        </div>
-        <div style="font-size:0.7rem; color:var(--text-secondary); opacity:0.5; margin-top:0.5rem;">
-            Cliquez sur le lien pour annuler et rediriger immédiatement
+    <div class="smart-redirect-overlay" id="smart-redirect-overlay" aria-live="polite">
+        <div class="redirect-background" id="smart-redirect-background" aria-hidden="true"></div>
+        <div class="redirect-card">
+            <div class="countdown-number" id="countdown-number">2</div>
+            <div class="countdown-text">
+                <div class="redirect-message" id="redirect-message-display">Redirection sécurisée en cours...</div>
+            </div>
+            <div class="countdown-progress">
+                <div class="progress-fill" id="countdown-progress-fill" style="width:100%;"></div>
+            </div>
+            <div style="font-size:0.7rem; color:var(--text-secondary); opacity:0.65; margin-top:0.5rem;">
+                Cliquez sur le lien pour annuler et rediriger immédiatement
+            </div>
         </div>
     </div>
 
@@ -3031,6 +3078,7 @@
                     }
                     if (typeof merged.views !== 'number') merged.views = 0;
                     if (typeof merged.redirectUnique !== 'boolean') merged.redirectUnique = false;
+                    if (typeof merged.redirect_message !== 'string') merged.redirect_message = '';
                     if (typeof merged.verified !== 'boolean') merged.verified = false;
                     if (typeof merged.total_views_month !== 'number') merged.total_views_month = 0;
                     if (typeof merged.monthly_views_reset !== 'string') merged.monthly_views_reset = new Date().toISOString().slice(0, 7);
@@ -4148,45 +4196,42 @@
         let smartRedirectCountdown = null;
         let smartRedirectCancelled = false;
 
-        function startSmartRedirect(uid, linkId, targetUrl) {
+        function startSmartRedirect(uid, linkId, targetUrl, redirectMessage, imageUrl) {
             const overlay = document.getElementById('smart-redirect-overlay');
             const numberEl = document.getElementById('countdown-number');
             const progressEl = document.getElementById('countdown-progress-fill');
-            const targetUrlEl = document.getElementById('countdown-target-url');
+            const messageEl = document.getElementById('redirect-message-display');
+            const backgroundEl = document.getElementById('smart-redirect-background');
 
-            // Annuler toute redirection précédente
             cancelSmartRedirect();
 
             smartRedirectCancelled = false;
-            targetUrlEl.textContent = targetUrl;
+            messageEl.textContent = (redirectMessage || '').trim() || 'Redirection sécurisée en cours...';
+            backgroundEl.style.backgroundImage = imageUrl ? `url("${imageUrl.replace(/"/g, '\\\"')}")` : 'none';
             overlay.classList.add('active');
 
             let countdown = 2;
             numberEl.textContent = countdown;
             progressEl.style.width = '100%';
 
-            // Incrémenter la vue du profil instantanément
-            incrementViews(uid).catch(() => {});
-
-            // Incrémenter le compteur mensuel pour le badge automatique
-            incrementMonthlyViews(uid).catch(() => {});
-
-            // Journaliser l'événement
+            // Les vues profil + mensuelles sont déjà attendues par loadPublicProfile()
+            // avant le démarrage de ce compte à rebours.
             logAnalyticsEvent('smart_redirect_start', { linkId: linkId });
 
-            smartRedirectTimer = setInterval(() => {
+            smartRedirectTimer = setInterval(async () => {
                 countdown -= 0.05;
                 if (countdown <= 0) {
-                    // Redirection terminée
                     clearInterval(smartRedirectTimer);
                     smartRedirectTimer = null;
                     overlay.classList.remove('active');
 
                     if (!smartRedirectCancelled) {
-                        // Incrémenter le clic avant la redirection
-                        incrementLinkClick(uid, linkId).catch(() => {});
-                        logAnalyticsEvent('smart_redirect_complete', { linkId: linkId });
-                        window.location.href = targetUrl;
+                        smartRedirectCancelled = true;
+                        const tracked = await incrementLinkClick(uid, linkId);
+                        if (tracked) {
+                            logAnalyticsEvent('smart_redirect_complete', { linkId: linkId });
+                            window.location.href = targetUrl;
+                        }
                     }
                 } else {
                     numberEl.textContent = Math.ceil(countdown);
@@ -4194,33 +4239,30 @@
                 }
             }, 50);
 
-            // Gestionnaire pour annuler si l'utilisateur clique
-            const cancelHandler = (e) => {
-                if (!smartRedirectCancelled) {
-                    smartRedirectCancelled = true;
-                    cancelSmartRedirect();
-                    overlay.classList.remove('active');
+            const cancelHandler = async (e) => {
+                if (smartRedirectCancelled) return;
+                if (e) e.preventDefault();
 
-                    // Incrémenter le clic normalement
-                    incrementLinkClick(uid, linkId).catch(() => {});
+                smartRedirectCancelled = true;
+                cancelSmartRedirect();
+                overlay.classList.remove('active');
+
+                const tracked = await incrementLinkClick(uid, linkId);
+                if (tracked) {
                     logAnalyticsEvent('smart_redirect_manual_click', { linkId: linkId });
-
-                    // Rediriger immédiatement
                     window.location.href = targetUrl;
                 }
             };
 
-            // Ajouter des écouteurs sur tous les liens cliquables de la page
-            const clickables = document.querySelectorAll('#public-links a, #public-links .rich-link-card, #public-links .link-action-bar');
-            clickables.forEach(el => {
-                el.addEventListener('click', cancelHandler, { once: true });
-            });
+            // Délégation sur le conteneur : les cartes sont rendues après le démarrage du Smart Link.
+            const linksContainer = document.getElementById('public-links');
+            if (linksContainer) {
+                linksContainer.addEventListener('click', cancelHandler, { once: true });
+            }
 
-            // Écouter aussi le clic sur l'overlay lui-même
             overlay.addEventListener('click', cancelHandler, { once: true });
 
-            // Stocker les références pour nettoyage
-            overlay._cancelHandlers = clickables;
+            overlay._cancelHandlers = linksContainer ? [linksContainer] : [];
             overlay._cancelHandler = cancelHandler;
         }
 
@@ -4930,16 +4972,18 @@
         }
 
         async function incrementLinkClick(uid, linkId) {
-            if (!uid || !linkId) return;
+            if (!uid || !linkId) return false;
             const docRef = db.collection('users').doc(uid);
             try {
                 await db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(docRef);
-                    if (!doc.exists) return;
+                    if (!doc.exists) throw new Error('Profil introuvable.');
                     const data = doc.data();
-                    if (!data.links) return;
+                    if (!Array.isArray(data.links)) throw new Error('Liens introuvables.');
+
                     const linkIndex = data.links.findIndex(l => l.id === linkId);
-                    if (linkIndex === -1) return;
+                    if (linkIndex === -1) throw new Error('Lien introuvable.');
+
                     const updatedLinks = [...data.links];
                     updatedLinks[linkIndex] = {
                         ...updatedLinks[linkIndex],
@@ -4947,6 +4991,7 @@
                     };
                     transaction.update(docRef, { links: updatedLinks });
                 });
+
                 if (userProfile && userProfile._id === uid) {
                     const link = userProfile.links.find(l => l.id === linkId);
                     if (link) link.clicks = (link.clicks || 0) + 1;
@@ -4955,10 +5000,13 @@
                     }
                 }
                 logAnalyticsEvent('clic_reseau_social', { linkId: linkId });
+                return true;
             } catch (error) {
                 console.warn('Impossible d\'incrémenter le clic :', error);
+                return false;
             }
         }
+
 
         async function addSubscriber(uid, email) {
             if (!uid || !email) return false;
@@ -4993,32 +5041,46 @@
             const track = document.getElementById('redirect-toggle-track');
             const label = document.getElementById('redirect-status-label');
             const hint = document.getElementById('redirect-hint');
+            const messageGroup = document.getElementById('redirect-message-group');
+            const messageInput = document.getElementById('redirect-message-input');
+
             if (!userProfile || !userProfile.links) {
                 track.classList.remove('enabled', 'active');
                 label.textContent = 'Désactivé';
                 label.classList.remove('active');
                 hint.textContent = '(aucun lien)';
+                if (messageGroup) messageGroup.style.display = 'none';
                 return;
             }
+
             const activeLinks = userProfile.links.filter(l => l.active && !l.isSection && l.url && l.url.trim() !== '');
             const count = activeLinks.length;
+
             if (count === 1) {
                 track.classList.add('enabled');
                 hint.textContent = '(1 lien actif)';
+
                 if (userProfile.redirectUnique === true) {
                     track.classList.add('active');
                     label.textContent = 'Activé';
                     label.classList.add('active');
+                    if (messageGroup) messageGroup.style.display = 'block';
+                    if (messageInput && !messageInput.value.trim()) {
+                        messageInput.value = userProfile.redirect_message || 'Redirection sécurisée en cours...';
+                    }
                 } else {
                     track.classList.remove('active');
                     label.textContent = 'Désactivé';
                     label.classList.remove('active');
+                    if (messageGroup) messageGroup.style.display = 'none';
                 }
             } else {
                 track.classList.remove('enabled', 'active');
                 label.textContent = 'Désactivé';
                 label.classList.remove('active');
                 hint.textContent = `(${count} liens actifs - désactivé)`;
+                if (messageGroup) messageGroup.style.display = 'none';
+
                 if (userProfile.redirectUnique === true) {
                     userProfile.redirectUnique = false;
                     saveUserProfile(currentUser.uid, { redirectUnique: false }).catch(() => {});
@@ -5038,7 +5100,14 @@
             }
             const newState = !userProfile.redirectUnique;
             userProfile.redirectUnique = newState;
-            await saveUserProfile(currentUser.uid, { redirectUnique: newState });
+            const messageInput = document.getElementById('redirect-message-input');
+            const redirectMessage = (messageInput?.value || userProfile.redirect_message || '').trim();
+            const savedMessage = redirectMessage || 'Redirection sécurisée en cours...';
+            userProfile.redirect_message = savedMessage;
+            await saveUserProfile(currentUser.uid, {
+                redirectUnique: newState,
+                redirect_message: savedMessage
+            });
             updateRedirectToggleState();
             showToast(newState ? 'Redirection unique activée !' : 'Redirection unique désactivée.', 'info');
             logAnalyticsEvent('modification_profil', { action: 'toggle_redirect', state: newState });
@@ -5394,6 +5463,7 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    redirect_message: '',
                     verified: false,
                     total_views_month: 0,
                     monthly_views_reset: new Date().toISOString().slice(0, 7),
@@ -5409,6 +5479,7 @@
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
             document.getElementById('views-count-display').textContent = userProfile.views || 0;
+            document.getElementById('redirect-message-input').value = userProfile.redirect_message || '';
 
             document.getElementById('seo-title').value = userProfile.seo?.title || '';
             document.getElementById('seo-description').value = userProfile.seo?.description || '';
@@ -5827,12 +5898,18 @@
 
                 if (isRedirectActive) {
                     const targetUrl = sanitizeUrl(activeLinks[0].url);
-                    wrapperLink.href = targetUrl;
+                    wrapperLink.href = '#';
                     wrapperLink.style.pointerEvents = 'auto';
                     wrapperLink.style.cursor = 'pointer';
 
-                    // Démarrer le compte à rebours SMART LINK
-                    startSmartRedirect(uid, activeLinks[0].id, targetUrl);
+                    // Démarrer le compte à rebours SMART LINK sans afficher l'URL finale.
+                    startSmartRedirect(
+                        uid,
+                        activeLinks[0].id,
+                        targetUrl,
+                        data.redirect_message,
+                        activeLinks[0].imageUrl
+                    );
                 } else {
                     wrapperLink.href = '#';
                     wrapperLink.style.pointerEvents = 'none';
@@ -5886,15 +5963,8 @@
 
                         const handleCardClick = (e) => {
                             if (isRedirectActive) {
-                                // Si la redirection automatique est active, annuler le compte à rebours
-                                // et rediriger immédiatement
-                                if (!smartRedirectCancelled) {
-                                    smartRedirectCancelled = true;
-                                    cancelSmartRedirect();
-                                    incrementLinkClick(uid, item.id).catch(() => {});
-                                    logAnalyticsEvent('smart_redirect_manual_click', { linkId: item.id });
-                                    window.open(sanitizeUrl(item.url), '_blank');
-                                }
+                                // Le gestionnaire Smart Link global gère le clic, le tracking et la redirection.
+                                e.preventDefault();
                                 return;
                             }
                             e.preventDefault();
@@ -6052,6 +6122,168 @@
             }
         }
 
+        // ============================================================
+        // IMPORT / EXPORT DE LA CONFIGURATION DU PROFIL
+        // ============================================================
+        const PROFILE_AUTH_FIELDS = new Set([
+            'uid',
+            'email',
+            'createdAt',
+            'created_at',
+            'creationDate',
+            'creation_date',
+            'dateCreation',
+            'date_creation'
+        ]);
+
+        function isUnsafeConfigKey(key) {
+            return key === '__proto__' || key === 'prototype' || key === 'constructor';
+        }
+
+        function validateConfigObject(value, depth = 0) {
+            if (depth > 20) return false;
+            if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                return true;
+            }
+            if (Array.isArray(value)) {
+                return value.every(item => validateConfigObject(item, depth + 1));
+            }
+            if (typeof value === 'object') {
+                return Object.keys(value).every(key => {
+                    if (isUnsafeConfigKey(key)) return false;
+                    return validateConfigObject(value[key], depth + 1);
+                });
+            }
+            return false;
+        }
+
+        function stripProfileAuthFields(source) {
+            const result = {};
+            Object.keys(source || {}).forEach(key => {
+                if (!PROFILE_AUTH_FIELDS.has(key) && key !== '_id') {
+                    result[key] = source[key];
+                }
+            });
+            return result;
+        }
+
+        function getConfigFilenameUsername(profile) {
+            const raw = profile?.username ||
+                profile?.displayName ||
+                currentUser?.displayName ||
+                currentUser?.email?.split('@')[0] ||
+                'user';
+
+            return String(raw)
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9._-]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 80) || 'user';
+        }
+
+        async function exportProfileConfiguration() {
+            if (!currentUser) {
+                showToast('Vous devez être connecté.', 'error');
+                return;
+            }
+
+            try {
+                const doc = await db.collection('users').doc(currentUser.uid).get();
+                if (!doc.exists) {
+                    showToast('Configuration Firestore introuvable.', 'error');
+                    return;
+                }
+
+                const configuration = stripProfileAuthFields(doc.data());
+
+                if (!validateConfigObject(configuration)) {
+                    showToast('La configuration contient des données JSON invalides.', 'error');
+                    return;
+                }
+
+                const payload = {
+                    format: 'linkext-profile-config',
+                    version: 1,
+                    exportedAt: new Date().toISOString(),
+                    configuration: configuration
+                };
+
+                const blob = new Blob([JSON.stringify(payload, null, 2)], {
+                    type: 'application/json;charset=utf-8'
+                });
+                const downloadUrl = URL.createObjectURL(blob);
+                const anchor = document.createElement('a');
+                anchor.href = downloadUrl;
+                anchor.download = `linkext-backup-${getConfigFilenameUsername(configuration)}.json`;
+                document.body.appendChild(anchor);
+                anchor.click();
+                anchor.remove();
+                URL.revokeObjectURL(downloadUrl);
+
+                showToast('Configuration exportée !', 'info');
+                logAnalyticsEvent('modification_profil', { action: 'export_profile_configuration' });
+            } catch (error) {
+                console.error('Erreur export configuration :', error);
+                showToast('Impossible d’exporter la configuration.', 'error');
+            }
+        }
+
+        async function importProfileConfiguration(file) {
+            if (!currentUser || !file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Le fichier JSON est trop volumineux (2 Mo maximum).', 'error');
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                const payload = JSON.parse(text);
+                const configuration = payload?.configuration && typeof payload.configuration === 'object'
+                    ? payload.configuration
+                    : payload;
+
+                if (!configuration || Array.isArray(configuration) || !validateConfigObject(configuration)) {
+                    throw new Error('Format de configuration invalide.');
+                }
+
+                const sanitizedConfiguration = stripProfileAuthFields(configuration);
+                delete sanitizedConfiguration.uid;
+                delete sanitizedConfiguration.email;
+                delete sanitizedConfiguration._id;
+
+                const docRef = db.collection('users').doc(currentUser.uid);
+                const currentDoc = await docRef.get();
+                if (!currentDoc.exists) {
+                    throw new Error('Document du compte actuel introuvable.');
+                }
+
+                const currentData = currentDoc.data() || {};
+                const preservedAuthData = {};
+                PROFILE_AUTH_FIELDS.forEach(key => {
+                    if (Object.prototype.hasOwnProperty.call(currentData, key)) {
+                        preservedAuthData[key] = currentData[key];
+                    }
+                });
+
+                await docRef.set({
+                    ...sanitizedConfiguration,
+                    ...preservedAuthData
+                }, { merge: true });
+
+                userProfile = null;
+                await loadUserProfile(currentUser.uid);
+                await populateDashboard();
+
+                showToast('Configuration importée avec succès !', 'info');
+                logAnalyticsEvent('modification_profil', { action: 'import_profile_configuration' });
+            } catch (error) {
+                console.error('Erreur import configuration :', error);
+                showToast('Fichier JSON invalide ou configuration impossible à importer.', 'error');
+            }
+        }
+
         function exportReport() {
             if (!userProfile) {
                 showToast('Profil non chargé.', 'error');
@@ -6140,6 +6372,7 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    redirect_message: '',
                     verified: false,
                     total_views_month: 0,
                     monthly_views_reset: new Date().toISOString().slice(0, 7),
@@ -6335,6 +6568,7 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    redirect_message: '',
                     verified: false,
                     total_views_month: 0,
                     monthly_views_reset: new Date().toISOString().slice(0, 7),
@@ -6388,6 +6622,7 @@
                     featuredLink: null,
                     views: 0,
                     redirectUnique: false,
+                    redirect_message: '',
                     verified: false,
                     total_views_month: 0,
                     monthly_views_reset: new Date().toISOString().slice(0, 7),
@@ -6467,6 +6702,10 @@
                     locked: l.locked || false
                 })) : [];
 
+                const redirectMessageInput = document.getElementById('redirect-message-input');
+                const redirectMessage = (redirectMessageInput?.value || userProfile.redirect_message || '').trim();
+                const savedRedirectMessage = redirectMessage || 'Redirection sécurisée en cours...';
+
                 const saved = await saveUserProfile(currentUser.uid, {
                     displayName: name,
                     bio: bio,
@@ -6474,6 +6713,7 @@
                     seo: { title: seoTitle, description: seoDesc, keywords: seoKeywords },
                     integrations: { metaPixel: metaPixel, ga: gaId },
                     flash: { active: flashActive, message: flashMessage, color: flashColor },
+                    redirect_message: savedRedirectMessage,
                     onboardingCompleted: true
                 });
                 if (saved) {
@@ -6568,6 +6808,18 @@
             });
 
             document.getElementById('export-report-btn').addEventListener('click', exportReport);
+
+            document.getElementById('export-profile-config-btn').addEventListener('click', exportProfileConfiguration);
+            document.getElementById('import-profile-config-btn').addEventListener('click', () => {
+                document.getElementById('import-profile-config-input').click();
+            });
+            document.getElementById('import-profile-config-input').addEventListener('change', async function() {
+                const file = this.files?.[0];
+                this.value = '';
+                if (file) {
+                    await importProfileConfiguration(file);
+                }
+            });
 
             document.getElementById('copy-emails-btn').addEventListener('click', copyEmails);
 
