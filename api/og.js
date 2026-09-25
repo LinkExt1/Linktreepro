@@ -1,62 +1,88 @@
 const fs = require('fs');
 const path = require('path');
 
-module.exports = async (req, res) => {
-  // Récupère l'ID dans le lien
-  const { id } = req.query; 
-  
-  // Textes par défaut si c'est le lien global du site
-  let title = "Linktreepro - Ta page de liens personnalisée";
-  let description = "Centralisez vos réseaux et projets en un clic.";
-  let imageUrl = "https://ui-avatars.com/api/?name=Linktreepro&background=0a0b10&color=00f2fe&size=200";
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
-  // Si on a un ID utilisateur, on va chercher ses infos publiquement
-  if (id) {
+function sanitizeHttpUrl(value, fallback = '') {
+  if (!value || typeof value !== 'string') return fallback;
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return fallback;
+    return url.toString();
+  } catch (_) {
+    return fallback;
+  }
+}
+
+module.exports = async (req, res) => {
+  const rawId = Array.isArray(req.query?.id) ? req.query.id[0] : req.query?.id;
+  const id = typeof rawId === 'string' ? rawId.trim() : '';
+
+  let title = 'Linktreepro - Ta page de liens personnalisée';
+  let description = 'Centralisez vos réseaux et projets en un clic.';
+  let imageUrl = 'https://ui-avatars.com/api/?name=Linktreepro&background=0a0b10&color=00f2fe&size=200';
+
+  if (id && /^[A-Za-z0-9_-]{1,128}$/.test(id)) {
     try {
-      // Pas besoin de clés secrètes grâce à tes règles de sécurité !
-      const response = await fetch(`https://firestore.googleapis.com/v1/projects/linkext-83984/databases/(default)/documents/users/${id}`);
+      const firestoreId = encodeURIComponent(id);
+      const response = await fetch(
+        `https://firestore.googleapis.com/v1/projects/linkext-83984/databases/(default)/documents/users/${firestoreId}`
+      );
       if (response.ok) {
         const data = await response.json();
         if (data.fields) {
-           title = data.fields.displayName?.stringValue ? `${data.fields.displayName.stringValue} - LinkExt` : title;
-           description = data.fields.bio?.stringValue || description;
-           imageUrl = data.fields.photoURL?.stringValue || imageUrl;
+          const displayName = data.fields.displayName?.stringValue;
+          const bio = data.fields.bio?.stringValue;
+          const photoURL = data.fields.photoURL?.stringValue;
+
+          if (displayName) title = `${displayName} - LinkExt`;
+          if (bio) description = bio;
+          if (photoURL) imageUrl = sanitizeHttpUrl(photoURL, imageUrl);
         }
       }
     } catch (e) {
-      console.error("Erreur de récupération :", e);
+      console.error('Erreur de récupération :', e);
     }
   }
 
-  // Lecture de ton site et injection
   try {
     const indexPath = path.join(process.cwd(), 'index.html');
     let html = fs.readFileSync(indexPath, 'utf8');
 
-    // On efface les vieilles balises pour éviter les doublons
     html = html.replace(/<meta property="og:[^>]+>/g, '');
     html = html.replace(/<meta name="twitter:[^>]+>/g, '');
     html = html.replace(/<title>[^<]*<\/title>/, '');
 
-    // On injecte les nouvelles infos
+    const safeTitle = escapeHTML(title);
+    const safeDescription = escapeHTML(description);
+    const safeImageUrl = escapeHTML(sanitizeHttpUrl(imageUrl, ''));
+
     const metaTags = `
-      <title>${title}</title>
-      <meta property="og:title" content="${title}">
-      <meta property="og:description" content="${description}">
-      <meta property="og:image" content="${imageUrl}">
+      <title>${safeTitle}</title>
+      <meta property="og:title" content="${safeTitle}">
+      <meta property="og:description" content="${safeDescription}">
+      <meta property="og:image" content="${safeImageUrl}">
       <meta property="og:type" content="profile">
       <meta name="twitter:card" content="summary_large_image">
-      <meta name="twitter:title" content="${title}">
-      <meta name="twitter:description" content="${description}">
-      <meta name="twitter:image" content="${imageUrl}">
+      <meta name="twitter:title" content="${safeTitle}">
+      <meta name="twitter:description" content="${safeDescription}">
+      <meta name="twitter:image" content="${safeImageUrl}">
     `;
 
     html = html.replace('</head>', `${metaTags}\n</head>`);
-    
-    // On envoie au robot (Facebook/WhatsApp)
+
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.status(200).send(html);
-  } catch(err) {
-    res.status(500).send("Erreur serveur");
+  } catch (err) {
+    console.error('Erreur OG :', err);
+    res.status(500).send('Erreur serveur');
   }
 };
