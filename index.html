@@ -2960,7 +2960,6 @@
         let linkImageUrl = '';
         let gatedPendingLink = null;
         let gatedPendingTarget = null;
-        let backupCode = '';
         let scheduleInterval = null;
         let donationUnsubscribe = null;
         let adminLinksUnsubscribe = null;
@@ -3001,9 +3000,34 @@
             setTimeout(() => toast.remove(), 4000);
         }
 
+        // ============================================================
+        // SÉCURITÉ : ÉCHAPPEMENT HTML DES DONNÉES NON FIABLES
+        // ============================================================
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function sanitizeImageUrl(url) {
+            if (!url || typeof url !== 'string') return '';
+            const value = url.trim();
+            try {
+                const parsed = new URL(value, window.location.origin);
+                if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return '';
+                return parsed.href;
+            } catch (e) {
+                return '';
+            }
+        }
+
         function sanitizeUrl(url) {
             if (!url) return '';
-            url = url.trim();
+            url = String(url).trim();
             if (!/^https?:\/\//i.test(url)) return 'https://' + url;
             return url;
         }
@@ -3167,75 +3191,37 @@
         // ADMIN
         // ============================================================
         async function checkIsAdmin(uid) {
-            if (!uid || uid === '') return false;
+            if (!uid || !currentUser || currentUser.uid !== uid) return false;
             try {
-                const docRef = db.collection('admin_config').doc('security');
-                const doc = await docRef.get();
-                if (!doc.exists) return false;
-                const data = doc.data();
-                return data.adminUid === uid;
+                const tokenResult = await currentUser.getIdTokenResult(true);
+                return tokenResult?.claims?.admin === true;
             } catch (e) {
-                console.error('Erreur de lecture admin_config/security :', e);
+                console.error('Erreur de vérification des droits administrateur :', e);
+                return false;
+            }
+        }
+
+        async function isPublicAdminProfile(uid) {
+            if (!uid) return false;
+            try {
+                const doc = await db.collection('admin_config').doc('status').get();
+                return doc.exists && doc.data()?.adminUid === uid;
+            } catch (e) {
+                console.warn('Impossible de vérifier le statut public administrateur :', e);
                 return false;
             }
         }
 
         function openAdminGate() {
-            return new Promise((resolve) => {
-                const modal = document.getElementById('admin-gate-modal');
-                const backupInput = document.getElementById('admin-backup-input');
-                const errorDiv = document.getElementById('admin-gate-error');
-                const submitBtn = document.getElementById('admin-gate-submit');
-                const closeBtn = document.getElementById('admin-gate-close');
-
-                backupInput.value = '';
-                errorDiv.style.display = 'none';
-                modal.classList.add('active');
-
-                db.collection('admin_config').doc('security').get()
-                    .then((doc) => {
-                        if (!doc.exists) {
-                            errorDiv.textContent = 'Configuration admin manquante.';
-                            errorDiv.style.display = 'block';
-                            return;
-                        }
-                        const data = doc.data();
-                        backupCode = data.backupCode || '';
-                        if (!backupCode) {
-                            errorDiv.textContent = 'Clé de secours non configurée.';
-                            errorDiv.style.display = 'block';
-                        }
-                    })
-                    .catch((err) => {
-                        console.error('Erreur de lecture Firestore :', err);
-                        errorDiv.textContent = 'Erreur de chargement des secrets.';
-                        errorDiv.style.display = 'block';
-                    });
-
-                function validate() {
-                    const input = backupInput.value.trim();
-                    if (!input) {
-                        errorDiv.textContent = 'Veuillez saisir la clé de secours.';
-                        errorDiv.style.display = 'block';
-                        return;
-                    }
-                    if (input !== backupCode) {
-                        errorDiv.textContent = 'Clé de secours incorrecte.';
-                        errorDiv.style.display = 'block';
-                        return;
-                    }
-                    modal.classList.remove('active');
-                    resolve(true);
-                }
-
-                submitBtn.onclick = validate;
-                closeBtn.onclick = () => {
-                    modal.classList.remove('active');
+            return new Promise(async (resolve) => {
+                try {
+                    const granted = await checkIsAdmin(currentUser?.uid);
+                    if (!granted) showToast('Accès administrateur refusé.', 'error');
+                    resolve(granted);
+                } catch (e) {
+                    console.error('Erreur de validation administrateur :', e);
                     resolve(false);
-                };
-                backupInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') validate();
-                });
+                }
             });
         }
 
@@ -3304,11 +3290,11 @@
                             if (item.addr) {
                                 html += `
                                     <div class="donation-method">
-                                        <div class="method-label"><i class="fab fa-bitcoin"></i> ${item.label}</div>
+                                        <div class="method-label"><i class="fab fa-bitcoin"></i> ${escapeHTML(item.label)}</div>
                                         <div class="method-detail">
-                                            <span>${item.addr}</span>
-                                            <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
-                                            ${item.qr ? `<img class="qr-thumb" src="${item.qr}" alt="QR" data-qr="${item.qr}">` : ''}
+                                            <span>${escapeHTML(item.addr)}</span>
+                                            <button class="copy-btn" data-text="${escapeHTML(item.addr)}"><i class="fas fa-copy"></i></button>
+                                            ${item.qr ? `<img class="qr-thumb" src="${escapeHTML(sanitizeImageUrl(item.qr))}" alt="QR" data-qr="${escapeHTML(sanitizeImageUrl(item.qr))}">` : ''}
                                         </div>
                                     </div>
                                 `;
@@ -3323,10 +3309,10 @@
                             if (item.addr) {
                                 html += `
                                     <div class="donation-method">
-                                        <div class="method-label"><i class="fas fa-mobile-alt"></i> ${item.label}</div>
+                                        <div class="method-label"><i class="fas fa-mobile-alt"></i> ${escapeHTML(item.label)}</div>
                                         <div class="method-detail">
-                                            <span>${item.addr}</span>
-                                            <button class="copy-btn" data-text="${item.addr}"><i class="fas fa-copy"></i></button>
+                                            <span>${escapeHTML(item.addr)}</span>
+                                            <button class="copy-btn" data-text="${escapeHTML(item.addr)}"><i class="fas fa-copy"></i></button>
                                         </div>
                                     </div>
                                 `;
@@ -3416,7 +3402,7 @@
 
         async function updateAdminStatus(newStatus) {
             try {
-                await db.collection('admin_config').doc('status').set({ currentStatus: newStatus }, { merge: true });
+                await db.collection('admin_config').doc('status').set({ currentStatus: newStatus, adminUid: currentUser?.uid || null }, { merge: true });
                 showToast('Statut administrateur mis à jour !', 'info');
                 addAdminLog('Changement de statut administrateur : ' + newStatus);
                 logAnalyticsEvent('changement_theme', { theme: 'admin_status', status: newStatus });
@@ -3451,11 +3437,11 @@
                                 const data = doc.data();
                                 const id = doc.id;
                                 html += `
-                                    <div class="admin-link-item" data-id="${id}">
-                                        <input type="text" class="admin-link-label" value="${data.label || ''}" placeholder="Label">
-                                        <input type="text" class="admin-link-url" value="${data.url || ''}" placeholder="URL">
+                                    <div class="admin-link-item" data-id="${escapeHTML(id)}">
+                                        <input type="text" class="admin-link-label" value="${escapeHTML(data.label || '')}" placeholder="Label">
+                                        <input type="text" class="admin-link-url" value="${escapeHTML(data.url || '')}" placeholder="URL">
                                         <select class="admin-link-icon">
-                                            ${PLATFORMS.map(p => `<option value="${p.icon}" ${data.icon === p.icon ? 'selected' : ''}>${p.name}</option>`).join('')}
+                                            ${PLATFORMS.map(p => `<option value="${escapeHTML(p.icon)}" ${data.icon === p.icon ? 'selected' : ''}>${escapeHTML(p.name)}</option>`).join('')}
                                         </select>
                                         <div class="link-actions">
                                             <button class="save-link-btn" title="Sauvegarder"><i class="fas fa-save"></i></button>
@@ -3602,10 +3588,10 @@
                             const date = data.timestamp?.toDate?.() || new Date(data.timestamp);
                             const timeStr = date.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                             html += `
-                                <div class="admin-log-entry" data-id="${doc.id}">
+                                <div class="admin-log-entry" data-id="${escapeHTML(doc.id)}">
                                     <span class="log-time">${timeStr}</span>
-                                    <span class="log-action">${data.action || 'Action'}</span>
-                                    <button class="log-delete-btn" data-id="${doc.id}" title="Supprimer ce log"><i class="fas fa-times-circle"></i></button>
+                                    <span class="log-action">${escapeHTML(data.action || 'Action')}</span>
+                                    <button class="log-delete-btn" data-id="${escapeHTML(doc.id)}" title="Supprimer ce log"><i class="fas fa-times-circle"></i></button>
                                 </div>
                             `;
                         });
@@ -3673,7 +3659,7 @@
 
             document.documentElement.style.setProperty('--theme-primary-color', themeData.primaryColor);
             if (themeData.backgroundImage) {
-                document.documentElement.style.setProperty('--theme-background-image', `url(${themeData.backgroundImage})`);
+                document.documentElement.style.setProperty('--theme-background-image', themeData.backgroundImage ? `url(\"${escapeHTML(sanitizeImageUrl(themeData.backgroundImage))}\")` : 'none');
             } else {
                 document.documentElement.style.setProperty('--theme-background-image', 'none');
             }
@@ -3785,8 +3771,8 @@
                 div.className = 'testimonial-item';
                 div.innerHTML = `
                     <div class="testimonial-fields">
-                        <input type="text" class="testimonial-name-input" data-index="${index}" value="${t.name || ''}" placeholder="Nom">
-                        <textarea class="testimonial-msg-input" data-index="${index}" rows="2" placeholder="Message">${t.message || ''}</textarea>
+                        <input type="text" class="testimonial-name-input" data-index="${index}" value="${escapeHTML(t.name || '')}" placeholder="Nom">
+                        <textarea class="testimonial-msg-input" data-index="${index}" rows="2" placeholder="Message">${escapeHTML(t.message || '')}</textarea>
                         <div style="display:flex; gap:0.4rem; align-items:center;">
                             <label style="font-size:0.7rem; color:var(--text-secondary);">Note :</label>
                             <select class="testimonial-stars-select" data-index="${index}">
@@ -3795,7 +3781,7 @@
                             <button class="btn btn-outline testimonial-upload-img" data-index="${index}" style="padding:0.1rem 0.6rem; font-size:0.7rem;">
                                 <i class="fas fa-image"></i> Photo
                             </button>
-                            ${t.imageUrl ? `<img src="${t.imageUrl}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid var(--cyan);">` : ''}
+                            ${t.imageUrl ? `<img src="${escapeHTML(sanitizeImageUrl(t.imageUrl))}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid var(--cyan);">` : ''}
                         </div>
                     </div>
                     <div class="testimonial-actions">
@@ -3884,9 +3870,9 @@
                 const stars = '★'.repeat(t.stars || 5) + '☆'.repeat(5 - (t.stars || 5));
                 slide.innerHTML = `
                     <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-                    ${t.imageUrl ? `<img class="testimonial-image" src="${t.imageUrl}" alt="${t.name || 'Témoin'}">` : ''}
-                    <div class="testimonial-name">${t.name || 'Anonyme'}</div>
-                    <div class="testimonial-message">"${t.message || ''}"</div>
+                    ${t.imageUrl ? `<img class="testimonial-image" src="${escapeHTML(sanitizeImageUrl(t.imageUrl))}" alt="${escapeHTML(t.name || 'Témoin')}">` : ''}
+                    <div class="testimonial-name">${escapeHTML(t.name || 'Anonyme')}</div>
+                    <div class="testimonial-message">"${escapeHTML(t.message || '')}"</div>
                     <div class="testimonial-stars">${stars}</div>
                 `;
                 track.appendChild(slide);
@@ -4030,8 +4016,8 @@
                         <option value="occupe" ${s.status === 'occupe' ? 'selected' : ''}>Occupé</option>
                         <option value="enlive" ${s.status === 'enlive' ? 'selected' : ''}>En Live</option>
                     </select>
-                    <input type="time" class="schedule-start" data-index="${index}" value="${s.start || ''}">
-                    <input type="time" class="schedule-end" data-index="${index}" value="${s.end || ''}">
+                    <input type="time" class="schedule-start" data-index="${index}" value="${escapeHTML(s.start || '')}">
+                    <input type="time" class="schedule-end" data-index="${index}" value="${escapeHTML(s.end || '')}">
                     <div class="schedule-actions">
                         <button class="delete-schedule" data-index="${index}"><i class="fas fa-times"></i></button>
                     </div>
@@ -4137,9 +4123,9 @@
                     let html = `
                         <div class="user-result-item">
                             <div class="user-info">
-                                <div class="user-name">${data.displayName || 'Sans nom'}</div>
-                                <div class="user-id" style="font-size:0.65rem; color:var(--text-secondary);">UID: ${uid}</div>
-                                ${data.email ? `<div class="user-id" style="font-size:0.65rem; color:var(--text-secondary);">Email: ${data.email}</div>` : ''}
+                                <div class="user-name">${escapeHTML(data.displayName || 'Sans nom')}</div>
+                                <div class="user-id" style="font-size:0.65rem; color:var(--text-secondary);">UID: ${escapeHTML(uid)}</div>
+                                ${data.email ? `<div class="user-id" style="font-size:0.65rem; color:var(--text-secondary);">Email: ${escapeHTML(data.email)}</div>` : ''}
                             </div>
                             <span class="badge-status ${isVerified ? 'verified' : 'unverified'}">
                                 ${isVerified ? '✅ Vérifié' : '❌ Non vérifié'}
@@ -4207,7 +4193,7 @@
 
             smartRedirectCancelled = false;
             messageEl.textContent = (redirectMessage || '').trim() || 'Redirection sécurisée en cours...';
-            backgroundEl.style.backgroundImage = imageUrl ? `url("${imageUrl.replace(/"/g, '\\\"')}")` : 'none';
+            backgroundEl.style.backgroundImage = imageUrl ? `url("${escapeHTML(sanitizeImageUrl(imageUrl))}")` : 'none';
             overlay.classList.add('active');
 
             let countdown = 2;
@@ -4469,16 +4455,16 @@
                                 const statusLabel = data.status === 'resolved' ? '✅ Résolu' : '⏳ En attente';
 
                                 html += `
-                                    <div class="bug-report-item" data-id="${id}">
+                                    <div class="bug-report-item" data-id="${escapeHTML(id)}">
                                         <div class="bug-header">
-                                            <span><i class="fas fa-user"></i> ${data.userId || 'Anonyme'}</span>
+                                            <span><i class="fas fa-user"></i> ${escapeHTML(data.userId || 'Anonyme')}</span>
                                             <span>${timeStr}</span>
                                             <span class="bug-status ${statusClass}">${statusLabel}</span>
                                         </div>
-                                        <div class="bug-message">${data.message || 'Aucun message'}</div>
+                                        <div class="bug-message">${escapeHTML(data.message || 'Aucun message')}</div>
                                         <div class="bug-actions">
-                                            ${data.status !== 'resolved' ? `<button class="resolve-btn" data-id="${id}"><i class="fas fa-check"></i> Marquer comme résolu</button>` : ''}
-                                            <button class="delete-bug-btn" data-id="${id}"><i class="fas fa-trash"></i> Supprimer</button>
+                                            ${data.status !== 'resolved' ? `<button class="resolve-btn" data-id="${escapeHTML(id)}"><i class="fas fa-check"></i> Marquer comme résolu</button>` : ''}
+                                            <button class="delete-bug-btn" data-id="${escapeHTML(id)}"><i class="fas fa-trash"></i> Supprimer</button>
                                         </div>
                                     </div>
                                 `;
@@ -4672,32 +4658,32 @@
                         <label><i class="fas fa-coins"></i> Crypto-monnaies</label>
                         <div style="margin-bottom:0.5rem;">
                             <label style="font-size:0.75rem;">USDT (TRC-20)</label>
-                            <input type="text" id="admin-usdt" value="${methods.usdt || ''}" placeholder="Adresse USDT">
+                            <input type="text" id="admin-usdt" value="${escapeHTML(methods.usdt || '')}" placeholder="Adresse USDT">
                             <div class="qr-upload-row">
                                 <button class="btn btn-outline admin-upload-qr" data-field="usdtQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
                                     <i class="fas fa-qrcode"></i> QR Code
                                 </button>
-                                ${methods.usdtQR ? `<img src="${methods.usdtQR}" alt="QR"> <button class="btn-remove-qr" data-field="usdtQR"><i class="fas fa-times"></i></button>` : ''}
+                                ${methods.usdtQR ? `<img src="${escapeHTML(sanitizeImageUrl(methods.usdtQR))}" alt="QR"> <button class="btn-remove-qr" data-field="usdtQR"><i class="fas fa-times"></i></button>` : ''}
                             </div>
                         </div>
                         <div style="margin-bottom:0.5rem;">
                             <label style="font-size:0.75rem;">Tron (TRX)</label>
-                            <input type="text" id="admin-tron" value="${methods.tron || ''}" placeholder="Adresse Tron">
+                            <input type="text" id="admin-tron" value="${escapeHTML(methods.tron || '')}" placeholder="Adresse Tron">
                             <div class="qr-upload-row">
                                 <button class="btn btn-outline admin-upload-qr" data-field="tronQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
                                     <i class="fas fa-qrcode"></i> QR Code
                                 </button>
-                                ${methods.tronQR ? `<img src="${methods.tronQR}" alt="QR"> <button class="btn-remove-qr" data-field="tronQR"><i class="fas fa-times"></i></button>` : ''}
+                                ${methods.tronQR ? `<img src="${escapeHTML(sanitizeImageUrl(methods.tronQR))}" alt="QR"> <button class="btn-remove-qr" data-field="tronQR"><i class="fas fa-times"></i></button>` : ''}
                             </div>
                         </div>
                         <div style="margin-bottom:0.5rem;">
                             <label style="font-size:0.75rem;">Bitcoin (BTC)</label>
-                            <input type="text" id="admin-btc" value="${methods.btc || ''}" placeholder="Adresse Bitcoin">
+                            <input type="text" id="admin-btc" value="${escapeHTML(methods.btc || '')}" placeholder="Adresse Bitcoin">
                             <div class="qr-upload-row">
                                 <button class="btn btn-outline admin-upload-qr" data-field="btcQR" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
                                     <i class="fas fa-qrcode"></i> QR Code
                                 </button>
-                                ${methods.btcQR ? `<img src="${methods.btcQR}" alt="QR"> <button class="btn-remove-qr" data-field="btcQR"><i class="fas fa-times"></i></button>` : ''}
+                                ${methods.btcQR ? `<img src="${escapeHTML(sanitizeImageUrl(methods.btcQR))}" alt="QR"> <button class="btn-remove-qr" data-field="btcQR"><i class="fas fa-times"></i></button>` : ''}
                             </div>
                         </div>
                     </div>
@@ -4705,15 +4691,15 @@
                         <label><i class="fas fa-mobile-alt"></i> Mobile Money</label>
                         <div style="margin-bottom:0.5rem;">
                             <label style="font-size:0.75rem;">MTN Mobile Money</label>
-                            <input type="text" id="admin-mtn" value="${methods.mtn || ''}" placeholder="Numéro MTN">
+                            <input type="text" id="admin-mtn" value="${escapeHTML(methods.mtn || '')}" placeholder="Numéro MTN">
                         </div>
                         <div style="margin-bottom:0.5rem;">
                             <label style="font-size:0.75rem;">Moov</label>
-                            <input type="text" id="admin-moov" value="${methods.moov || ''}" placeholder="Numéro Moov">
+                            <input type="text" id="admin-moov" value="${escapeHTML(methods.moov || '')}" placeholder="Numéro Moov">
                         </div>
                         <div style="margin-bottom:0.5rem;">
                             <label style="font-size:0.75rem;">Wave</label>
-                            <input type="text" id="admin-wave" value="${methods.wave || ''}" placeholder="Numéro Wave">
+                            <input type="text" id="admin-wave" value="${escapeHTML(methods.wave || '')}" placeholder="Numéro Wave">
                         </div>
                     </div>
                     <button class="btn" id="save-admin-donations" style="margin-top:0.5rem;">Mettre à jour les coordonnées</button>
@@ -4809,7 +4795,7 @@
                     <div class="admin-field">
                         <label>Couleur principale</label>
                         <div class="color-picker-row">
-                            <input type="color" id="theme-primary-color" value="${themeData.primaryColor}">
+                            <input type="color" id="theme-primary-color" value="${escapeHTML(themeData.primaryColor || '')}">
                             <span style="font-size:0.8rem; color:var(--text-secondary);">Choisissez une couleur</span>
                         </div>
                     </div>
@@ -4819,7 +4805,7 @@
                             <button class="btn btn-outline" id="btn-upload-bg" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
                                 <i class="fas fa-image"></i> Changer l'image
                             </button>
-                            ${themeData.backgroundImage ? `<img class="bg-preview" src="${themeData.backgroundImage}" alt="Fond">` : ''}
+                            ${themeData.backgroundImage ? `<img class="bg-preview" src="${escapeHTML(sanitizeImageUrl(themeData.backgroundImage))}" alt="Fond">` : ''}
                             ${themeData.backgroundImage ? `<button class="btn btn-outline btn-remove-bg" style="padding:0.2rem 0.6rem; font-size:0.7rem; border-color:var(--danger); color:var(--danger);"><i class="fas fa-times"></i> Supprimer</button>` : ''}
                         </div>
                     </div>
@@ -4919,7 +4905,25 @@
                     resourceType: "image",
                     signature: false,
                     maxFileSize: 5242880,
-                    allowedFormats: ['jpg', 'jpeg', 'png', 'webp']
+                    allowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+                    clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+                    preBatch: (cb, data) => {
+                        const files = Array.isArray(data?.files) ? data.files : [];
+                        const allowed = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+                        const maxBytes = 5 * 1024 * 1024;
+                        const invalid = files.some(file => {
+                            const typeOk = allowed.has(String(file?.type || '').toLowerCase());
+                            const nameOk = /\.(jpe?g|png|webp|gif)$/i.test(String(file?.name || ''));
+                            const sizeOk = Number(file?.size || 0) > 0 && Number(file.size) <= maxBytes;
+                            return !typeOk || !nameOk || !sizeOk;
+                        });
+                        if (invalid) {
+                            showToast('Fichier refusé : JPG, PNG, WEBP ou GIF uniquement, 5 Mo maximum.', 'error');
+                            cb({ cancel: true });
+                            return;
+                        }
+                        cb();
+                    },
                 },
                 (error, result) => {
                     if (error) {
@@ -5137,9 +5141,9 @@
                 const percent = maxClicks > 0 ? Math.round((link.clicks / maxClicks) * 100) : 0;
                 html += `
                     <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.7rem; margin-bottom:0.2rem;">
-                        <i class="${platform.icon}" style="width:1.2rem; color:var(--cyan);"></i>
-                        <span style="flex:1;">${platform.name}</span>
-                        <span style="color:var(--text-secondary);">${link.clicks}</span>
+                        <i class="${escapeHTML(platform.icon)}" style="width:1.2rem; color:var(--cyan);"></i>
+                        <span style="flex:1;">${escapeHTML(platform.name)}</span>
+                        <span style="color:var(--text-secondary);">${escapeHTML(link.clicks || 0)}</span>
                         <div class="stat-bar" style="width:60px; height:4px; background:var(--card-border); border-radius:4px; overflow:hidden;">
                             <div class="fill" style="width:${percent}%; background:var(--cyan); height:100%; border-radius:4px;"></div>
                         </div>
@@ -5171,9 +5175,9 @@
                 html += `
                     <span class="rank-item">
                         <span class="rank-num">#${index+1}</span>
-                        <i class="${platform.icon}"></i>
-                        ${platform.name}
-                        <span style="opacity:0.6; font-size:0.7rem;">${link.clicks || 0} (${percent}%)</span>
+                        <i class="${escapeHTML(platform.icon)}"></i>
+                        ${escapeHTML(platform.name)}
+                        <span style="opacity:0.6; font-size:0.7rem;">${escapeHTML(link.clicks || 0)} (${escapeHTML(percent)}%)</span>
                     </span>
                 `;
             });
@@ -5198,14 +5202,14 @@
                     const div = document.createElement('div');
                     div.className = 'section-item';
                     div.innerHTML = `
-                        <span style="flex:1; font-size:0.9rem;">${item.title || 'Section'}</span>
+                        <span style="flex:1; font-size:0.9rem;">${escapeHTML(item.title || 'Section')}</span>
                         <div class="section-actions">
-                            <button data-id="${item.id}" data-action="edit-section" title="Modifier"><i class="fas fa-edit"></i></button>
-                            <button data-id="${item.id}" data-action="delete-section" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                            <button data-id="${escapeHTML(item.id)}" data-action="edit-section" title="Modifier"><i class="fas fa-edit"></i></button>
+                            <button data-id="${escapeHTML(item.id)}" data-action="delete-section" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
                         </div>
                         <div class="order-controls" style="display:flex; flex-direction:column; gap:0.2rem; margin-left:0.5rem;">
-                            ${index > 0 ? `<button data-id="${item.id}" data-dir="up"><i class="fas fa-chevron-up"></i></button>` : ''}
-                            ${index < total - 1 ? `<button data-id="${item.id}" data-dir="down"><i class="fas fa-chevron-down"></i></button>` : ''}
+                            ${index > 0 ? `<button data-id="${escapeHTML(item.id)}" data-dir="up"><i class="fas fa-chevron-up"></i></button>` : ''}
+                            ${index < total - 1 ? `<button data-id="${escapeHTML(item.id)}" data-dir="down"><i class="fas fa-chevron-down"></i></button>` : ''}
                         </div>
                     `;
                     container.appendChild(div);
@@ -5220,30 +5224,30 @@
                     const startDisplay = item.startDate || item.endDate ? `<span style="font-size:0.55rem; color:var(--text-secondary);"><i class="fas fa-calendar-alt"></i></span>` : '';
                     const lockedDisplay = item.locked ? `<span style="font-size:0.55rem; color:var(--cyan);"><i class="fas fa-lock"></i></span>` : '';
                     div.innerHTML = `
-                        <i class="${platform.icon} platform-icon" style="color:var(--cyan);"></i>
-                        <input type="text" class="input-field link-url-input" value="${item.url || ''}" placeholder="URL" data-id="${item.id}">
-                        <div class="toggle-switch ${item.active ? 'active' : ''}" data-id="${item.id}" data-action="toggle"></div>
-                        <button class="delete-link-btn" data-id="${item.id}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
-                        <button class="btn btn-outline feature-btn" data-id="${item.id}" style="padding:0.2rem 0.4rem; font-size:0.7rem;">
+                        <i class="${escapeHTML(platform.icon)} platform-icon" style="color:var(--cyan);"></i>
+                        <input type="text" class="input-field link-url-input" value="${escapeHTML(item.url || '')}" placeholder="URL" data-id="${escapeHTML(item.id)}">
+                        <div class="toggle-switch ${item.active ? 'active' : ''}" data-id="${escapeHTML(item.id)}" data-action="toggle"></div>
+                        <button class="delete-link-btn" data-id="${escapeHTML(item.id)}" data-action="delete"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn btn-outline feature-btn" data-id="${escapeHTML(item.id)}" style="padding:0.2rem 0.4rem; font-size:0.7rem;">
                             ${isFeatured ? '<i class="fas fa-thumbtack" style="color:var(--cyan);"></i>' : '<i class="fas fa-thumbtack"></i>'}
                         </button>
                         <div class="order-controls">
-                            ${index > 0 ? `<button data-id="${item.id}" data-dir="up"><i class="fas fa-chevron-up"></i></button>` : ''}
-                            ${index < total - 1 ? `<button data-id="${item.id}" data-dir="down"><i class="fas fa-chevron-down"></i></button>` : ''}
+                            ${index > 0 ? `<button data-id="${escapeHTML(item.id)}" data-dir="up"><i class="fas fa-chevron-up"></i></button>` : ''}
+                            ${index < total - 1 ? `<button data-id="${escapeHTML(item.id)}" data-dir="down"><i class="fas fa-chevron-down"></i></button>` : ''}
                         </div>
-                        <span style="font-size:0.7rem; color:var(--text-secondary);">${clicks} clics</span>
-                        <button class="reset-clicks-btn" data-id="${item.id}" title="Réinitialiser les clics de ce lien"><i class="fas fa-sync-alt"></i></button>
+                        <span style="font-size:0.7rem; color:var(--text-secondary);">${escapeHTML(clicks)} clics</span>
+                        <button class="reset-clicks-btn" data-id="${escapeHTML(item.id)}" title="Réinitialiser les clics de ce lien"><i class="fas fa-sync-alt"></i></button>
                         ${lockedDisplay}
                         ${startDisplay}
                         ${item.startDate ? `<span style="font-size:0.55rem; color:var(--text-secondary);">${new Date(item.startDate).toLocaleDateString()}</span>` : ''}
-                        <button class="btn btn-outline lock-toggle-btn" data-id="${item.id}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
+                        <button class="btn btn-outline lock-toggle-btn" data-id="${escapeHTML(item.id)}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
                             ${item.locked ? '🔓 Déverrouiller' : '🔒 Verrouiller'}
                         </button>
                         <!-- NOUVEAU : Bouton Modifier l'image -->
-                        <button class="btn btn-outline change-link-image-btn" data-id="${item.id}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
+                        <button class="btn btn-outline change-link-image-btn" data-id="${escapeHTML(item.id)}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
                             <i class="fas fa-image"></i> Image
                         </button>
-                        ${item.imageUrl ? `<img src="${item.imageUrl}" style="width:24px; height:24px; border-radius:4px; object-fit:cover; border:1px solid var(--card-border);">` : ''}
+                        ${item.imageUrl ? `<img src="${escapeHTML(sanitizeImageUrl(item.imageUrl))}" style="width:24px; height:24px; border-radius:4px; object-fit:cover; border:1px solid var(--card-border);">` : ''}
                     `;
                     container.appendChild(div);
                 }
@@ -5403,7 +5407,7 @@
                 const div = document.createElement('div');
                 div.className = `platform-item ${selectedOnboardingPlatforms.has(p.id) ? 'selected' : ''}`;
                 div.dataset.platform = p.id;
-                div.innerHTML = `<i class="${p.icon}"></i><span>${p.name}</span>`;
+                div.innerHTML = `<i class="${escapeHTML(p.icon)}"></i><span>${escapeHTML(p.name)}</span>`;
                 div.addEventListener('click', () => toggleOnboardingPlatform(p.id));
                 grid.appendChild(div);
             });
@@ -5433,9 +5437,9 @@
                 const wrapper = document.createElement('div');
                 wrapper.className = 'input-group url-input-animated mt-1';
                 wrapper.innerHTML = `
-                    <label><i class="${platform.icon}"></i> Lien ${platform.name}</label>
+                    <label><i class="${escapeHTML(platform.icon)}"></i> Lien ${escapeHTML(platform.name)}</label>
                     <input type="text" class="input-field onboarding-url-input" data-platform="${platformId}" 
-                           placeholder="https://..." value="${onboardingUrls[platformId] || ''}">
+                           placeholder="https://..." value="${escapeHTML(onboardingUrls[platformId] || '')}">
                 `;
                 container.appendChild(wrapper);
             });
@@ -5692,7 +5696,7 @@
             userProfile.subscribers.forEach(sub => {
                 html += `
                     <div class="sub-item">
-                        <span class="sub-email">${sub.email}</span>
+                        <span class="sub-email">${escapeHTML(sub.email)}</span>
                         <span class="sub-date">${new Date(sub.date).toLocaleDateString()}</span>
                     </div>
                 `;
@@ -5750,10 +5754,13 @@
         function injectTrackingScripts(integrations) {
             document.querySelectorAll('[data-linkext-tracking]').forEach(el => el.remove());
 
-            if (integrations.metaPixel) {
+            const metaPixel = typeof integrations.metaPixel === 'string' ? integrations.metaPixel.trim() : '';
+            const gaId = typeof integrations.ga === 'string' ? integrations.ga.trim() : '';
+
+            if (metaPixel && /^[A-Za-z0-9_-]{3,100}$/.test(metaPixel)) {
                 const metaScript = document.createElement('script');
                 metaScript.setAttribute('data-linkext-tracking', 'meta');
-                metaScript.innerHTML = `
+                metaScript.textContent = `
                     !function(f,b,e,v,n,t,s)
                     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
                     n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -5762,26 +5769,26 @@
                     t.src=v;s=b.getElementsByTagName(e)[0];
                     s.parentNode.insertBefore(t,s)}(window, document,'script',
                     'https://connect.facebook.net/en_US/fbevents.js');
-                    fbq('init', '${integrations.metaPixel}');
+                    fbq('init', ${JSON.stringify(metaPixel)});
                     fbq('track', 'PageView');
                 `;
                 document.head.appendChild(metaScript);
             }
 
-            if (integrations.ga) {
+            if (gaId && /^G-[A-Za-z0-9_-]{3,100}$/.test(gaId)) {
                 const gaScript = document.createElement('script');
                 gaScript.setAttribute('data-linkext-tracking', 'ga');
                 gaScript.async = true;
-                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${integrations.ga}`;
+                gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId);
                 document.head.appendChild(gaScript);
 
                 const gaInit = document.createElement('script');
                 gaInit.setAttribute('data-linkext-tracking', 'ga-init');
-                gaInit.innerHTML = `
+                gaInit.textContent = `
                     window.dataLayer = window.dataLayer || [];
                     function gtag(){dataLayer.push(arguments);}
                     gtag('js', new Date());
-                    gtag('config', '${integrations.ga}');
+                    gtag('config', ${JSON.stringify(gaId)});
                 `;
                 document.head.appendChild(gaInit);
             }
@@ -5824,7 +5831,7 @@
                 }
 
                 const avatar = document.getElementById('public-avatar');
-                avatar.src = data.photoURL || generateAvatarUrl(data.displayName || 'User');
+                avatar.src = sanitizeImageUrl(data.photoURL) || generateAvatarUrl(data.displayName || 'User');
                 avatar.onerror = () => { avatar.src = generateAvatarUrl('User'); };
 
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
@@ -5833,7 +5840,7 @@
                 // Affichage du badge de certification
                 updatePublicVerifiedBadge(data.verified === true);
 
-                const isOwnerAdmin = await checkIsAdmin(uid);
+                const isOwnerAdmin = await isPublicAdminProfile(uid);
                 let statusBadge = document.getElementById('public-status-badge');
                 if (isOwnerAdmin) {
                     if (adminStatusUnsubscribe) {
@@ -5854,7 +5861,7 @@
                                 };
                                 const st = statusMap[status] || statusMap.disponible;
                                 statusBadge.className = `status-badge ${st.class}`;
-                                statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+                                statusBadge.innerHTML = `<span class="dot"></span> ${escapeHTML(st.label)}`;
                             }, (err) => {
                                 console.warn('Erreur écoute statut admin public:', err);
                             });
@@ -5869,7 +5876,7 @@
                     };
                     const st = statusMap[data.status] || statusMap.disponible;
                     statusBadge.className = `status-badge ${st.class}`;
-                    statusBadge.innerHTML = `<span class="dot"></span> ${st.label}`;
+                    statusBadge.innerHTML = `<span class="dot"></span> ${escapeHTML(st.label)}`;
                 }
 
                 applySavedTheme();
@@ -5882,7 +5889,7 @@
                     const flashDiv = document.createElement('div');
                     flashDiv.className = `flash-banner active flash-${data.flash.color || 'red'}`;
                     flashDiv.innerHTML = `
-                        ${data.flash.message}
+                        ${escapeHTML(data.flash.message)}
                         <button class="flash-close" id="flash-close-btn"><i class="fas fa-times"></i></button>
                     `;
                     flashContainer.appendChild(flashDiv);
@@ -5995,13 +6002,13 @@
                         const desc = document.createElement('div');
                         desc.className = 'link-description';
                         const lockIcon = item.locked ? ' <i class="fas fa-lock" style="color:var(--cyan);"></i>' : '';
-                        desc.innerHTML = (item.description || `Rejoindre ${platform.name}`) + lockIcon;
+                        desc.innerHTML = escapeHTML(item.description || `Rejoindre ${platform.name}`) + lockIcon;
 
                         const media = document.createElement('div');
                         if (item.imageUrl && item.imageUrl !== '') {
                             const img = document.createElement('img');
                             img.className = 'card-media';
-                            img.src = item.imageUrl;
+                            img.src = sanitizeImageUrl(item.imageUrl);
                             img.alt = platform.name;
                             media.appendChild(img);
                         } else {
@@ -6026,8 +6033,8 @@
                         const actionBar = document.createElement('div');
                         actionBar.className = 'link-action-bar';
                         actionBar.innerHTML = `
-                            <i class="${platform.icon}"></i>
-                            <span>${item.locked ? '🔒 Déverrouiller' : (isRedirectActive ? 'Redirection automatique...' : 'Cliquez ici pour rejoindre')}</span>
+                            <i class="${escapeHTML(platform.icon)}"></i>
+                            <span>${escapeHTML(item.locked ? '🔒 Déverrouiller' : (isRedirectActive ? 'Redirection automatique...' : 'Cliquez ici pour rejoindre'))}</span>
                         `;
 
                         card.appendChild(desc);
@@ -6954,7 +6961,7 @@
                 const card = document.createElement('div');
                 card.className = 'network-card';
                 card.dataset.platform = p.id;
-                card.innerHTML = `<i class="${p.icon}"></i><span>${p.name}</span>`;
+                card.innerHTML = `<i class="${escapeHTML(p.icon)}"></i><span>${escapeHTML(p.name)}</span>`;
                 card.addEventListener('click', () => selectNetwork(p.id));
                 grid.appendChild(card);
             });
