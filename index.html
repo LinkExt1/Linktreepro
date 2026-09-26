@@ -2496,7 +2496,27 @@
             .dashboard-nav .nav-item span { font-size: 0.4rem; }
             .admin-dashboard-grid { grid-template-columns: 1fr; }
         }
-    </style>
+    
+        /* ===== LinkExt v2.1 : analytics / leads / catalogue / social proof ===== */
+        .v21-section { margin-top: .8rem; border-top: 1px solid var(--border-glow); padding-top: .8rem; }
+        .v21-list { display:flex; flex-direction:column; gap:.45rem; max-height:280px; overflow:auto; }
+        .v21-row { display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.55rem .65rem; border:1px solid var(--card-border); border-radius:10px; background:rgba(255,255,255,.025); font-size:.75rem; }
+        .v21-muted { color:var(--text-secondary); font-size:.7rem; }
+        .v21-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.45rem; }
+        .v21-product-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; margin-top:.7rem; }
+        .v21-product-card { border:1px solid var(--card-border); border-radius:14px; overflow:hidden; background:rgba(255,255,255,.035); text-align:left; }
+        .v21-product-card img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+        .v21-product-body { padding:.65rem; }
+        .v21-product-title { font-family:var(--font-heading); font-size:.85rem; margin-bottom:.25rem; }
+        .v21-product-price { color:var(--cyan); font-weight:700; font-size:.8rem; margin-bottom:.35rem; }
+        .v21-product-desc { color:var(--text-secondary); font-size:.7rem; line-height:1.4; margin-bottom:.55rem; }
+        .v21-like-btn { display:inline-flex; align-items:center; gap:.4rem; margin-top:.5rem; border:1px solid var(--border-glow); background:rgba(255,255,255,.04); color:var(--text-primary); border-radius:999px; padding:.35rem .75rem; cursor:pointer; }
+        .v21-like-btn.liked { color:#ff4d6d; border-color:#ff4d6d; }
+        .v21-danger { border-color:var(--danger)!important; color:var(--danger)!important; }
+        .v21-admin-user { display:grid; grid-template-columns:1fr auto; gap:.4rem; align-items:center; }
+        @media (max-width:560px) { .v21-grid,.v21-product-grid { grid-template-columns:1fr; } .v21-admin-user { grid-template-columns:1fr; } }
+
+</style>
 </head>
 <body>
 <div id="app">
@@ -2614,6 +2634,29 @@
                         <button class="btn btn-outline" id="reset-views-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;"><i class="fas fa-redo"></i> Réinitialiser les vues</button>
                     </div>
                     <div id="top-networks-container" class="top-networks"></div>
+                    <div class="v21-section">
+                        <div class="flex-between">
+                            <h4 style="font-family:var(--font-heading);font-size:.9rem;color:var(--cyan);margin:0;"><i class="fas fa-heart"></i> J'aime public</h4>
+                            <div class="toggle-switch" id="likes-toggle"></div>
+                        </div>
+                    </div>
+                    <div class="v21-section">
+                        <div class="flex-between">
+                            <h4 style="font-family:var(--font-heading);font-size:.9rem;color:var(--cyan);margin:0;"><i class="fas fa-globe"></i> Historique des Visites</h4>
+                            <div class="toggle-switch" id="visitor-analytics-toggle" title="Activer/désactiver"></div>
+                        </div>
+                        <div id="visitor-history-dashboard" style="display:none;margin-top:.6rem;">
+                            <div class="v21-grid">
+                                <input type="date" class="input-field" id="visitor-date-filter">
+                                <input type="time" class="input-field" id="visitor-hour-filter">
+                            </div>
+                            <div class="v21-list" id="visitor-logs-container" style="margin-top:.5rem;"></div>
+                            <div style="display:flex;gap:.4rem;margin-top:.45rem;">
+                                <button class="btn btn-outline" id="visitor-clear-filters-btn" style="flex:1;padding:.3rem .6rem;font-size:.7rem;">Réinitialiser</button>
+                                <button class="btn btn-outline v21-danger" id="purge-visitor-history-btn" style="flex:1;padding:.3rem .6rem;font-size:.7rem;"><i class="fas fa-trash"></i> Purger l'historique</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- LIENS -->
@@ -2651,6 +2694,7 @@
                     </div>
                     <div class="input-group mt-1"><label>Photo de profil</label><button class="btn btn-outline" id="btn-change-photo" style="justify-content: center; padding:0.4rem;"><i class="fas fa-camera"></i> Changer la photo</button></div>
                     <div class="input-group mt-1"><label>Biographie</label><textarea class="input-field" id="dashboard-bio" rows="2" maxlength="150"></textarea></div>
+                    <div class="input-group mt-1"><label><i class="fas fa-phone"></i> Numéro de téléphone</label><input type="tel" class="input-field" id="dashboard-phone" placeholder="+229XXXXXXXX" maxlength="20" autocomplete="tel"></div>
                     <div class="input-group mt-1" style="border-top:1px solid var(--border-glow); padding-top:0.8rem;">
                         <label><i class="fas fa-database"></i> Sauvegarde de configuration</label>
                         <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
@@ -2699,6 +2743,35 @@
                     <div class="integrations-section"><h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-chart-line"></i> Intégrations Marketing</h4>
                         <div class="input-group"><label>ID Pixel Meta (Facebook)</label><input type="text" class="input-field" id="meta-pixel-id" placeholder="123456789012345"></div>
                         <div class="input-group"><label>ID Google Analytics (G-XXXXX)</label><input type="text" class="input-field" id="google-analytics-id" placeholder="G-XXXXXXXXXX"></div>
+                        <div class="input-group"><label>ID TikTok Pixel</label><input type="text" class="input-field" id="tiktok-pixel-id" placeholder="CXXXXXXXXXXXXXXXXX"></div><div class="flex-between" style="margin-top:.35rem;"><span style="font-size:.75rem;color:var(--text-secondary);">Activer le TikTok Pixel</span><div class="toggle-switch" id="tiktok-pixel-toggle"></div></div>
+                    </div>
+                    <div class="v21-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-user-plus"></i> Capture de leads</h4>
+                        <div class="flex-between"><span style="font-size:.8rem;color:var(--text-secondary);">Activer la collecte de contacts</span><div class="toggle-switch" id="lead-capture-toggle"></div></div>
+                        <div id="lead-capture-dashboard" style="display:none; margin-top:.6rem;">
+                            <div class="v21-list" id="leads-list-container"><span class="v21-muted">Aucun lead pour le moment.</span></div>
+                            <div style="display:flex;gap:.4rem;margin-top:.45rem;">
+                                <button class="btn btn-outline" id="export-leads-btn" style="flex:1;padding:.3rem .6rem;font-size:.7rem;"><i class="fas fa-file-csv"></i> Exporter CSV</button>
+                                <button class="btn btn-outline" id="refresh-leads-btn" style="padding:.3rem .6rem;font-size:.7rem;"><i class="fas fa-sync"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="v21-section">
+                        <h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-store"></i> Catalogue Produits</h4>
+                        <div class="flex-between"><span style="font-size:.8rem;color:var(--text-secondary);">Activer la vitrine</span><div class="toggle-switch" id="catalog-toggle"></div></div>
+                        <div id="catalog-dashboard" style="display:none; margin-top:.6rem;">
+                            <div class="v21-grid">
+                                <input class="input-field" id="product-title-input" placeholder="Titre du produit" maxlength="100">
+                                <input class="input-field" id="product-price-input" placeholder="Prix" maxlength="40">
+                            </div>
+                            <textarea class="input-field" id="product-description-input" rows="2" maxlength="300" placeholder="Description"></textarea>
+                            <div style="display:flex;gap:.4rem;align-items:center;margin-top:.35rem;">
+                                <button class="btn btn-outline" id="product-photo-btn" style="padding:.3rem .6rem;font-size:.7rem;"><i class="fas fa-image"></i> Photo</button>
+                                <img id="product-photo-preview" src="" alt="Produit" style="display:none;width:42px;height:42px;object-fit:cover;border-radius:7px;">
+                                <button class="btn" id="add-product-btn" style="padding:.3rem .7rem;font-size:.7rem;">Ajouter</button>
+                            </div>
+                            <div class="v21-list" id="products-dashboard-list" style="margin-top:.5rem;"></div>
+                        </div>
                     </div>
                     <div class="flash-section"><h4 style="font-family:var(--font-heading); font-size:0.9rem; color:var(--cyan);"><i class="fas fa-bolt"></i> Alerte Flash</h4>
                         <div class="flex-between"><span style="font-size:0.8rem; color:var(--text-secondary);">Activer la bannière</span><div class="toggle-switch" id="flash-toggle"></div></div>
@@ -2743,6 +2816,14 @@
                             <button class="btn btn-outline" id="badge-search-btn"><i class="fas fa-search"></i> Rechercher</button>
                         </div>
                         <div id="badge-search-results"></div>
+                    </div>
+                    <div class="v21-section" id="admin-account-management">
+                        <h4 style="font-family:var(--font-heading);font-size:.9rem;color:var(--cyan);"><i class="fas fa-user-shield"></i> Comptes utilisateurs</h4>
+                        <div class="v21-grid">
+                            <input class="input-field" id="ban-message-input" maxlength="300" placeholder="Message personnalisé de suspension">
+                            <input class="input-field" id="ban-contact-input" maxlength="200" placeholder="Lien contact Admin (WhatsApp/Email)">
+                        </div>
+                        <div id="admin-users-container" class="v21-list" style="margin-top:.5rem;"><span class="v21-muted">Chargement...</span></div>
                     </div>
                     <div id="admin-panel-container"></div>
                 </div>
@@ -2822,6 +2903,19 @@
                 </div>
                 <div class="public-links-divider"></div>
                 <div id="public-links"></div>
+                <div id="public-social-proof" style="padding:.2rem 1rem .6rem;text-align:center;">
+                    <button class="v21-like-btn exclude-click" id="public-like-btn" type="button"><i class="far fa-heart"></i> J'aime <span id="public-like-count">0</span></button>
+                </div>
+                <div id="public-leads-capture" style="display:none;padding:.7rem 1rem;">
+                    <div class="glass-card" style="padding:.9rem;">
+                        <h3 style="font-family:var(--font-heading);font-size:1rem;margin-bottom:.25rem;">Restons en contact</h3>
+                        <p style="font-size:.75rem;color:var(--text-secondary);margin-bottom:.6rem;">Laissez votre nom et votre email ou numéro WhatsApp.</p>
+                        <input class="input-field" id="public-lead-name" placeholder="Nom" maxlength="100">
+                        <input class="input-field" id="public-lead-contact" placeholder="Email ou numéro WhatsApp" maxlength="120" style="margin-top:.4rem;">
+                        <button class="btn" id="public-lead-submit" style="width:100%;margin-top:.5rem;">S'inscrire / Être rappelé</button>
+                    </div>
+                </div>
+                <div id="public-products" style="display:none;padding:.4rem 1rem .8rem;"></div>
                 <!-- ===== TÉMOIGNAGES DÉPLACÉS ICI (avant le pied de page) ===== -->
                 <div id="public-testimonials" style="padding:0.8rem 1rem 0.5rem 1rem; margin-top:0.5rem;"></div>
             </div>
@@ -2853,15 +2947,21 @@
     <!-- ===== MODALE ADMIN ===== -->
     <div class="modal-overlay admin-gate" id="admin-gate-modal">
         <div class="modal-content">
-            <h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-lock"></i> Accès Administrateur</h3>
-            <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem 0;">Veuillez saisir votre clé de secours.</p>
-            <div class="input-group">
-                <label>Clé de secours (Backup)</label>
-                <input type="password" class="input-field" id="admin-backup-input" placeholder="••••••••••••••••" autocomplete="off">
-            </div>
-            <div id="admin-gate-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.4rem; display:none;">Code invalide.</div>
-            <button class="btn" id="admin-gate-submit" style="width:100%; margin-top:1rem;">Vérifier et accéder</button>
+            <h3 style="font-family:var(--font-heading); font-size:1.2rem;"><i class="fas fa-shield-alt"></i> Accès Administrateur</h3>
+            <p style="color:var(--text-secondary); font-size:0.85rem; margin:0.7rem 0 1rem 0;">L'accès administrateur est vérifié exclusivement par le Custom Claim Firebase <strong>admin</strong>.</p>
+            <div id="admin-gate-error" style="color:var(--danger); font-size:0.8rem; margin-top:0.4rem; display:none;">Accès administrateur refusé.</div>
+            <button class="btn" id="admin-gate-submit" style="width:100%; margin-top:1rem;">Vérifier mes droits</button>
             <button class="close-modal" id="admin-gate-close" style="margin-top:0.5rem;">Fermer</button>
+        </div>
+    </div>
+
+    <!-- ===== MODALE COMPTE SUSPENDU ===== -->
+    <div class="modal-overlay" id="banned-account-modal">
+        <div class="modal-content">
+            <h3 style="font-family:var(--font-heading);font-size:1.15rem;color:var(--danger);"><i class="fas fa-ban"></i> Compte désactivé</h3>
+            <p id="banned-account-message" style="color:var(--text-secondary);font-size:.85rem;margin:.8rem 0;"></p>
+            <a id="banned-account-contact" class="btn" href="#" target="_blank" rel="noopener noreferrer" style="display:none;width:100%;text-decoration:none;">Contacter l'administrateur</a>
+            <button class="close-modal" id="banned-account-close" style="margin-top:.5rem;">Fermer</button>
         </div>
     </div>
 
@@ -2971,6 +3071,10 @@
         let profileListenerInitialized = false;
         let carouselInterval = null;
         let carouselCurrentIndex = 0;
+        let leadCaptureUnsubscribe = null;
+        let visitorLogsCache = [];
+        let productImageUrl = '';
+        let bannedNoticePending = null;
 
         // ============================================================
         // VUES
@@ -3094,6 +3198,7 @@
                             if (l.isSection === undefined) l.isSection = false;
                             if (!l.title) l.title = '';
                             if (l.locked === undefined) l.locked = false;
+                            if (l.deepLink === undefined) l.deepLink = false;
                             return l;
                         });
                         merged.links.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -3112,6 +3217,18 @@
                     if (!merged.subscribers) merged.subscribers = [];
                     if (!merged.testimonials) merged.testimonials = [];
                     if (!merged.schedules) merged.schedules = [];
+                    if (typeof merged.phoneNumber !== 'string') merged.phoneNumber = '';
+                    if (typeof merged.totalViews !== 'number') merged.totalViews = Number(merged.views || 0);
+                    if (typeof merged.likes !== 'number') merged.likes = 0;
+                    if (typeof merged.likesEnabled !== 'boolean') merged.likesEnabled = true;
+                    if (typeof merged.tiktokPixelEnabled !== 'boolean') merged.tiktokPixelEnabled = true;
+                    if (typeof merged.visitorAnalyticsEnabled !== 'boolean') merged.visitorAnalyticsEnabled = true;
+                    if (typeof merged.leadCaptureEnabled !== 'boolean') merged.leadCaptureEnabled = false;
+                    if (typeof merged.catalogEnabled !== 'boolean') merged.catalogEnabled = false;
+                    if (!Array.isArray(merged.products)) merged.products = [];
+                    if (typeof merged.accountStatus !== 'string') merged.accountStatus = 'active';
+                    if (typeof merged.banReason !== 'string') merged.banReason = '';
+                    if (typeof merged.adminContactLink !== 'string') merged.adminContactLink = '';
 
                     userProfile = merged;
                     return userProfile;
@@ -4387,6 +4504,7 @@
             renderAdminLinks();
             loadAdminLogs(10);
             renderThemeManager();
+            loadAdminUsers();
 
             // Afficher la gestion des badges
             const badgeContainer = document.getElementById('badge-management-container');
@@ -4965,8 +5083,12 @@
             if (sessionStorage.getItem(key) === 'true') return;
             try {
                 const docRef = db.collection('users').doc(uid);
-                await docRef.update({ views: firebase.firestore.FieldValue.increment(1) });
+                await docRef.update({
+                    totalViews: firebase.firestore.FieldValue.increment(1),
+                    views: firebase.firestore.FieldValue.increment(1)
+                });
                 if (userProfile && userProfile._id === uid) {
+                    userProfile.totalViews = (userProfile.totalViews || userProfile.views || 0) + 1;
                     userProfile.views = (userProfile.views || 0) + 1;
                 }
                 sessionStorage.setItem(key, 'true');
@@ -5123,7 +5245,7 @@
         function updateStats() {
             if (!userProfile) return;
             const totalClicks = userProfile.links ? userProfile.links.reduce((sum, l) => sum + (l.clicks || 0), 0) : 0;
-            document.getElementById('stat-views').textContent = userProfile.views || 0;
+            document.getElementById('stat-views').textContent = userProfile.totalViews ?? userProfile.views ?? 0;
             document.getElementById('stat-total-clicks').textContent = totalClicks;
 
             const barsContainer = document.getElementById('stat-bars');
@@ -5247,6 +5369,9 @@
                         <button class="btn btn-outline change-link-image-btn" data-id="${escapeHTML(item.id)}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
                             <i class="fas fa-image"></i> Image
                         </button>
+                        <button class="btn btn-outline deep-link-toggle-btn" data-id="${escapeHTML(item.id)}" style="padding:0.1rem 0.4rem; font-size:0.6rem;">
+                            <i class="fas fa-mobile-alt"></i> ${item.deepLink ? 'App activée' : "Ouvrir dans l’application"}
+                        </button>
                         ${item.imageUrl ? `<img src="${escapeHTML(sanitizeImageUrl(item.imageUrl))}" style="width:24px; height:24px; border-radius:4px; object-fit:cover; border:1px solid var(--card-border);">` : ''}
                     `;
                     container.appendChild(div);
@@ -5336,6 +5461,18 @@
                         renderDashboardLinks();
                         saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
                         logAnalyticsEvent('modification_profil', { action: 'toggle_lock', linkId: id });
+                    }
+                    return;
+                }
+                const deepLinkBtn = e.target.closest('.deep-link-toggle-btn');
+                if (deepLinkBtn) {
+                    const id = deepLinkBtn.dataset.id;
+                    const link = userProfile.links.find(l => l.id === id);
+                    if (link && !link.isSection) {
+                        link.deepLink = !link.deepLink;
+                        renderDashboardLinks();
+                        saveUserProfile(currentUser.uid, { links: userProfile.links }).catch(() => {});
+                        showToast(link.deepLink ? "Ouverture dans l’application activée." : "Ouverture native désactivée.", 'info');
                     }
                     return;
                 }
@@ -5477,12 +5614,25 @@
                     subscribers: [],
                     testimonials: [],
                     schedules: [],
+                    phoneNumber: '',
+                    totalViews: 0,
+                    likes: 0,
+                    likesEnabled: true,
+                    tiktokPixelEnabled: true,
+                    visitorAnalyticsEnabled: true,
+                    leadCaptureEnabled: false,
+                    catalogEnabled: false,
+                    products: [],
+                    accountStatus: 'active',
+                    banReason: '',
+                    adminContactLink: '',
                 };
             }
 
             document.getElementById('dashboard-name').value = userProfile.displayName || '';
             document.getElementById('dashboard-bio').value = userProfile.bio || '';
-            document.getElementById('views-count-display').textContent = userProfile.views || 0;
+            document.getElementById('dashboard-phone').value = userProfile.phoneNumber || '';
+            document.getElementById('views-count-display').textContent = userProfile.totalViews ?? userProfile.views ?? 0;
             document.getElementById('redirect-message-input').value = userProfile.redirect_message || '';
 
             document.getElementById('seo-title').value = userProfile.seo?.title || '';
@@ -5491,6 +5641,14 @@
 
             document.getElementById('meta-pixel-id').value = userProfile.integrations?.metaPixel || '';
             document.getElementById('google-analytics-id').value = userProfile.integrations?.ga || '';
+            document.getElementById('tiktok-pixel-id').value = userProfile.integrations?.tiktokPixel || '';
+            document.getElementById('tiktok-pixel-toggle').classList.toggle('active', userProfile.tiktokPixelEnabled !== false);
+            document.getElementById('likes-toggle').classList.toggle('active', userProfile.likesEnabled !== false);
+            document.getElementById('lead-capture-toggle').classList.toggle('active', userProfile.leadCaptureEnabled === true);
+            document.getElementById('catalog-toggle').classList.toggle('active', userProfile.catalogEnabled === true);
+            document.getElementById('visitor-analytics-toggle').classList.toggle('active', userProfile.visitorAnalyticsEnabled !== false);
+            document.getElementById('lead-capture-dashboard').style.display = userProfile.leadCaptureEnabled === true ? 'block' : 'none';
+            document.getElementById('catalog-dashboard').style.display = userProfile.catalogEnabled === true ? 'block' : 'none';
 
             const flash = userProfile.flash || { active: false, message: '', color: 'red' };
             document.getElementById('flash-toggle').classList.toggle('active', flash.active);
@@ -5519,7 +5677,15 @@
             applyBackground();
 
             renderSubscribers();
+            renderProductsDashboard();
             renderTestimonialsPrivate();
+            if (userProfile.leadCaptureEnabled === true) loadLeads();
+            if (userProfile.visitorAnalyticsEnabled !== false) {
+                document.getElementById('visitor-history-dashboard').style.display = 'block';
+                loadVisitorLogs();
+            } else {
+                document.getElementById('visitor-history-dashboard').style.display = 'none';
+            }
             renderSchedules();
             startScheduler();
 
@@ -5547,6 +5713,13 @@
                                 document.getElementById('seo-keywords').value = userProfile.seo?.keywords || '';
                                 document.getElementById('meta-pixel-id').value = userProfile.integrations?.metaPixel || '';
                                 document.getElementById('google-analytics-id').value = userProfile.integrations?.ga || '';
+                                document.getElementById('tiktok-pixel-id').value = userProfile.integrations?.tiktokPixel || '';
+                                document.getElementById('tiktok-pixel-toggle').classList.toggle('active', userProfile.tiktokPixelEnabled !== false);
+                                document.getElementById('likes-toggle').classList.toggle('active', userProfile.likesEnabled !== false);
+                                document.getElementById('dashboard-phone').value = userProfile.phoneNumber || '';
+                                document.getElementById('lead-capture-toggle').classList.toggle('active', userProfile.leadCaptureEnabled === true);
+                                document.getElementById('catalog-toggle').classList.toggle('active', userProfile.catalogEnabled === true);
+                                document.getElementById('visitor-analytics-toggle').classList.toggle('active', userProfile.visitorAnalyticsEnabled !== false);
                             }
                         }
                     }, (error) => {
@@ -5756,6 +5929,7 @@
 
             const metaPixel = typeof integrations.metaPixel === 'string' ? integrations.metaPixel.trim() : '';
             const gaId = typeof integrations.ga === 'string' ? integrations.ga.trim() : '';
+            const tiktokPixel = typeof integrations.tiktokPixel === 'string' ? integrations.tiktokPixel.trim() : '';
 
             if (metaPixel && /^[A-Za-z0-9_-]{3,100}$/.test(metaPixel)) {
                 const metaScript = document.createElement('script');
@@ -5773,6 +5947,23 @@
                     fbq('track', 'PageView');
                 `;
                 document.head.appendChild(metaScript);
+            }
+
+            if (integrations.tiktokEnabled !== false && tiktokPixel && /^[A-Za-z0-9_-]{3,100}$/.test(tiktokPixel)) {
+                const ttScript = document.createElement('script');
+                ttScript.setAttribute('data-linkext-tracking', 'tiktok');
+                ttScript.textContent = `
+                    !function (w, d, t) {
+                        w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=['page','track','identify','instances','debug','on','off','once','ready','alias','group','enableCookie','disableCookie'];
+                        ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
+                        for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+                        ttq.instance=function(t){var e=ttq._i[t]||[];for(var n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};
+                        ttq.load=function(e,n){var r='https://analytics.tiktok.com/i18n/pixel/events.js';ttq._i=ttq._i||{},ttq._i[e]=[],ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var i=document.createElement('script');i.type='text/javascript',i.async=!0,i.src=r+'?sdkid='+e+'&lib='+t;var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(i,s)};
+                        ttq.load(${JSON.stringify(tiktokPixel)});
+                        ttq.page();
+                    }(window, document, 'ttq');
+                `;
+                document.head.appendChild(ttScript);
             }
 
             if (gaId && /^G-[A-Za-z0-9_-]{3,100}$/.test(gaId)) {
@@ -5795,6 +5986,43 @@
         }
 
         // ============================================================
+        // DEEP LINKING
+        // ============================================================
+        function getDeepLinkUrl(item) {
+            const url = sanitizeUrl(item?.url || '');
+            if (!item?.deepLink || !url) return url;
+            try {
+                const parsed = new URL(url);
+                const host = parsed.hostname.toLowerCase();
+                if (item.platform === 'instagram' && (host === 'instagram.com' || host.endsWith('.instagram.com'))) {
+                    const username = parsed.pathname.split('/').filter(Boolean)[0];
+                    if (username) return 'instagram://user?username=' + encodeURIComponent(username);
+                }
+                if (item.platform === 'telegram' && (host === 't.me' || host.endsWith('.t.me'))) {
+                    const path = parsed.pathname.replace(/^\//, '');
+                    if (path) return 'tg://resolve?domain=' + encodeURIComponent(path.split('/')[0]);
+                }
+                if (item.platform === 'youtube' && (host === 'youtube.com' || host === 'www.youtube.com' || host === 'youtu.be')) {
+                    return 'vnd.youtube:' + parsed.href;
+                }
+            } catch (_) {}
+            return url;
+        }
+
+        function openLinkWithDeepLink(item) {
+            const fallbackUrl = sanitizeUrl(item?.url || '');
+            const appUrl = getDeepLinkUrl(item);
+            if (!item?.deepLink || appUrl === fallbackUrl) {
+                window.open(fallbackUrl, '_blank');
+                return;
+            }
+            let fallbackTimer = setTimeout(() => { window.open(fallbackUrl, '_blank'); }, 1200);
+            const clearFallback = () => { clearTimeout(fallbackTimer); fallbackTimer = null; };
+            window.addEventListener('pagehide', clearFallback, { once: true });
+            window.location.href = appUrl;
+        }
+
+        // ============================================================
         // ROUTAGE PUBLIC AVEC OPEN GRAPH DYNAMIQUE (DÉSACTIVÉ CÔTÉ CLIENT)
         // ============================================================
         async function loadPublicProfile(uid) {
@@ -5811,12 +6039,26 @@
                 }
                 const data = doc.data();
 
+                if (data.accountStatus === 'banned') {
+                    const publicView = document.getElementById('view-profile-public');
+                    publicView.innerHTML = `
+                        <div class="glass-card" style="padding:2rem 1.5rem;text-align:center;">
+                            <i class="fas fa-ban" style="font-size:2rem;color:var(--danger);"></i>
+                            <h2 style="margin:.7rem 0;">404 — Profil introuvable</h2>
+                            <p style="color:var(--text-secondary);">Ce profil est introuvable ou ce compte est actuellement suspendu.</p>
+                        </div>`;
+                    return;
+                }
+
                 // Incrémenter les vues globales et mensuelles
                 await incrementViews(uid);
                 await incrementMonthlyViews(uid);
 
-                const integrations = data.integrations || { metaPixel: '', ga: '' };
+                const integrations = data.integrations || { metaPixel: '', ga: '', tiktokPixel: '' };
                 injectTrackingScripts(integrations);
+                if (data.visitorAnalyticsEnabled !== false) {
+                    fetch('/api/visit?id=' + encodeURIComponent(uid), { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' } }).catch(() => {});
+                }
 
                 if (data.maintenance === true) {
                     const publicView = document.getElementById('view-profile-public');
@@ -5836,6 +6078,61 @@
 
                 document.getElementById('public-name').textContent = data.displayName || 'Utilisateur';
                 document.getElementById('public-bio-text').textContent = data.bio || '';
+
+                const likeBtn = document.getElementById('public-like-btn');
+                const socialProof = document.getElementById('public-social-proof');
+                socialProof.style.display = data.likesEnabled === false ? 'none' : 'block';
+                const likeCount = document.getElementById('public-like-count');
+                const likeKey = 'linkext-liked-' + uid;
+                likeCount.textContent = String(Number(data.likes || 0));
+                const alreadyLiked = localStorage.getItem(likeKey) === 'true';
+                likeBtn.classList.toggle('liked', alreadyLiked);
+                likeBtn.innerHTML = `<i class="${alreadyLiked ? 'fas' : 'far'} fa-heart"></i> J'aime <span id="public-like-count">${escapeHTML(Number(data.likes || 0))}</span>`;
+                likeBtn.onclick = async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (localStorage.getItem(likeKey) === 'true') return;
+                    try {
+                        await db.collection('users').doc(uid).update({ likes: firebase.firestore.FieldValue.increment(1) });
+                        localStorage.setItem(likeKey, 'true');
+                        const count = Number(document.getElementById('public-like-count').textContent || 0) + 1;
+                        document.getElementById('public-like-count').textContent = String(count);
+                        likeBtn.classList.add('liked');
+                        likeBtn.querySelector('i').className = 'fas fa-heart';
+                    } catch (e) {
+                        console.warn("Impossible d’enregistrer le J’aime:", e);
+                    }
+                };
+
+                const leadBox = document.getElementById('public-leads-capture');
+                leadBox.style.display = data.leadCaptureEnabled === true ? 'block' : 'none';
+                const leadSubmit = document.getElementById('public-lead-submit');
+                leadSubmit.onclick = async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const leadName = document.getElementById('public-lead-name').value.trim();
+                    const leadContact = document.getElementById('public-lead-contact').value.trim();
+                    if (!leadName || !leadContact) { showToast('Nom et contact requis.', 'error'); return; }
+                    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(leadContact);
+                    const isPhone = /^\+?[0-9 ()-]{7,20}$/.test(leadContact);
+                    if (!isEmail && !isPhone) { showToast('Entrez un email ou un numéro WhatsApp valide.', 'error'); return; }
+                    try {
+                        await db.collection('users').doc(uid).collection('leads').add({
+                            name: leadName.slice(0,100),
+                            contact: leadContact.slice(0,120),
+                            type: isEmail ? 'email' : 'whatsapp',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        document.getElementById('public-lead-name').value = '';
+                        document.getElementById('public-lead-contact').value = '';
+                        showToast('Merci, votre contact a été enregistré.', 'info');
+                    } catch (e) {
+                        console.error('Erreur enregistrement lead:', e);
+                        showToast("Impossible d’enregistrer votre contact.", 'error');
+                    }
+                };
+
+                renderPublicProducts(data);
 
                 // Affichage du badge de certification
                 updatePublicVerifiedBadge(data.verified === true);
@@ -5985,7 +6282,7 @@
                                 return;
                             }
 
-                            window.open(sanitizeUrl(item.url), '_blank');
+                            openLinkWithDeepLink(item);
                             incrementLinkClick(uid, item.id).catch(() => {});
                             logAnalyticsEvent('clic_reseau_social', { linkId: item.id, platform: item.platform });
                         };
@@ -6055,6 +6352,7 @@
 
                 window._vcardData = {
                     displayName: data.displayName || 'Utilisateur',
+                    phoneNumber: data.phoneNumber || '',
                     links: data.links || []
                 };
 
@@ -6062,6 +6360,207 @@
                 console.error(err);
                 showToast('Erreur chargement profil public.', 'error');
             }
+        }
+
+        // ============================================================
+        // v2.1 : HISTORIQUE DES VISITES
+        // ============================================================
+        async function loadVisitorLogs() {
+            const container = document.getElementById('visitor-logs-container');
+            if (!container || !currentUser) return;
+            container.innerHTML = '<span class="v21-muted">Chargement...</span>';
+            try {
+                const snap = await db.collection('users').doc(currentUser.uid)
+                    .collection('visitor_logs').orderBy('timestamp', 'desc').limit(100).get();
+                visitorLogsCache = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderVisitorLogs();
+            } catch (e) {
+                console.error('Erreur historique visites:', e);
+                container.innerHTML = '<span class="v21-muted">Impossible de charger l\'historique.</span>';
+            }
+        }
+
+        function renderVisitorLogs() {
+            const container = document.getElementById('visitor-logs-container');
+            if (!container) return;
+            const dateFilter = document.getElementById('visitor-date-filter')?.value || '';
+            const hourFilter = document.getElementById('visitor-hour-filter')?.value || '';
+            let logs = visitorLogsCache.filter(log => {
+                if (dateFilter && log.dateStr !== dateFilter) return false;
+                if (hourFilter && String(log.hourStr || '').slice(0, 5) !== hourFilter) return false;
+                return true;
+            });
+            if (!dateFilter && !hourFilter) logs = logs.slice(0, 10);
+            if (!logs.length) {
+                container.innerHTML = '<span class="v21-muted">Aucune visite correspondant au filtre.</span>';
+                return;
+            }
+            container.innerHTML = logs.map(log => {
+                const timestamp = log.timestamp?.toDate ? log.timestamp.toDate() : (log.timestamp ? new Date(log.timestamp) : null);
+                const label = timestamp && !Number.isNaN(timestamp.getTime()) ? timestamp.toLocaleString('fr-FR') : `${log.dateStr || ''} ${log.hourStr || ''}`;
+                return `<div class="v21-row"><span><strong>${escapeHTML(log.country || 'XX')}</strong><br><span class="v21-muted">${escapeHTML(label)}</span></span><span class="v21-muted">${escapeHTML(log.hourStr || '')}</span></div>`;
+            }).join('');
+        }
+
+        async function purgeVisitorHistory() {
+            if (!currentUser) return;
+            if (!confirm('Supprimer tout l\'historique des visites de ce profil ?')) return;
+            try {
+                const ref = db.collection('users').doc(currentUser.uid).collection('visitor_logs');
+                const snap = await ref.get();
+                const chunks = [];
+                let batch = db.batch();
+                let count = 0;
+                snap.docs.forEach(doc => {
+                    batch.delete(doc.ref); count++;
+                    if (count === 400) { chunks.push(batch); batch = db.batch(); count = 0; }
+                });
+                if (count) chunks.push(batch);
+                for (const b of chunks) await b.commit();
+                visitorLogsCache = [];
+                renderVisitorLogs();
+                showToast('Historique des visites purgé.', 'info');
+            } catch (e) {
+                console.error('Erreur purge historique:', e);
+                showToast('Impossible de purger l\'historique.', 'error');
+            }
+        }
+
+        // ============================================================
+        // v2.1 : LEADS
+        // ============================================================
+        async function loadLeads() {
+            const container = document.getElementById('leads-list-container');
+            if (!container || !currentUser) return;
+            try {
+                const snap = await db.collection('users').doc(currentUser.uid).collection('leads').orderBy('createdAt', 'desc').limit(500).get();
+                const leads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                window._linkextLeads = leads;
+                if (!leads.length) { container.innerHTML = '<span class="v21-muted">Aucun lead pour le moment.</span>'; return; }
+                container.innerHTML = leads.map(lead => {
+                    const contact = String(lead.contact || '');
+                    const waNumber = contact.replace(/[^0-9]/g, '');
+                    const waHref = waNumber.length >= 7 ? `https://wa.me/${waNumber}?text=${encodeURIComponent('Bonjour ' + (lead.name || '') + ', merci pour votre intérêt pour LinkExt.')}` : `https://wa.me/?text=${encodeURIComponent('Bonjour ' + (lead.name || '') + ', merci pour votre intérêt pour LinkExt.')}`;
+                    return `<div class="v21-row"><span><strong>${escapeHTML(lead.name || 'Sans nom')}</strong><br><span class="v21-muted">${escapeHTML(contact)}</span></span><a class="btn btn-outline" href="${escapeHTML(waHref)}" target="_blank" rel="noopener noreferrer" style="padding:.25rem .5rem;font-size:.65rem;">WhatsApp</a></div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Erreur chargement leads:', e);
+                container.innerHTML = '<span class="v21-muted">Impossible de charger les leads.</span>';
+            }
+        }
+
+        function exportLeadsCSV() {
+            const leads = window._linkextLeads || [];
+            if (!leads.length) { showToast('Aucun lead à exporter.', 'info'); return; }
+            const esc = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
+            const rows = [['Nom', 'Contact', 'Type', 'Date']];
+            leads.forEach(l => rows.push([l.name || '', l.contact || '', l.type || '', l.createdAt?.toDate ? l.createdAt.toDate().toISOString() : '']));
+            const csv = '\ufeff' + rows.map(r => r.map(esc).join(';')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob); const a = document.createElement('a');
+            a.href = url; a.download = `linkext-leads-${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        }
+
+        // ============================================================
+        // v2.1 : CATALOGUE PRODUITS
+        // ============================================================
+        function renderProductsDashboard() {
+            const container = document.getElementById('products-dashboard-list');
+            if (!container) return;
+            const products = Array.isArray(userProfile?.products) ? userProfile.products : [];
+            container.innerHTML = products.length ? products.map((p, i) => `<div class="v21-row"><span><strong>${escapeHTML(p.title || 'Produit')}</strong><br><span class="v21-muted">${escapeHTML(p.price || '')}</span></span><button class="btn btn-outline v21-danger delete-product-btn" data-index="${i}" style="padding:.25rem .5rem;font-size:.65rem;">Supprimer</button></div>`).join('') : '<span class="v21-muted">Aucun produit.</span>';
+            container.querySelectorAll('.delete-product-btn').forEach(btn => btn.addEventListener('click', async () => {
+                const index = Number(btn.dataset.index);
+                userProfile.products.splice(index, 1);
+                await saveUserProfile(currentUser.uid, { products: userProfile.products });
+                renderProductsDashboard(); renderPublicProducts(userProfile);
+            }));
+        }
+
+        async function addProduct() {
+            if (!currentUser) return;
+            const title = document.getElementById('product-title-input').value.trim();
+            const price = document.getElementById('product-price-input').value.trim();
+            const description = document.getElementById('product-description-input').value.trim();
+            const imageUrl = sanitizeImageUrl(productImageUrl);
+            if (!title || !price || !imageUrl) { showToast('Titre, prix et photo sont requis.', 'error'); return; }
+            if (!Array.isArray(userProfile.products)) userProfile.products = [];
+            if (userProfile.products.length >= 30) { showToast('Maximum de 30 produits.', 'error'); return; }
+            userProfile.products.push({ id: 'prod_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7), title, price, description, imageUrl });
+            const saved = await saveUserProfile(currentUser.uid, { products: userProfile.products });
+            if (saved) {
+                document.getElementById('product-title-input').value = ''; document.getElementById('product-price-input').value = ''; document.getElementById('product-description-input').value = '';
+                productImageUrl = ''; document.getElementById('product-photo-preview').style.display = 'none';
+                renderProductsDashboard(); showToast('Produit ajouté.', 'info');
+            }
+        }
+
+        function renderPublicProducts(data) {
+            const container = document.getElementById('public-products');
+            if (!container) return;
+            if (data.catalogEnabled !== true || !Array.isArray(data.products) || !data.products.length) { container.style.display = 'none'; container.innerHTML = ''; return; }
+            container.style.display = 'block';
+            container.innerHTML = `<h3 style="font-family:var(--font-heading);font-size:1rem;color:var(--cyan);text-align:left;margin:.4rem 0;">Catalogue</h3><div class="v21-product-grid">${data.products.slice(0,30).map((p, i) => `<article class="v21-product-card"><img src="${escapeHTML(sanitizeImageUrl(p.imageUrl))}" alt="${escapeHTML(p.title || 'Produit')}"><div class="v21-product-body"><div class="v21-product-title">${escapeHTML(p.title || 'Produit')}</div><div class="v21-product-price">${escapeHTML(p.price || '')}</div><div class="v21-product-desc">${escapeHTML(p.description || '')}</div><button class="btn product-wa-btn" data-product-index="${i}" style="width:100%;font-size:.7rem;padding:.35rem;">Commander sur WhatsApp</button></div></article>`).join('')}</div>`;
+            container.querySelectorAll('.product-wa-btn').forEach(btn => btn.addEventListener('click', e => {
+                e.preventDefault(); e.stopPropagation();
+                const p = data.products[Number(btn.dataset.productIndex)];
+                const phone = String(data.phoneNumber || '').replace(/[^0-9]/g, '');
+                if (!phone) { showToast('Le numéro WhatsApp du vendeur n\'est pas configuré.', 'error'); return; }
+                const text = `Bonjour, je souhaite commander l'article ${p.title || ''} au prix de ${p.price || ''} vu sur votre LinkExt.`;
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+            }));
+        }
+
+        // ============================================================
+        // v2.1 : ADMINISTRATION DES COMPTES
+        // ============================================================
+        async function loadAdminUsers() {
+            const container = document.getElementById('admin-users-container');
+            if (!container || !isAdmin) return;
+            try {
+                const snap = await db.collection('users').get();
+                const users = snap.docs.map(doc => ({ uid: doc.id, ...doc.data() })).sort((a,b) => String(a.displayName || '').localeCompare(String(b.displayName || '')));
+                if (!users.length) { container.innerHTML = '<span class="v21-muted">Aucun utilisateur.</span>'; return; }
+                container.innerHTML = users.map(u => {
+                    const banned = u.accountStatus === 'banned';
+                    return `<div class="v21-row v21-admin-user"><span><strong>${escapeHTML(u.displayName || 'Sans nom')}</strong><br><span class="v21-muted">${escapeHTML(u.email || u.uid)}</span><br><span class="v21-muted">${banned ? 'BANNI' : 'Actif'}</span></span><button class="btn ${banned ? 'btn-outline' : 'v21-danger'} admin-account-action" data-uid="${escapeHTML(u.uid)}" data-banned="${banned}" style="padding:.3rem .55rem;font-size:.65rem;">${banned ? 'Réactiver' : 'Bannir'}</button></div>`;
+                }).join('');
+                container.querySelectorAll('.admin-account-action').forEach(btn => btn.addEventListener('click', () => toggleBanUser(btn.dataset.uid, btn.dataset.banned === 'true')));
+            } catch (e) {
+                console.error('Erreur liste utilisateurs admin:', e);
+                container.innerHTML = '<span class="v21-muted">Accès aux utilisateurs refusé.</span>';
+            }
+        }
+
+        async function toggleBanUser(uid, currentlyBanned) {
+            if (!isAdmin || !uid) return;
+            if (uid === currentUser?.uid) { showToast('Vous ne pouvez pas bannir votre propre compte.', 'error'); return; }
+            try {
+                if (currentlyBanned) {
+                    await db.collection('users').doc(uid).update({ accountStatus: 'active', banReason: '', adminContactLink: '' });
+                    addAdminLog('Compte réactivé : ' + uid);
+                } else {
+                    const reason = document.getElementById('ban-message-input').value.trim() || 'Votre compte a été désactivé par l\'administrateur.';
+                    const contact = document.getElementById('ban-contact-input').value.trim();
+                    if (contact && !/^https?:\/\//i.test(contact)) { showToast('Le lien de contact doit commencer par http:// ou https://', 'error'); return; }
+                    await db.collection('users').doc(uid).update({ accountStatus: 'banned', banReason: reason.slice(0,300), adminContactLink: contact.slice(0,200) });
+                    addAdminLog('Compte banni : ' + uid);
+                }
+                await loadAdminUsers();
+                showToast(currentlyBanned ? 'Compte réactivé.' : 'Compte banni.', 'info');
+            } catch (e) {
+                console.error('Erreur bannissement:', e); showToast('Action impossible.', 'error');
+            }
+        }
+
+        function showBannedAccountModal(reason, contact) {
+            const modal = document.getElementById('banned-account-modal');
+            if (!modal) return;
+            document.getElementById('banned-account-message').textContent = reason || 'Votre compte a été désactivé par l\'administrateur.';
+            const link = document.getElementById('banned-account-contact');
+            const safe = sanitizeHttpUrl(contact || '');
+            if (safe) { link.href = safe; link.style.display = 'block'; } else { link.style.display = 'none'; }
+            modal.classList.add('active');
         }
 
         // ============================================================
@@ -6117,8 +6616,9 @@
             }
             try {
                 const docRef = db.collection('users').doc(currentUser.uid);
-                await docRef.update({ views: 0 });
+                await docRef.update({ views: 0, totalViews: 0 });
                 userProfile.views = 0;
+                userProfile.totalViews = 0;
                 document.getElementById('views-count-display').textContent = '0';
                 updateStats();
                 showToast('Vues globales réinitialisées !', 'info');
@@ -6297,7 +6797,7 @@
                 return;
             }
             const stats = {
-                views: userProfile.views || 0,
+                views: userProfile.totalViews ?? userProfile.views ?? 0,
                 totalClicks: userProfile.links ? userProfile.links.reduce((sum, l) => sum + (l.clicks || 0), 0) : 0,
                 links: userProfile.links ? userProfile.links.filter(l => !l.isSection && l.active) : []
             };
@@ -6358,6 +6858,14 @@
         // ============================================================
         async function handleAuthRedirection(user) {
             if (!user) {
+                const storedBan = sessionStorage.getItem('linkext-banned-notice');
+                if (storedBan) {
+                    try { bannedNoticePending = JSON.parse(storedBan); } catch (_) { bannedNoticePending = null; }
+                    sessionStorage.removeItem('linkext-banned-notice');
+                    showView('view-auth');
+                    showBannedAccountModal(bannedNoticePending?.reason, bannedNoticePending?.contact);
+                    return;
+                }
                 if (!isConsentGiven()) {
                     showView('view-consent');
                     return;
@@ -6367,6 +6875,12 @@
                 return;
             }
             const profile = await loadUserProfile(user.uid);
+            if (profile && profile.accountStatus === 'banned') {
+                bannedNoticePending = { reason: profile.banReason || '', contact: profile.adminContactLink || '' };
+                sessionStorage.setItem('linkext-banned-notice', JSON.stringify(bannedNoticePending));
+                await auth.signOut();
+                return;
+            }
             if (!profile) {
                 const defaultProfile = {
                     displayName: user.displayName || user.email?.split('@')[0] || 'Utilisateur',
@@ -6389,6 +6903,18 @@
                     subscribers: [],
                     testimonials: [],
                     schedules: [],
+                    phoneNumber: '',
+                    totalViews: 0,
+                    likes: 0,
+                    likesEnabled: true,
+                    tiktokPixelEnabled: true,
+                    visitorAnalyticsEnabled: true,
+                    leadCaptureEnabled: false,
+                    catalogEnabled: false,
+                    products: [],
+                    accountStatus: 'active',
+                    banReason: '',
+                    adminContactLink: '',
                     onboardingCompleted: false
                 };
                 saveUserProfile(user.uid, defaultProfile).catch(() => {});
@@ -6560,7 +7086,8 @@
                             endDate: null,
                             isSection: false,
                             title: '',
-                            locked: false
+                            locked: false,
+                            deepLink: false
                         });
                     }
                 });
@@ -6585,6 +7112,18 @@
                     subscribers: [],
                     testimonials: [],
                     schedules: [],
+                    phoneNumber: '',
+                    totalViews: 0,
+                    likes: 0,
+                    likesEnabled: true,
+                    tiktokPixelEnabled: true,
+                    visitorAnalyticsEnabled: true,
+                    leadCaptureEnabled: false,
+                    catalogEnabled: false,
+                    products: [],
+                    accountStatus: 'active',
+                    banReason: '',
+                    adminContactLink: '',
                     onboardingCompleted: true
                 };
                 saveUserProfile(currentUser.uid, profileData).catch(() => {});
@@ -6614,7 +7153,8 @@
                             endDate: null,
                             isSection: false,
                             title: '',
-                            locked: false
+                            locked: false,
+                            deepLink: false
                         });
                     }
                 });
@@ -6639,6 +7179,18 @@
                     subscribers: [],
                     testimonials: [],
                     schedules: [],
+                    phoneNumber: '',
+                    totalViews: 0,
+                    likes: 0,
+                    likesEnabled: true,
+                    tiktokPixelEnabled: true,
+                    visitorAnalyticsEnabled: true,
+                    leadCaptureEnabled: false,
+                    catalogEnabled: false,
+                    products: [],
+                    accountStatus: 'active',
+                    banReason: '',
+                    adminContactLink: '',
                     onboardingCompleted: true
                 };
                 const saved = await saveUserProfile(currentUser.uid, profileData);
@@ -6688,6 +7240,8 @@
 
                 const metaPixel = document.getElementById('meta-pixel-id').value.trim();
                 const gaId = document.getElementById('google-analytics-id').value.trim();
+                const tiktokPixel = document.getElementById('tiktok-pixel-id').value.trim();
+                const phoneNumber = document.getElementById('dashboard-phone').value.trim();
 
                 const flashActive = document.getElementById('flash-toggle').classList.contains('active');
                 const flashMessage = document.getElementById('flash-message').value.trim();
@@ -6706,7 +7260,8 @@
                     endDate: l.endDate || null,
                     isSection: l.isSection || false,
                     title: l.title || '',
-                    locked: l.locked || false
+                    locked: l.locked || false,
+                    deepLink: l.deepLink === true
                 })) : [];
 
                 const redirectMessageInput = document.getElementById('redirect-message-input');
@@ -6718,14 +7273,17 @@
                     bio: bio,
                     links: links,
                     seo: { title: seoTitle, description: seoDesc, keywords: seoKeywords },
-                    integrations: { metaPixel: metaPixel, ga: gaId },
+                    integrations: { metaPixel: metaPixel, ga: gaId, tiktokPixel: tiktokPixel, tiktokEnabled: userProfile.tiktokPixelEnabled !== false },
+                    tiktokPixelEnabled: userProfile.tiktokPixelEnabled !== false,
+                    likesEnabled: userProfile.likesEnabled !== false,
+                    phoneNumber: phoneNumber,
                     flash: { active: flashActive, message: flashMessage, color: flashColor },
                     redirect_message: savedRedirectMessage,
                     onboardingCompleted: true
                 });
                 if (saved) {
                     showToast('Profil enregistré !', 'info');
-                    document.getElementById('views-count-display').textContent = userProfile.views || 0;
+                    document.getElementById('views-count-display').textContent = userProfile.totalViews ?? userProfile.views ?? 0;
                     updateRedirectToggleState();
                     updateStats();
                     renderSubscribers();
@@ -6817,6 +7375,57 @@
             document.getElementById('export-report-btn').addEventListener('click', exportReport);
 
             document.getElementById('export-profile-config-btn').addEventListener('click', exportProfileConfiguration);
+
+            document.getElementById('tiktok-pixel-toggle').addEventListener('click', async function() {
+                const enabled = !this.classList.contains('active');
+                this.classList.toggle('active', enabled);
+                await saveUserProfile(currentUser.uid, { tiktokPixelEnabled: enabled });
+                injectTrackingScripts({ ...(userProfile.integrations || {}), tiktokEnabled: enabled });
+            });
+            document.getElementById('likes-toggle').addEventListener('click', async function() {
+                const enabled = !this.classList.contains('active');
+                this.classList.toggle('active', enabled);
+                await saveUserProfile(currentUser.uid, { likesEnabled: enabled });
+            });
+            document.getElementById('lead-capture-toggle').addEventListener('click', async function() {
+                const enabled = !this.classList.contains('active');
+                this.classList.toggle('active', enabled);
+                document.getElementById('lead-capture-dashboard').style.display = enabled ? 'block' : 'none';
+                await saveUserProfile(currentUser.uid, { leadCaptureEnabled: enabled });
+                if (enabled) loadLeads();
+            });
+            document.getElementById('catalog-toggle').addEventListener('click', async function() {
+                const enabled = !this.classList.contains('active');
+                this.classList.toggle('active', enabled);
+                document.getElementById('catalog-dashboard').style.display = enabled ? 'block' : 'none';
+                await saveUserProfile(currentUser.uid, { catalogEnabled: enabled });
+                renderPublicProducts(userProfile);
+            });
+            document.getElementById('visitor-analytics-toggle').addEventListener('click', async function() {
+                const enabled = !this.classList.contains('active');
+                this.classList.toggle('active', enabled);
+                document.getElementById('visitor-history-dashboard').style.display = enabled ? 'block' : 'none';
+                await saveUserProfile(currentUser.uid, { visitorAnalyticsEnabled: enabled });
+                if (enabled) loadVisitorLogs();
+            });
+            document.getElementById('visitor-date-filter').addEventListener('change', renderVisitorLogs);
+            document.getElementById('visitor-hour-filter').addEventListener('change', renderVisitorLogs);
+            document.getElementById('visitor-clear-filters-btn').addEventListener('click', () => { document.getElementById('visitor-date-filter').value=''; document.getElementById('visitor-hour-filter').value=''; renderVisitorLogs(); });
+            document.getElementById('purge-visitor-history-btn').addEventListener('click', purgeVisitorHistory);
+            document.getElementById('export-leads-btn').addEventListener('click', exportLeadsCSV);
+            document.getElementById('refresh-leads-btn').addEventListener('click', loadLeads);
+            document.getElementById('product-photo-btn').addEventListener('click', function() {
+                openCloudinaryWidget({ button: this, onSuccess: (url) => { productImageUrl = sanitizeImageUrl(url); const img=document.getElementById('product-photo-preview'); img.src=productImageUrl; img.style.display='block'; } });
+            });
+            document.getElementById('add-product-btn').addEventListener('click', addProduct);
+            document.getElementById('banned-account-close').addEventListener('click', () => document.getElementById('banned-account-modal').classList.remove('active'));
+            document.getElementById('admin-gate-submit').addEventListener('click', async () => {
+                const granted = await checkIsAdmin(currentUser?.uid);
+                const error = document.getElementById('admin-gate-error');
+                error.style.display = granted ? 'none' : 'block';
+                if (granted) document.getElementById('admin-gate-modal').classList.remove('active');
+            });
+            document.getElementById('admin-gate-close').addEventListener('click', () => document.getElementById('admin-gate-modal').classList.remove('active'));
             document.getElementById('import-profile-config-btn').addEventListener('click', () => {
                 document.getElementById('import-profile-config-input').click();
             });
@@ -7023,7 +7632,8 @@
                 endDate: endDate || null,
                 isSection: false,
                 title: '',
-                locked: locked
+                locked: locked,
+                deepLink: false
             };
 
             try {
@@ -7108,22 +7718,8 @@
                 e.preventDefault();
                 const data = window._vcardData || {};
                 const name = data.displayName || 'Utilisateur';
-                let phone = '';
-                if (data.links) {
-                    const whatsappLink = data.links.find(l => l.platform === 'whatsapp' && l.active && !l.isSection);
-                    if (whatsappLink && whatsappLink.url) {
-                        const match = whatsappLink.url.match(/https?:\/\/(?:www\.)?wa\.me\/(\d+)/);
-                        if (match) phone = match[1];
-                    }
-                }
-                const uid = getPublicUid() || (currentUser ? currentUser.uid : '');
-                const urlProfil = window.location.origin + window.location.pathname + '?id=' + uid;
-
-                let vcard = `BEGIN:VCARD
-VERSION:3.0
-FN:${name}
-URL:${urlProfil}
-`;
+                const phone = String(data.phoneNumber || '').trim();
+                let vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\n`;
                 if (phone) {
                     vcard += `TEL;TYPE=CELL:${phone}\n`;
                 }
@@ -7184,7 +7780,7 @@ URL:${urlProfil}
 
                 await incrementLinkClick(gatedPendingTarget, gatedPendingLink);
                 modal.classList.remove('active');
-                window.open(sanitizeUrl(link.url), '_blank');
+                openLinkWithDeepLink(link);
 
                 gatedPendingLink = null;
                 gatedPendingTarget = null;
