@@ -317,6 +317,12 @@ module.exports = async (req, res) => {
               firestoreDocument
             );
 
+          if (user.accountStatus === 'banned') {
+            dynamicTitle = 'Profil introuvable - LinkExt';
+            dynamicDescription = 'Ce profil est introuvable ou ce compte est actuellement suspendu.';
+            dynamicImage = defaultImage;
+          }
+
           const displayName =
             typeof user.displayName === 'string'
               ? user.displayName.trim()
@@ -370,7 +376,7 @@ module.exports = async (req, res) => {
             user.redirectUnique === true &&
             activeLinks.length === 1;
 
-          if (uniqueRedirectActive) {
+          if (user.accountStatus !== 'banned' && uniqueRedirectActive) {
             /*
              * ====================================================
              * RÈGLE 1
@@ -419,7 +425,7 @@ module.exports = async (req, res) => {
                 ? user.redirect_message.trim()
                 : linkTitle;
 
-          } else {
+          } else if (user.accountStatus !== 'banned') {
             /*
              * ====================================================
              * RÈGLE 2
