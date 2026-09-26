@@ -45,7 +45,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <style>
+        .linkext-upload-progress { margin-top:.45rem; padding:.45rem .55rem; border:1px solid var(--card-border); border-radius:.65rem; background:var(--card-bg); }
+        .linkext-upload-progress-track { height:7px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.08); }
+        .linkext-upload-progress-bar { height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,var(--cyan),var(--violet)); transition:width .12s ease; }
+        .linkext-upload-progress-text { margin-top:.3rem; font-size:.68rem; color:var(--text-secondary); }
+        .linkext-upload-progress.success .linkext-upload-progress-bar { background:var(--success); }
+        .linkext-upload-progress.success .linkext-upload-progress-text { color:var(--success); }
+        .linkext-upload-progress.error .linkext-upload-progress-text { color:var(--danger); }
+    </style>
 
     <style>
         /* ===== VARIABLES ===== */
@@ -3033,8 +3041,6 @@
         // ============================================================
         // CONSTANTES
         // ============================================================
-        const CLOUDINARY_CLOUD_NAME = "bwexb1sj";
-        const CLOUDINARY_UPLOAD_PRESET = "LinkExt";
 
         const PLATFORMS = [
             { id: 'whatsapp', name: 'WhatsApp', icon: 'fab fa-whatsapp' },
@@ -3055,7 +3061,6 @@
         let selectedOnboardingPlatforms = new Set();
         let onboardingUrls = {};
         let authRedirectInProgress = false;
-        let isCloudinaryWidgetOpen = false;
         let selectedNetworkType = null;
         let linkImageUrl = '';
         let gatedPendingLink = null;
@@ -4995,167 +5000,207 @@
         }
 
         // ============================================================
-        // CLOUDINARY WIDGET
+        // IMPORTATION CLOUDINARY PERSONNALISÉE V2.2
         // ============================================================
         function openCloudinaryWidget({ button, onSuccess, onError }) {
             if (!currentUser) {
                 showToast('Connectez-vous pour continuer.', 'error');
                 return;
             }
-            if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-                showToast('Erreur de configuration Cloudinary.', 'error');
-                if (onError) onError('Cloudinary config manquante');
-                return;
-            }
-            if (isCloudinaryWidgetOpen) return;
-            isCloudinaryWidgetOpen = true;
-            const originalHTML = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = '<span class="spinner"></span> Ouverture...';
 
-            cloudinary.openUploadWidget(
-                {
-                    cloudName: CLOUDINARY_CLOUD_NAME,
-                    uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-                    sources: ["local", "url", "camera"],
-                    multiple: false,
-                    cropping: true,
-                    resourceType: "image",
-                    signature: false,
-                    maxFileSize: 5242880,
-                    allowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
-                    clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
-                    preBatch: (cb, data) => {
-                        const files = Array.isArray(data?.files) ? data.files : [];
-                        const allowed = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
-                        const maxBytes = 5 * 1024 * 1024;
-                        const invalid = files.some(file => {
-                            const typeOk = allowed.has(String(file?.type || '').toLowerCase());
-                            const nameOk = /\.(jpe?g|png|webp|gif)$/i.test(String(file?.name || ''));
-                            const sizeOk = Number(file?.size || 0) > 0 && Number(file.size) <= maxBytes;
-                            return !typeOk || !nameOk || !sizeOk;
-                        });
-                        if (invalid) {
-                            showToast('Fichier refusé : JPG, PNG, WEBP ou GIF uniquement, 5 Mo maximum.', 'error');
-                            cb({ cancel: true });
-                            return;
-                        }
-                        cb();
-                    },
-                },
-                (error, result) => {
-                    if (error) {
-                        console.error("Erreur Cloudinary:", error);
-                        let message = "Erreur lors de l'upload.";
-                        if (error.message && error.message.includes("Unknown API key")) {
-                            message = "Clé API inconnue. Vérifiez cloudName et uploadPreset.";
-                        } else if (error.message) {
-                            message = error.message;
-                        }
-                        showToast('Erreur Cloudinary : ' + message, 'error');
-                        button.disabled = false;
-                        button.innerHTML = originalHTML;
-                        isCloudinaryWidgetOpen = false;
-                        if (onError) onError(message);
-                        return;
-                    }
-                    if (!error && result && result.event === "success") {
-                        const imageUrl = result.info.secure_url;
-                        if (imageUrl && onSuccess) {
-                            onSuccess(imageUrl);
-                        }
-                    }
-                    if (result && (result.event === "close" || result.event === "abort")) {
-                        button.disabled = false;
-                        button.innerHTML = originalHTML;
-                        isCloudinaryWidgetOpen = false;
-                    }
+            if (!button) return;
+
+            const originalHTML = button.innerHTML;
+            let input = button._linkextFileInput;
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/jpeg,image/png,image/webp,image/gif';
+                input.className = 'hidden';
+                input.setAttribute('aria-hidden', 'true');
+                button.insertAdjacentElement('afterend', input);
+                button._linkextFileInput = input;
+            }
+
+            let progress = button._linkextProgress;
+            if (!progress) {
+                progress = document.createElement('div');
+                progress.className = 'linkext-upload-progress';
+                progress.innerHTML = '<div class="linkext-upload-progress-track"><div class="linkext-upload-progress-bar"></div></div><div class="linkext-upload-progress-text">Prêt à importer.</div>';
+                button.insertAdjacentElement('afterend', progress);
+                button._linkextProgress = progress;
+            }
+
+            const bar = progress.querySelector('.linkext-upload-progress-bar');
+            const text = progress.querySelector('.linkext-upload-progress-text');
+            const resetButton = () => {
+                button.disabled = false;
+                button.innerHTML = originalHTML;
+            };
+            const fail = (message) => {
+                progress.classList.remove('success');
+                progress.classList.add('error');
+                bar.style.width = '0%';
+                text.textContent = message;
+                resetButton();
+                if (onError) onError(message);
+            };
+
+            input.value = '';
+            input.onchange = async () => {
+                const file = input.files?.[0];
+                if (!file) return;
+
+                const maxBytes = 5 * 1024 * 1024;
+                const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+                const extensionOk = /\.(jpe?g|png|webp|gif)$/i.test(file.name || '');
+
+                if (file.size > maxBytes) {
+                    fail('Fichier trop lourd (Max 5 Mo)');
+                    showToast('Fichier trop lourd (Max 5 Mo)', 'error');
+                    return;
                 }
-            );
+                if (!allowedTypes.has(String(file.type || '').toLowerCase()) || !extensionOk) {
+                    fail('Format refusé. JPG, PNG, WEBP ou GIF uniquement.');
+                    showToast('Format d’image non pris en charge.', 'error');
+                    return;
+                }
+
+                try {
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner"></span> Préparation...';
+                    progress.classList.remove('error', 'success');
+                    bar.style.width = '0%';
+                    text.textContent = 'Téléchargement en cours... 0%';
+
+                    const token = await currentUser.getIdToken();
+                    const signatureResponse = await fetch('/api/cloudinary-signature', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type': 'application/json'
+                        },
+                        body: '{}'
+                    });
+                    const signatureData = await signatureResponse.json().catch(() => ({}));
+                    if (!signatureResponse.ok || !signatureData.ok) {
+                        throw new Error(signatureData.error || 'Signature Cloudinary refusée.');
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('api_key', signatureData.apiKey);
+                    formData.append('timestamp', String(signatureData.timestamp));
+                    formData.append('folder', signatureData.folder);
+                    formData.append('allowed_formats', signatureData.allowedFormats);
+                    formData.append('signature', signatureData.signature);
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', `https://api.cloudinary.com/v1_1/${encodeURIComponent(signatureData.cloudName)}/image/upload`, true);
+                    xhr.upload.onprogress = (event) => {
+                        if (!event.lengthComputable) return;
+                        const percent = Math.min(100, Math.round((event.loaded / event.total) * 100));
+                        bar.style.width = percent + '%';
+                        text.textContent = `Téléchargement en cours... ${percent}%`;
+                    };
+                    xhr.onload = () => {
+                        let result = {};
+                        try { result = JSON.parse(xhr.responseText || '{}'); } catch (_) {}
+                        if (xhr.status >= 200 && xhr.status < 300 && result.secure_url) {
+                            bar.style.width = '100%';
+                            progress.classList.remove('error');
+                            progress.classList.add('success');
+                            text.textContent = 'Téléchargement réussi !';
+                            resetButton();
+                            onSuccess?.(result.secure_url);
+                        } else {
+                            fail('Échec de l’importation, veuillez réessayer');
+                            showToast('Échec de l’importation, veuillez réessayer', 'error');
+                        }
+                    };
+                    xhr.onerror = () => {
+                        fail('Échec de l’importation, veuillez réessayer');
+                        showToast('Échec de l’importation, veuillez réessayer', 'error');
+                    };
+                    xhr.onabort = () => fail('Importation annulée.');
+                    xhr.send(formData);
+                } catch (error) {
+                    console.error('Erreur importation Cloudinary:', error);
+                    fail(error.message || 'Échec de l’importation, veuillez réessayer');
+                    showToast('Échec de l’importation, veuillez réessayer', 'error');
+                }
+            };
+
+            input.click();
         }
 
         // ============================================================
         // FONCTIONS MÉTIERS
         // ============================================================
         async function incrementViews(uid) {
-            if (!uid) return;
+            // Les vues publiques sont désormais comptabilisées uniquement par /api/visit.
+            // La clé de session évite les doublons côté interface ; l'API applique aussi un rate-limit.
+            if (!uid) return false;
             const key = 'viewCounted_' + uid;
-            if (sessionStorage.getItem(key) === 'true') return;
+            if (sessionStorage.getItem(key) === 'true') return true;
             try {
-                const docRef = db.collection('users').doc(uid);
-                await docRef.update({
-                    totalViews: firebase.firestore.FieldValue.increment(1),
-                    views: firebase.firestore.FieldValue.increment(1)
+                const response = await fetch('/api/visit?id=' + encodeURIComponent(uid), {
+                    method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' }
                 });
-                if (userProfile && userProfile._id === uid) {
-                    userProfile.totalViews = (userProfile.totalViews || userProfile.views || 0) + 1;
-                    userProfile.views = (userProfile.views || 0) + 1;
+                if (response.ok || response.status === 204) {
+                    sessionStorage.setItem(key, 'true');
+                    return true;
                 }
-                sessionStorage.setItem(key, 'true');
             } catch (error) {
-                console.warn('Impossible d\'incrémenter les vues :', error);
+                console.warn("Impossible d’incrémenter les vues :", error);
             }
+            return false;
         }
 
         async function incrementLinkClick(uid, linkId) {
             if (!uid || !linkId) return false;
-            const docRef = db.collection('users').doc(uid);
             try {
-                await db.runTransaction(async (transaction) => {
-                    const doc = await transaction.get(docRef);
-                    if (!doc.exists) throw new Error('Profil introuvable.');
-                    const data = doc.data();
-                    if (!Array.isArray(data.links)) throw new Error('Liens introuvables.');
-
-                    const linkIndex = data.links.findIndex(l => l.id === linkId);
-                    if (linkIndex === -1) throw new Error('Lien introuvable.');
-
-                    const updatedLinks = [...data.links];
-                    updatedLinks[linkIndex] = {
-                        ...updatedLinks[linkIndex],
-                        clicks: (updatedLinks[linkIndex].clicks || 0) + 1
-                    };
-                    transaction.update(docRef, { links: updatedLinks });
+                const response = await fetch('/api/click?id=' + encodeURIComponent(uid) + '&link=' + encodeURIComponent(linkId), {
+                    method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' }
                 });
-
+                if (!response.ok) return false;
+                const result = await response.json().catch(() => ({}));
                 if (userProfile && userProfile._id === uid) {
-                    const link = userProfile.links.find(l => l.id === linkId);
-                    if (link) link.clicks = (link.clicks || 0) + 1;
-                    if (document.getElementById('view-dashboard').classList.contains('active')) {
-                        updateStats();
-                    }
+                    const link = userProfile.links?.find(l => l.id === linkId);
+                    if (link) link.clicks = Number(result.clicks || link.clicks || 0);
+                    if (document.getElementById('view-dashboard')?.classList.contains('active')) updateStats();
                 }
-                logAnalyticsEvent('clic_reseau_social', { linkId: linkId });
                 return true;
             } catch (error) {
-                console.warn('Impossible d\'incrémenter le clic :', error);
+                console.warn("Impossible d’incrémenter le clic :", error);
                 return false;
             }
         }
 
-
         async function addSubscriber(uid, email) {
             if (!uid || !email) return false;
             try {
-                const docRef = db.collection('users').doc(uid);
-                const doc = await docRef.get();
-                if (!doc.exists) return false;
-                const data = doc.data();
-                const subscribers = data.subscribers || [];
-                if (subscribers.some(s => s.email === email)) {
+                const response = await fetch('/api/subscribe?id=' + encodeURIComponent(uid), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: String(email).slice(0, 160) })
+                });
+                const result = await response.json().catch(() => ({}));
+                if (response.status === 409 && result.alreadySubscribed) {
                     showToast('Cet email est déjà enregistré.', 'info');
                     return false;
                 }
-                const newSub = { email, date: new Date().toISOString() };
-                const updated = [...subscribers, newSub];
-                await docRef.update({ subscribers: updated });
-                if (userProfile && userProfile._id === uid) {
-                    userProfile.subscribers = updated;
+                if (!response.ok || !result.ok) {
+                    showToast('Impossible d’enregistrer l’abonné.', 'error');
+                    return false;
                 }
-                logAnalyticsEvent('modification_profil', { action: 'add_subscriber' });
+                if (userProfile && userProfile._id === uid) {
+                    userProfile.subscribers = Array.isArray(userProfile.subscribers) ? userProfile.subscribers : [];
+                    userProfile.subscribers.push({ email, date: new Date().toISOString() });
+                }
                 return true;
             } catch (error) {
-                console.warn('Impossible d\'ajouter l\'abonné :', error);
+                console.warn("Impossible d’ajouter l’abonné :", error);
                 return false;
             }
         }
@@ -6031,13 +6076,17 @@
                 return;
             }
             try {
-                const docRef = db.collection('users').doc(uid);
-                const doc = await docRef.get();
-                if (!doc.exists) {
-                    showToast('Profil introuvable.', 'error');
+                const response = await fetch('/api/profile?id=' + encodeURIComponent(uid), {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok || !result.ok || !result.profile) {
+                    showToast(response.status === 404 ? 'Profil introuvable.' : 'Erreur chargement profil public.', 'error');
                     return;
                 }
-                const data = doc.data();
+                const data = result.profile;
 
                 if (data.accountStatus === 'banned') {
                     const publicView = document.getElementById('view-profile-public');
@@ -6050,15 +6099,12 @@
                     return;
                 }
 
-                // Incrémenter les vues globales et mensuelles
-                await incrementViews(uid);
-                await incrementMonthlyViews(uid);
-
+                // Les vues publiques sont comptabilisées côté serveur par /api/visit.
                 const integrations = data.integrations || { metaPixel: '', ga: '', tiktokPixel: '' };
                 injectTrackingScripts(integrations);
-                if (data.visitorAnalyticsEnabled !== false) {
-                    fetch('/api/visit?id=' + encodeURIComponent(uid), { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' } }).catch(() => {});
-                }
+                fetch('/api/visit?id=' + encodeURIComponent(uid), {
+                    method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' }
+                }).catch(() => {});
 
                 if (data.maintenance === true) {
                     const publicView = document.getElementById('view-profile-public');
@@ -6093,14 +6139,21 @@
                     event.stopPropagation();
                     if (localStorage.getItem(likeKey) === 'true') return;
                     try {
-                        await db.collection('users').doc(uid).update({ likes: firebase.firestore.FieldValue.increment(1) });
+                        const response = await fetch('/api/like?id=' + encodeURIComponent(uid), {
+                            method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' }
+                        });
+                        const result = await response.json().catch(() => ({}));
+                        if (!response.ok || !result.ok) {
+                            showToast(result.error || 'Impossible d’enregistrer le J’aime.', 'error');
+                            return;
+                        }
                         localStorage.setItem(likeKey, 'true');
-                        const count = Number(document.getElementById('public-like-count').textContent || 0) + 1;
-                        document.getElementById('public-like-count').textContent = String(count);
+                        document.getElementById('public-like-count').textContent = String(Number(result.likes || 0));
                         likeBtn.classList.add('liked');
                         likeBtn.querySelector('i').className = 'fas fa-heart';
                     } catch (e) {
                         console.warn("Impossible d’enregistrer le J’aime:", e);
+                        showToast('Impossible d’enregistrer le J’aime.', 'error');
                     }
                 };
 
@@ -6504,7 +6557,7 @@
             container.querySelectorAll('.product-wa-btn').forEach(btn => btn.addEventListener('click', e => {
                 e.preventDefault(); e.stopPropagation();
                 const p = data.products[Number(btn.dataset.productIndex)];
-                const phone = String(data.phoneNumber || '').replace(/[^0-9]/g, '');
+                const phone = String(data.publicWhatsAppNumber || '').replace(/[^0-9]/g, '');
                 if (!phone) { showToast('Le numéro WhatsApp du vendeur n\'est pas configuré.', 'error'); return; }
                 const text = `Bonjour, je souhaite commander l'article ${p.title || ''} au prix de ${p.price || ''} vu sur votre LinkExt.`;
                 window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
@@ -7713,25 +7766,34 @@
         }
 
         function setupVcard() {
-            document.getElementById('vcard-btn').addEventListener('click', (e) => {
+            document.getElementById('vcard-btn').addEventListener('click', async (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 const data = window._vcardData || {};
                 const name = data.displayName || 'Utilisateur';
-                const phone = String(data.phoneNumber || '').trim();
-                let vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\n`;
-                if (phone) {
-                    vcard += `TEL;TYPE=CELL:${phone}\n`;
+                let phone = '';
+                try {
+                    const uid = getPublicUid();
+                    const response = await fetch('/api/profile?id=' + encodeURIComponent(uid) + '&contact=1', {
+                        method: 'GET', credentials: 'same-origin', headers: { 'Accept': 'application/json' }
+                    });
+                    const result = await response.json().catch(() => ({}));
+                    if (response.ok && result.ok) phone = String(result.profile?.publicPhoneNumber || '').trim();
+                } catch (error) {
+                    console.warn('Impossible de récupérer le numéro VCard:', error);
                 }
+                const safeName = String(name).replace(/[\r\n]/g, ' ').slice(0, 120);
+                let vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${safeName}\n`;
+                if (phone) vcard += `TEL;TYPE=CELL:${phone}\n`;
                 vcard += `END:VCARD`;
-
                 const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `${name}.vcf`;
+                link.download = `${safeName}.vcf`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 showToast('Contact enregistré !', 'info');
             });
         }
@@ -7764,13 +7826,16 @@
                     return;
                 }
 
-                const targetDoc = await db.collection('users').doc(gatedPendingTarget).get();
-                if (!targetDoc.exists) {
+                const targetResponse = await fetch('/api/profile?id=' + encodeURIComponent(gatedPendingTarget), {
+                    method: 'GET', credentials: 'same-origin', headers: { 'Accept': 'application/json' }
+                });
+                const targetResult = await targetResponse.json().catch(() => ({}));
+                if (!targetResponse.ok || !targetResult.ok || !targetResult.profile) {
                     showToast('Erreur profil.', 'error');
                     modal.classList.remove('active');
                     return;
                 }
-                const data = targetDoc.data();
+                const data = targetResult.profile;
                 const link = data.links ? data.links.find(l => l.id === gatedPendingLink) : null;
                 if (!link || !link.url) {
                     showToast('Lien introuvable.', 'error');
