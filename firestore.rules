@@ -1,0 +1,137 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function activeOwner(userId) {
+      return isOwner(userId)
+        && resource.data.accountStatus == 'active'
+        && request.resource.data.accountStatus == 'active';
+    }
+
+    function ownerSafeUserUpdate(userId) {
+      return activeOwner(userId)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'role', 'accountStatus', 'banReason', 'adminContactLink'
+        ]);
+    }
+
+    function onlyClickIncrement() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clicks'])
+        && request.resource.data.clicks == resource.data.clicks + 1;
+    }
+
+    match /admin_config/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /donations/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /admin_logs/{document} {
+      allow create, read, update, delete: if isAdmin();
+    }
+
+    match /bug_reports/{reportId} {
+      allow read, create, update, delete: if false;
+    }
+
+    match /analytics_events/{eventId} {
+      allow create: if true;
+      allow read, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isAdmin() || isOwner(userId);
+
+      allow create: if isAdmin()
+        || (
+          isOwner(userId)
+          && (!('role' in request.resource.data) || request.resource.data.role != 'admin')
+          && (!('accountStatus' in request.resource.data) || request.resource.data.accountStatus == 'active')
+        );
+
+      allow update: if isAdmin() || ownerSafeUserUpdate(userId);
+
+      allow delete: if isAdmin() || isOwner(userId);
+
+      match /visitor_logs/{logId} {
+        allow read, delete: if isAdmin() || isOwner(userId);
+        allow create, update: if false;
+      }
+
+      match /leads/{leadId} {
+        allow create: if resource == null
+          && get(/databases/$(database)/documents/users/$(userId)).data.leadCaptureEnabled == true
+          && request.resource.data.keys().hasOnly(['name','contact','type','createdAt']);
+        allow read, delete: if isAdmin() || isOwner(userId);
+        allow update: if false;
+      }
+    }
+
+    match /links/{document} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || onlyClickIncrement();
+    }
+
+    match /public_rate_limits/{document} {
+      allow read, write: if false;
+    }
+
+    match /system_config/{document} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Source de vérité unique pour les recours — écriture uniquement via Admin SDK
+    match /appeals/{userId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if false;
+    }
+
+    match /appeal_verifications/{userId} {
+      allow read, write: if false;
+    }
+
+    match /otp_challenges/{id} {
+      allow read, write: if false;
+    }
+
+    match /otp_requests/{id} {
+      allow read, write: if false;
+    }
+
+    match /blacklisted_emails/{id} {
+      allow read, write: if false;
+    }
+
+    match /moderation_audit_logs/{logId} {
+      allow read, delete: if isAdmin();
+      allow create, update: if false;
+    }
+
+    match /admin_settings/{document} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
