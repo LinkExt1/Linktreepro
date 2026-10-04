@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() { return request.auth != null; }
+    function isOwner(userId) { return isAuthenticated() && request.auth.uid == userId; }
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+    function ownerSafeUserUpdate(userId) {
+      return isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'role','accountStatus','status','banReason','banReasonReport','adminContactLink','isBanned','isSuspended',
+        'suspensionReason','suspensionCount','adminOverride','moderationCorrection','moderationIncident','moderationReview'
+      ]);
+    }
+    function onlyClickIncrement() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clicks'])
+        && request.resource.data.clicks == resource.data.clicks + 1;
+    }
+
+    match /users/{userId} {
+      // Public profiles are exposed through /api/profile, which projects only public fields.
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAdmin() || (isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role != 'admin'));
+      allow update: if isAdmin() || ownerSafeUserUpdate(userId);
+      allow delete: if isAdmin() || isOwner(userId);
+
+      match /visitor_logs/{logId} {
+        allow read, delete: if isOwner(userId) || isAdmin();
+        allow create, update: if false;
+      }
+      match /leads/{leadId} {
+        allow create: if get(/databases/$(database)/documents/users/$(userId)).data.leadCaptureEnabled == true
+          && request.resource.data.keys().hasOnly(['name','contact','type','createdAt']);
+        allow read, delete: if isOwner(userId) || isAdmin();
+        allow update: if false;
+      }
+    }
+
+    match /settings/{settingId} {
+      // AI prompts, model endpoints and moderation configuration are private admin configuration.
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    match /logs/{logId} { allow read, write: if isAdmin(); }
+    match /blacklisted_emails/{emailId} { allow read, write: if isAdmin(); }
+    match /appeals/{userId} { allow read, update, delete: if isAdmin(); allow create: if false; }
+    match /appeal_verifications/{userId} { allow read, write: if false; }
+    match /otp_challenges/{id} { allow read, write: if false; }
+    match /otp_requests/{id} { allow read, write: if false; }
+    match /public_rate_limits/{document} { allow read, write: if false; }
+    match /moderation_audit_logs/{logId} { allow read, delete: if isAdmin(); allow create, update: if false; }
+    match /admin_config/{document} { allow read: if isAdmin(); allow write: if isAdmin(); }
+    match /admin_settings/{document} { allow read, write: if isAdmin(); }
+    match /system_config/{document} { allow read: if isAdmin(); allow write: if isAdmin(); }
+    match /admin_logs/{document} { allow read, write: if isAdmin(); }
+    match /donations/{document} { allow read: if true; allow write: if isAdmin(); }
+    match /analytics_events/{eventId} { allow create: if true; allow read, delete: if isAdmin(); }
+    match /links/{document} { allow read: if true; allow create, delete: if isAdmin(); allow update: if isAdmin() || onlyClickIncrement(); }
+    match /bug_reports/{reportId} { allow read, write: if false; }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
