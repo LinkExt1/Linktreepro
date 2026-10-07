@@ -1,4 +1,3 @@
-const { FieldValue } = require('firebase-admin/firestore');
 const {getAdminApp,getClientIp,originAllowed,handleCors,validUid,enforceRateLimit}=require('./_security');
 function getBeninParts(date=new Date()){return{dateStr:new Intl.DateTimeFormat('fr-CA',{timeZone:'Africa/Porto-Novo',year:'numeric',month:'2-digit',day:'2-digit'}).format(date),hourStr:new Intl.DateTimeFormat('fr-FR',{timeZone:'Africa/Porto-Novo',hour:'2-digit',minute:'2-digit',hour12:false}).format(date),monthStr:new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Porto-Novo',year:'numeric',month:'2-digit'}).format(date).slice(0,7)}}
 function readAuthUid(req){const h=req.headers.authorization||'';return h.startsWith('Bearer ')?h.slice(7).trim():''}
@@ -32,7 +31,7 @@ module.exports=async(req,res)=>{
    const threshold=current.badgeResetAt?Number(settings.minViewsPostSuspension):Number(settings.minViewsForBadge);
    const updates={totalRawViews:currentRawViews+1,backgroundViews:currentRawViews+1,totalViews:currentRawViews+1,views:currentRawViews+1,displayedViews:displayViews+1,publicViews:displayViews+1,total_views_month:nextMonthly,monthly_views_reset:monthStr,badgeRawViews:Number(current.badgeRawViews||0)+1,badgeWindowViews:windowViews,badgeWindowStartAt:windowStart};
    if(current.badgeManual!==true && Number.isFinite(threshold) && threshold>0 && windowViews>=threshold){updates.verified=true; if(current.badgeResetAt)updates.badgeResetAt=null;}
-   if(current.visitorAnalyticsEnabled!==false){const visitorRef=userRef.collection('visitor_logs').doc();transaction.set(visitorRef,{country,timestamp:FieldValue.serverTimestamp(),dateStr,hourStr});}
+   if(current.visitorAnalyticsEnabled!==false){const visitorRef=userRef.collection('visitor_logs').doc();transaction.set(visitorRef,{country,timestamp:admin.firestore.FieldValue.serverTimestamp(),dateStr,hourStr});}
    transaction.update(userRef,updates);return updates;
   });
   return res.status(201).json({ok:true,totalRawViews:result.totalRawViews,displayedViews:result.displayedViews,publicViews:result.publicViews,verified:result.verified===true});

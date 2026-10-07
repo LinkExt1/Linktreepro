@@ -1,31 +1,39 @@
 const express = require('express');
 const app = express();
 
-// 1. Indispensable : Permet de lire les données POST (le JSON) envoyées par le site
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Limite volontairement large pour les profils/catalogues, tout en évitant
+// qu'une requête gigantesque monopolise une fonction serverless.
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// 2. Routage dynamique qui gère tous les niveaux de sous-dossiers
+const ROUTE_NAME_RE = /^[A-Za-z0-9_-]+$/;
+
 app.all('/api/*', async (req, res) => {
-    try {
-        // Sanitization anti path-traversal
-        const routePath = String(req.params[0] || '').replace(/[^a-zA-Z0-9_-]/g, '');
-        if (!routePath || routePath.includes('..')) {
-            return res.status(404).json({ error: "Endpoint API introuvable" });
-        }
-        const handler = require(`../backend/${routePath}.js`);
-        return await handler(req, res);
-    } catch (error) {
-        console.error(`Erreur sur la route /api/${req.params[0]} :`, error.message || error);
+  const routePath = String(req.params[0] || '');
 
-        // 404 uniquement si le module n'existe pas
-        if (error.code === 'MODULE_NOT_FOUND') {
-            return res.status(404).json({ error: "Endpoint API introuvable" });
-        }
+  // Le routeur ne doit jamais transformer une URL fournie par le client
+  // en chemin de fichier arbitraire.
+  if (!ROUTE_NAME_RE.test(routePath)) {
+    return res.status(404).json({ error: 'Endpoint API introuvable' });
+  }
 
-        // Ne jamais exposer error.message au client (prévention de fuite d'informations)
-        return res.status(500).json({ error: "Erreur interne du serveur" });
+  try {
+    const handler = require(`../backend/${routePath}.js`);
+    if (typeof handler !== 'function') {
+      return res.status(404).json({ error: 'Endpoint API introuvable' });
     }
+    return await handler(req, res);
+  } catch (error) {
+    console.error(`Erreur sur la route /api/${routePath} :`, error);
+
+    // Ne jamais exposer error.message au client en production.
+    // MODULE_NOT_FOUND peut arriver si une route n'existe pas.
+    if (error && error.code === 'MODULE_NOT_FOUND') {
+      return res.status(404).json({ error: 'Endpoint API introuvable' });
+    }
+
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
 });
 
 module.exports = app;

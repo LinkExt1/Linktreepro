@@ -9,7 +9,11 @@ service cloud.firestore {
     function ownerSafeUserUpdate(userId) {
       return isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
         'role','accountStatus','status','banReason','banReasonReport','adminContactLink','isBanned','isSuspended',
-        'suspensionReason','suspensionCount','adminOverride','moderationCorrection','moderationIncident','moderationReview'
+        'suspensionReason','suspensionCount','adminOverride','moderationCorrection','moderationIncident','moderationReview',
+        'email','uid','createdAt','updatedAt','likes','subscribers','leads','views','totalViews',
+        'displayedViews','publicViews','badgeRawViews','badgeWindowViews','badgeWindowStartAt',
+        'badgeEvaluationStartAt','badgeResetAt','badgeManual','verified','bannedAt','suspendedAt',
+        'suspensionEndsAt','moderationCompletedAt'
       ]);
     }
     function onlyClickIncrement() {
@@ -54,7 +58,35 @@ service cloud.firestore {
     match /system_config/{document} { allow read: if isAdmin(); allow write: if isAdmin(); }
     match /admin_logs/{document} { allow read, write: if isAdmin(); }
     match /donations/{document} { allow read: if true; allow write: if isAdmin(); }
-    match /analytics_events/{eventId} { allow create: if true; allow read, delete: if isAdmin(); }
+    match /analytics_events/{eventId} {
+      allow create: if
+        request.resource.data.keys().hasOnly([
+          'event','userId','timestamp','userAgent','pageUrl',
+          'action','linkId','platform','theme','color','count','state','status'
+        ])
+        && request.resource.data.event is string
+        && request.resource.data.event.size() <= 100
+        && request.resource.data.userId is string
+        && (
+          (isAuthenticated() && request.resource.data.userId == request.auth.uid) ||
+          (!isAuthenticated() && request.resource.data.userId == 'anonymous')
+        )
+        && request.resource.data.timestamp is timestamp
+        && request.resource.data.userAgent is string
+        && request.resource.data.userAgent.size() <= 500
+        && request.resource.data.pageUrl is string
+        && request.resource.data.pageUrl.size() <= 2048
+        && (!('action' in request.resource.data) || request.resource.data.action is string)
+        && (!('linkId' in request.resource.data) || request.resource.data.linkId is string)
+        && (!('platform' in request.resource.data) || request.resource.data.platform is string)
+        && (!('theme' in request.resource.data) || request.resource.data.theme is string)
+        && (!('color' in request.resource.data) || request.resource.data.color is string)
+        && (!('count' in request.resource.data) || request.resource.data.count is number)
+        && (!('state' in request.resource.data) || request.resource.data.state is bool)
+        && (!('status' in request.resource.data) || request.resource.data.status is string);
+      allow read, delete: if isAdmin();
+      allow update: if false;
+    }
     match /links/{document} { allow read: if true; allow create, delete: if isAdmin(); allow update: if isAdmin() || onlyClickIncrement(); }
     match /bug_reports/{reportId} { allow read, write: if false; }
     match /{document=**} { allow read, write: if false; }

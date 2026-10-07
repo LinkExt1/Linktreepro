@@ -1,116 +1,79 @@
 const crypto = require('crypto');
 
-// =============================================================================
-// Firebase Admin — initialisation robuste pour Vercel (Serverless / Node.js)
-// Utilise l'API modulaire (firebase-admin/app, /firestore, /auth) pour éviter
-// les problèmes d'interop CJS/ESM et de structure de module (apps/credential
-// undefined) fréquemment rencontrés sur Vercel avec le namespace monolithique.
-// =============================================================================
-
-const { initializeApp, getApps, cert } = require('firebase-admin/app');
-const { getFirestore } = require('firebase-admin/firestore');
+// Firebase Admin SDK v14+ : utiliser les API modulaires explicitement.
+// Évite les ambiguïtés CommonJS/ESM de `require('firebase-admin')` et
+// conserve une petite façade compatible avec les routes existantes.
+const { getApps, initializeApp, cert } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
+const { getFirestore } = require('firebase-admin/firestore');
 
-/**
- * Construit les credentials à partir des variables d'environnement Vercel.
- * Supporte :
- *  - FIREBASE_SERVICE_ACCOUNT (JSON stringifié)
- *  - ou FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY
- * Gère correctement les \n échappés par Vercel.
- */
-function buildCredential() {
-  // Option 1 : JSON complet
+function normalizePrivateKey(value) {
+  let key = String(value || '').trim();
+  if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1);
+  }
+  return key.replace(/\\n/g, '\n').replace(/\r\n/g, '\n');
+}
+
+function getServiceAccountCredential() {
+  let projectId = String(process.env.FIREBASE_PROJECT_ID || '').trim();
+  let clientEmail = String(process.env.FIREBASE_CLIENT_EMAIL || '').trim();
+  let privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+
+  // Support optionnel d'un compte de service JSON, sans jamais exposer sa valeur.
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
-      const sa = typeof process.env.FIREBASE_SERVICE_ACCOUNT === 'string'
+      const raw = typeof process.env.FIREBASE_SERVICE_ACCOUNT === 'string'
         ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
         : process.env.FIREBASE_SERVICE_ACCOUNT;
-      if (sa && sa.project_id && sa.client_email && sa.private_key) {
-        return cert({
-          projectId: sa.project_id,
-          clientEmail: sa.client_email,
-          privateKey: String(sa.private_key).replace(/\\n/g, '\n')
-        });
+
+      if (raw && raw.project_id && raw.client_email && raw.private_key) {
+        projectId = String(raw.project_id).trim();
+        clientEmail = String(raw.client_email).trim();
+        privateKey = normalizePrivateKey(raw.private_key);
       }
-    } catch (err) {
-      console.error('[Firebase Admin] Erreur parsing FIREBASE_SERVICE_ACCOUNT:', err.message);
+    } catch (error) {
+      console.error('[Firebase Admin] FIREBASE_SERVICE_ACCOUNT invalide:', error.message);
     }
   }
 
-  // Option 2 : variables séparées (cas le plus courant sur Vercel)
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
-
-  if (projectId && clientEmail && privateKey) {
-    privateKey = String(privateKey).trim();
-    // Supprime les guillemets éventuels ajoutés par certains éditeurs d'env
-    if ((privateKey.startsWith('"') && privateKey.endsWith('"')) ||
-        (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
-      privateKey = privateKey.slice(1, -1);
-    }
-    privateKey = privateKey.replace(/\\n/g, '\n');
-
-    return cert({
-      projectId: String(projectId).trim(),
-      clientEmail: String(clientEmail).trim(),
-      privateKey
-    });
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error('FIREBASE_ADMIN_CONFIG_MISSING');
   }
 
-  return null;
+  if (!privateKey.includes('BEGIN PRIVATE KEY') || !privateKey.includes('END PRIVATE KEY')) {
+    throw new Error('FIREBASE_ADMIN_PRIVATE_KEY_INVALID');
+  }
+
+  try {
+    return cert({ projectId, clientEmail, privateKey });
+  } catch (error) {
+    console.error('[Firebase Admin] Impossible de créer le credential:', error.message);
+    throw new Error('FIREBASE_ADMIN_CREDENTIAL_INVALID');
+  }
+}
+
+function getFirebaseApp() {
+  const apps = getApps();
+  if (apps.length > 0) return apps[0];
+  return initializeApp({ credential: getServiceAccountCredential() });
 }
 
 /**
- * Retourne une façade compatible avec l'ancien usage :
- *   const app = getAdminApp();
- *   app.firestore()
- *   app.auth()
+ * Façade de compatibilité conservant les appels existants:
+ *   getAdminApp().firestore()
+ *   getAdminApp().auth()
  *
- * Sous le capot on utilise l'API modulaire (stable sur Vercel).
- * Lance une erreur claire si les credentials sont manquants/invalides.
+ * Les objets Auth/Firestore sont créés par les API modulaires officielles.
  */
 function getAdminApp() {
-  let app;
-  const existing = getApps();
-  if (existing.length > 0) {
-    app = existing[0];
-  } else {
-    const credential = buildCredential();
-    if (!credential) {
-      throw new Error(
-        'FIREBASE_ADMIN_CONFIG_MISSING: Variables d\'environnement Firebase manquantes ou invalides ' +
-        '(FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY ou FIREBASE_SERVICE_ACCOUNT).'
-      );
-    }
-    app = initializeApp({ credential });
-  }
-
-  // Façade de compatibilité pour tous les fichiers existants
-  // qui font encore getAdminApp().firestore() / .auth()
+  const app = getFirebaseApp();
   return {
-    _app: app,
+    app,
     firestore: () => getFirestore(app),
-    auth: () => getAuth(app),
-    name: app.name,
-    options: app.options
+    auth: () => getAuth(app)
   };
 }
-
-/**
- * Helpers pratiques (recommandés pour le nouveau code)
- */
-function getDb() {
-  return getAdminApp().firestore();
-}
-
-function getAuthInstance() {
-  return getAdminApp().auth();
-}
-
-// =============================================================================
-// Utilitaires réseau / CORS
-// =============================================================================
 
 function getClientIp(req) {
   const forwarded = req.headers['x-forwarded-for'];
@@ -118,17 +81,13 @@ function getClientIp(req) {
     return forwarded.split(',')[0].trim().slice(0, 100);
   }
   const real = req.headers['x-real-ip'];
-  if (typeof real === 'string' && real.trim()) {
-    return real.trim().slice(0, 100);
-  }
+  if (typeof real === 'string' && real.trim()) return real.trim().slice(0, 100);
   return 'unknown';
 }
 
 function getOrigin(req) {
   const origin = req.headers.origin;
-  if (typeof origin === 'string' && origin.trim()) {
-    return origin.trim().replace(/\/$/, '');
-  }
+  if (typeof origin === 'string' && origin.trim()) return origin.trim().replace(/\/$/, '');
   const referer = req.headers.referer;
   if (typeof referer === 'string' && referer.trim()) {
     try { return new URL(referer).origin; } catch (_) {}
@@ -143,25 +102,19 @@ function getAllowedOrigins(req) {
       .map(v => v.trim().replace(/\/$/, ''))
       .filter(Boolean)
   );
+
   const host = String(req.headers.host || '').trim().replace(/\/$/, '');
   if (host) allowed.add(`https://${host}`);
+
   const vu = String(process.env.VERCEL_URL || '').trim().replace(/\/$/, '');
   if (vu) allowed.add(`https://${vu}`);
+
   const vp = String(process.env.VERCEL_PROJECT_PRODUCTION_URL || '').trim().replace(/\/$/, '');
   if (vp) allowed.add(`https://${vp}`);
-  // Origines de confiance hardcodées (prod + GitHub Pages)
+
   allowed.add('https://nkext1.github.io');
   allowed.add('https://linktreepro.vercel.app');
   return allowed;
-}
-
-function isVercelPreviewOrigin(origin) {
-  try {
-    const u = new URL(origin);
-    return u.protocol === 'https:' && (u.hostname === 'vercel.app' || u.hostname.endsWith('.vercel.app'));
-  } catch (_) {
-    return false;
-  }
 }
 
 function originAllowed(req) {
@@ -170,14 +123,12 @@ function originAllowed(req) {
     const host = String(req.headers.host || '').trim().replace(/\/$/, '');
     return !!host && getAllowedOrigins(req).has(`https://${host}`);
   }
-  if (getAllowedOrigins(req).has(origin)) return true;
-  if (isVercelPreviewOrigin(origin)) return true;
-  return false;
+  return getAllowedOrigins(req).has(origin);
 }
 
 function setCorsHeaders(req, res) {
   const origin = getOrigin(req);
-  if (origin && (getAllowedOrigins(req).has(origin) || isVercelPreviewOrigin(origin))) {
+  if (origin && getAllowedOrigins(req).has(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
   }
@@ -195,10 +146,6 @@ function handleCors(req, res) {
   }
   return false;
 }
-
-// =============================================================================
-// Validation & Rate Limiting
-// =============================================================================
 
 function validUid(uid) {
   return typeof uid === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(uid);
@@ -223,10 +170,7 @@ async function enforceRateLimit(db, { action, uid = 'public', ip, limit, windowS
 
     if (!startedAt || now - startedAt >= windowMs) {
       tx.set(ref, {
-        action,
-        uid,
-        startedAt: now,
-        count: 1,
+        action, uid, startedAt: now, count: 1,
         expiresAt: new Date(now + windowMs)
       });
       return { allowed: true, retryAfter: windowSeconds };
@@ -242,15 +186,13 @@ async function enforceRateLimit(db, { action, uid = 'public', ip, limit, windowS
     }
 
     if (count >= limit) {
-      const lockMs = 3 * 60 * 60 * 1000; // 3 heures
+      const lockMs = 3 * 60 * 60 * 1000;
       tx.set(ref, {
-        action,
-        uid,
-        startedAt,
-        count,
+        action, uid, startedAt, count,
         blockedUntil: now + lockMs,
         expiresAt: new Date(now + lockMs)
       }, { merge: true });
+
       return {
         allowed: false,
         retryAfter: Math.ceil(lockMs / 1000),
@@ -288,23 +230,17 @@ async function enforceSensitiveRateLimit(db, { action, uid = 'public', ip, bypas
     });
     if (!byUser.allowed) return byUser;
   }
-
   return { allowed: true, retryAfter: 0 };
 }
 
-// =============================================================================
-// Authentification
-// =============================================================================
-
 async function verifyBearerUser(req) {
   const h = req.headers.authorization || '';
-  if (typeof h !== 'string' || !h.startsWith('Bearer ')) {
-    throw new Error('AUTH_REQUIRED');
-  }
-  const token = h.slice(7).trim();
+  if (typeof h !== 'string' || !/^Bearer\s+/i.test(h)) throw new Error('AUTH_REQUIRED');
+
+  const token = h.replace(/^Bearer\s+/i, '').trim();
   if (!token) throw new Error('AUTH_REQUIRED');
 
-  return getAuthInstance().verifyIdToken(token);
+  return getAdminApp().auth().verifyIdToken(token);
 }
 
 async function verifyAdmin(req) {
@@ -316,6 +252,7 @@ async function verifyAdmin(req) {
 async function requireActiveUser(db, uid) {
   const snap = await db.collection('users').doc(uid).get();
   if (!snap.exists) throw new Error('PROFILE_NOT_FOUND');
+
   const status = String(snap.data()?.accountStatus || 'active');
   if (status !== 'active') {
     if (status === 'suspended') throw new Error('ACCOUNT_SUSPENDED');
@@ -325,14 +262,8 @@ async function requireActiveUser(db, uid) {
   return snap;
 }
 
-// =============================================================================
-// Exports
-// =============================================================================
-
 module.exports = {
   getAdminApp,
-  getDb,
-  getAuthInstance,
   getClientIp,
   getOrigin,
   originAllowed,

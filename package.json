@@ -4,7 +4,7 @@
   "description": "Serverless functions pour LinkExt - Vercel V3.21 Pro",
   "main": "index.js",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

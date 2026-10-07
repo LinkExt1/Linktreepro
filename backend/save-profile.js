@@ -2,7 +2,9 @@ const { getAdminApp, handleCors, verifyBearerUser, validUid } = require('./_secu
 const { getAiConfig } = require('./ai-moderator');
 
 const BLOCKED_KEYS = new Set([
-  'role', 'accountStatus', 'status', 'banReason', 'banReasonReport', 'adminContactLink', 'createdAt', 'uid',
+  'role', 'accountStatus', 'status', 'banReason', 'banReasonReport', 'adminContactLink',
+  'createdAt', 'uid', 'email', 'updatedAt', 'likes', 'subscribers', 'leads',
+  'views', 'totalViews', 'displayedViews', 'publicViews',
   'views', 'totalViews', 'badgeRawViews', 'badgeWindowViews', 'badgeWindowStartAt',
   'badgeEvaluationStartAt', 'badgeResetAt', 'badgeManual', 'verified',
   'isBanned', 'isSuspended', 'bannedAt', 'suspendedAt', 'suspensionEndsAt',
